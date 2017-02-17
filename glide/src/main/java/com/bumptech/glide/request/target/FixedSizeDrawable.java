@@ -42,6 +42,10 @@ public class FixedSizeDrawable extends Drawable {
         wrapped.setBounds(0, 0, wrapped.getIntrinsicWidth(), wrapped.getIntrinsicHeight());
 
         matrix = new Matrix();
+        /**
+         * {@link Drawable#getIntrinsicWidth()}和{@link Drawable#getIntrinsicHeight()}分别获取
+         * 其所在对应设备上显示的实际宽高度值
+         */
         wrappedRect = new RectF(0, 0, wrapped.getIntrinsicWidth(), wrapped.getIntrinsicHeight());
         bounds = new RectF();
     }
@@ -172,16 +176,42 @@ public class FixedSizeDrawable extends Drawable {
         wrapped.setAlpha(i);
     }
 
+    /**
+     * 处理背景颜色，比如实现滤镜效果等
+     *
+     * @see {@link PorterDuff.Mode}
+     */
     @Override
     public void setColorFilter(ColorFilter colorFilter) {
         wrapped.setColorFilter(colorFilter);
     }
 
+    /**
+     * 获取该{@link Drawable}对象的透明度信息
+     *
+     * @see {@link android.graphics.PixelFormat#OPAQUE}
+     * @see {@link android.graphics.PixelFormat#TRANSLUCENT}
+     * @see {@link android.graphics.PixelFormat#TRANSPARENT}
+     * @see {@link android.graphics.PixelFormat#UNKNOWN}
+     */
     @Override
     public int getOpacity() {
         return wrapped.getOpacity();
     }
 
+    /**
+     * 使这个{@link Drawable}变得状态不定，这个操作不能还原（变为不定后就不能变为原来的状态）
+     * <p>
+     * 一个状态不定的{@link Drawable}可以保证它不与其他任何一个{@link Drawable}共享它的状态，
+     * 这对于你需要更改从同一资源加载来的{@link Drawable}的属性是非常有用
+     * <p>
+     * 默认情况下，所有的从同一资源（R.drawable.XXX）加载来的{@link Drawable}实例都共享一个共用的状态，
+     * 如果你更改一个实例的状态，其他所有的实例都会收到相同的通知
+     * <p>
+     * 这个方法对于已经是{@code mutable}的{@link Drawable}没有效果
+     *
+     * @return
+     */
     @Override
     public Drawable mutate() {
         if (!mutated && super.mutate() == this) {
@@ -197,6 +227,19 @@ public class FixedSizeDrawable extends Drawable {
         return state;
     }
 
+    /**
+     * 每个{@link Drawable}对象都关联一个{@link ConstantState}对象，这是为了保存{@link Drawable}
+     * 对象的一些恒定不变的数据，如果从同一个资源中创建的{@link Drawable}对象，为了节约内存，
+     * 它们会共享同一个{@link ConstantState}对象
+     * <p>
+     * 比如一个{@link android.graphics.drawable.ColorDrawable}对象，它会关联一个
+     * {@link android.graphics.drawable.ColorDrawable.ColorState}对象，颜色值就保存在该对象中，
+     * 如果修改{@link android.graphics.drawable.ColorDrawable}的颜色值，会修改到
+     * {@link android.graphics.drawable.ColorDrawable.ColorState}的值，会导致和其关联的所有的
+     * {@link android.graphics.drawable.ColorDrawable}的颜色都改变，在修改
+     * {@link android.graphics.drawable.ColorDrawable}的属性时，需要先调用{@link Drawable#mutate()}
+     * 让{@link Drawable}复制一个新的{@link android.graphics.drawable.Drawable.ConstantState}对象关联
+     */
     static class State extends ConstantState {
         private final ConstantState wrapped;
         @Synthetic

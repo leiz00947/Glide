@@ -251,6 +251,10 @@ public final class SingleRequest<R> implements Request,
         }
 
         status = Status.WAITING_FOR_SIZE;
+        /**
+         * 若宽高值不符合规范，则使用控件的宽高值
+         * @see com.bumptech.glide.request.target.ViewTarget.SizeDeterminer#getSize(SizeReadyCallback)
+         */
         if (Util.isValidDimensions(overrideWidth, overrideHeight)) {
             onSizeReady(overrideWidth, overrideHeight);
         } else {

@@ -11,7 +11,10 @@ import android.widget.ImageView;
  * 用来为给定的{@link android.view.View}的子类生产一个合适的{@link Target}类型
  */
 public class ImageViewTargetFactory {
-
+    /**
+     * @param clazz {@link com.bumptech.glide.RequestBuilder#transcodeClass}、
+     *              {@link com.bumptech.glide.RequestManager#as(Class)}
+     */
     @SuppressWarnings("unchecked")
     public <Z> Target<Z> buildTarget(ImageView view, Class<Z> clazz) {
         if (Bitmap.class.equals(clazz)) {

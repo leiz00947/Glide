@@ -215,9 +215,22 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
             clearCallbacksAndListener();
         }
 
+        /**
+         * 一般的，获取控件的宽高度值，若设置了任意的{@code android:padding}，也要减去，然后通知调用
+         * {@link SizeReadyCallback#onSizeReady(int, int)}
+         * <p>
+         * 若获取控件宽高值失败，说明控件宽高值还未计算出来，需要借助{@link ViewTreeObserver}和
+         * {@link ViewTreeObserver.OnPreDrawListener}来实现
+         *
+         * @see com.bumptech.glide.request.SingleRequest#onSizeReady(int, int)
+         */
         void getSize(SizeReadyCallback cb) {
             int currentWidth = getViewWidthOrParam();
             int currentHeight = getViewHeightOrParam();
+            /**
+             * 若{@link currentWidth}或{@link currentHeight}任何一个被赋值为{@link PENDING_SIZE}，
+             * 则条件不成立
+             */
             if (isSizeValid(currentWidth) && isSizeValid(currentHeight)) {
                 int paddingAdjustedWidth = currentWidth == WindowManager.LayoutParams.WRAP_CONTENT
                         ? currentWidth
@@ -234,6 +247,9 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
                     cbs.add(cb);
                 }
                 if (layoutListener == null) {
+                    /**
+                     * {@link ViewTreeObserver}是观察{@link View}对象的监听器
+                     */
                     final ViewTreeObserver observer = view.getViewTreeObserver();
                     layoutListener = new SizeDeterminerLayoutListener(this);
                     observer.addOnPreDrawListener(layoutListener);
@@ -285,7 +301,8 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
         }
 
         /**
-         * 若控件的宽高属性设置为自适应（{@link LayoutParams#WRAP_CONTENT}）,则计算其对应的数值
+         * 若控件的宽高属性设置为自适应（{@link LayoutParams#WRAP_CONTENT}）,则返回当前设备屏幕的
+         * 宽或高的像素值
          */
         private int getSizeForParam(int param, boolean isHeight) {
             if (param == LayoutParams.WRAP_CONTENT) {
@@ -297,7 +314,7 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
         }
 
         /**
-         * 将宽高值作为一个{@link Point}对象进行保存
+         * 将当前设备的宽高值作为一个{@link Point}对象进行保存
          */
         @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
         @SuppressWarnings("deprecation")
@@ -318,12 +335,16 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
         }
 
         /**
-         * 判断数值是否可取
+         * 判断数值是否可取，即若传参为{@link LayoutParams#WRAP_CONTENT}或任何大于0的值，
+         * 则返回{@code true}，否则返回{@code false}
          */
         private boolean isSizeValid(int size) {
             return size > 0 || size == LayoutParams.WRAP_CONTENT;
         }
 
+        /**
+         * {@link ViewTreeObserver.OnPreDrawListener}即绘图监听接口
+         */
         private static class SizeDeterminerLayoutListener implements ViewTreeObserver
                 .OnPreDrawListener {
             private final WeakReference<SizeDeterminer> sizeDeterminerRef;

@@ -45,6 +45,13 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
 
     private final GlideContext context;
     private final RequestManager requestManager;
+    /**
+     * 用来确定加载图片到一个{@link ImageView}时容器的类型，该变量即表示存放加载资源的容器的类
+     * （如{@link android.graphics.drawable.Drawable}、{@link android.graphics.Bitmap}、
+     * {@link File}等）
+     *
+     * @see {@link com.bumptech.glide.request.target.ImageViewTargetFactory#buildTarget(ImageView, Class)}
+     */
     private final Class<TranscodeType> transcodeClass;
     private final BaseRequestOptions<?> defaultRequestOptions;
 
@@ -388,6 +395,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      * @return The
      * {@link Target} used to wrap the given {@link ImageView}.
      * @see RequestManager#clear(Target)
+     * @see com.bumptech.glide.request.target.ImageViewTargetFactory#buildTarget(ImageView, Class)
      */
     public Target<TranscodeType> into(ImageView view) {
         Util.assertMainThread();

@@ -34,6 +34,9 @@ public abstract class ThumbnailImageViewTarget<T> extends ImageViewTarget<T> {
         super(view);
     }
 
+    /**
+     * @param resource {@link Drawable} or {@link android.graphics.drawable.BitmapDrawable}
+     */
     @Override
     protected void setResource(@Nullable T resource) {
         ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
