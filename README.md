@@ -16,80 +16,81 @@
 - com.bumptech.glide.provider.**ImageHeaderParserRegistry**
 Registry中的append和register方法是将传参数据添加到以上六个对象中的集合中去。
 
-ModelLoaderRegistry中的集合数据有：
-01)new MultiModelLoaderFactory.Entry(GifDecoder.class, GifDecoder.class, new UnitModelLoader.Factory<GifDecoder>())
-02)new MultiModelLoaderFactory.Entry(File.class, ByteBuffer.class, new ByteBufferFileLoader.Factory())
-03)new MultiModelLoaderFactory.Entry(File.class, InputStream.class, new FileLoader.StreamFactory())
-04)new MultiModelLoaderFactory.Entry(File.class, ParcelFileDescriptor.class, new FileLoader.FileDescriptorFactory())
-05)new MultiModelLoaderFactory.Entry(File.class, File.class, new UnitModelLoader.Factory<File>())
-06)new MultiModelLoaderFactory.Entry(int.class, InputStream.class, new ResourceLoader.StreamFactory(resources))
-07)new MultiModelLoaderFactory.Entry(int.class, ParcelFileDescriptor.class, new ResourceLoader.FileDescriptorFactory(resources))
-08)new MultiModelLoaderFactory.Entry(Integer.class, InputStream.class, new ResourceLoader.StreamFactory(resources))
-09)new MultiModelLoaderFactory.Entry(Integer.class, ParcelFileDescriptor.class, new ResourceLoader.FileDescriptorFactory(resources))
-10)new MultiModelLoaderFactory.Entry(String.class, InputStream.class, new DataUrlLoader.StreamFactory())
-11)new MultiModelLoaderFactory.Entry(String.class, InputStream.class, new StringLoader.StreamFactory())
-12)new MultiModelLoaderFactory.Entry(String.class, ParcelFileDescriptor.class, new StringLoader.FileDescriptorFactory())
-13)new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new HttpUriLoader.Factory())
-14)new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new AssetUriLoader.StreamFactory(context.getAssets()))
-15)new MultiModelLoaderFactory.Entry(Uri.class, ParcelFileDescriptor.class, new AssetUriLoader.FileDescriptorFactory(context.getAssets()))
-16)new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new MediaStoreImageThumbLoader.Factory(context))
-17)new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new MediaStoreVideoThumbLoader.Factory(context))
-18)new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new UriLoader.StreamFactory(context.getContentResolver()))
-19)new MultiModelLoaderFactory.Entry(Uri.class, ParcelFileDescriptor.class, new UriLoader.FileDescriptorFactory(context.getContentResolver()))
-20)new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new UrlUriLoader.StreamFactory())
-21)new MultiModelLoaderFactory.Entry(URL.class, InputStream.class, new UrlLoader.StreamFactory())
-22)new MultiModelLoaderFactory.Entry(Uri.class, File.class, new MediaStoreFileLoader.Factory(context))
-23)new MultiModelLoaderFactory.Entry(GlideUrl.class, InputStream.class, new HttpGlideUrlLoader.Factory())
-24)new MultiModelLoaderFactory.Entry(byte[].class, ByteBuffer.class, new ByteArrayLoader.ByteBufferFactory())
-25)new MultiModelLoaderFactory.Entry(byte[].class, InputStream.class, new ByteArrayLoader.StreamFactory())
+###ModelLoaderRegistry中的集合数据有：
+	01. new MultiModelLoaderFactory.Entry(GifDecoder.class, GifDecoder.class, new UnitModelLoader.Factory<GifDecoder>())
+	02. new MultiModelLoaderFactory.Entry(File.class, ByteBuffer.class, new ByteBufferFileLoader.Factory())
+	03. new MultiModelLoaderFactory.Entry(File.class, InputStream.class, new FileLoader.StreamFactory())
+	04. new MultiModelLoaderFactory.Entry(File.class, ParcelFileDescriptor.class, new FileLoader.FileDescriptorFactory())
+	05. new MultiModelLoaderFactory.Entry(File.class, File.class, new UnitModelLoader.Factory<File>())
+	06. new MultiModelLoaderFactory.Entry(int.class, InputStream.class, new ResourceLoader.StreamFactory(resources))
+	07. new MultiModelLoaderFactory.Entry(int.class, ParcelFileDescriptor.class, new ResourceLoader.FileDescriptorFactory(resources))
+	08. new MultiModelLoaderFactory.Entry(Integer.class, InputStream.class, new ResourceLoader.StreamFactory(resources))
+	09. new MultiModelLoaderFactory.Entry(Integer.class, ParcelFileDescriptor.class, new ResourceLoader.FileDescriptorFactory(resources))
+	10. new MultiModelLoaderFactory.Entry(String.class, InputStream.class, new DataUrlLoader.StreamFactory())
+	11. new MultiModelLoaderFactory.Entry(String.class, InputStream.class, new StringLoader.StreamFactory())
+	12. new MultiModelLoaderFactory.Entry(String.class, ParcelFileDescriptor.class, new StringLoader.FileDescriptorFactory())
+	13. new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new HttpUriLoader.Factory())
+	14. new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new AssetUriLoader.StreamFactory(context.getAssets()))
+	15. new MultiModelLoaderFactory.Entry(Uri.class, ParcelFileDescriptor.class, new AssetUriLoader.FileDescriptorFactory(context.getAssets()))
+	16. new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new MediaStoreImageThumbLoader.Factory(context))
+	17. new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new MediaStoreVideoThumbLoader.Factory(context))
+	18. new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new UriLoader.StreamFactory(context.getContentResolver()))
+	19. new MultiModelLoaderFactory.Entry(Uri.class, ParcelFileDescriptor.class, new UriLoader.FileDescriptorFactory(context.getContentResolver()))
+	20. new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new UrlUriLoader.StreamFactory())
+	21. new MultiModelLoaderFactory.Entry(URL.class, InputStream.class, new UrlLoader.StreamFactory())
+	22. new MultiModelLoaderFactory.Entry(Uri.class, File.class, new MediaStoreFileLoader.Factory(context))
+	23. new MultiModelLoaderFactory.Entry(GlideUrl.class, InputStream.class, new HttpGlideUrlLoader.Factory())
+	24. new MultiModelLoaderFactory.Entry(byte[].class, ByteBuffer.class, new ByteArrayLoader.ByteBufferFactory())
+	25. new MultiModelLoaderFactory.Entry(byte[].class, InputStream.class, new ByteArrayLoader.StreamFactory())
 
-EncoderRegistry中的集合数据有：
-1)new EncoderRegistry.Entry(ByteBuffer.class, new ByteBufferEncoder)
-2)new EncoderRegistry.Entry(InputStream.class, new StreamEncoder(arrayPool))
+###EncoderRegistry中的集合数据有：
+	1. new EncoderRegistry.Entry(ByteBuffer.class, new ByteBufferEncoder)
+	2. new EncoderRegistry.Entry(InputStream.class, new StreamEncoder(arrayPool))
 
-ResourceDecoderRegistry中的集合数据有：
-+)new ResourceDecoderRegistry.Entry(ByteBuffer.class, GifDrawable.class, byteBufferGifDecoder)
-+)new ResourceDecoderRegistry.Entry(InputStream.class, GifDrawable.class, new StreamGifDecoder(byteBufferGifDecoder, arrayPool))
-1)new ResourceDecoderRegistry.Entry(ByteBuffer.class, Bitmap.class, new ByteBufferBitmapDecoder(downsampler))
-2)new ResourceDecoderRegistry.Entry(InputStream.class, Bitmap.class, new StreamBitmapDecoder(downsampler,arrayPool))
-3)new ResourceDecoderRegistry.Entry(ParcelFileDescriptor.class, Bitmap.class, new VideoBitmapDecoder(bitmapPool))
-4)new ResourceDecoderRegistry.Entry(ByteBuffer.class, BitmapDrawable.class, new BitmapDrawableDecoder<>(resources, bitmapPool, new ByteBufferBitmapDecoder(downsampler)))
-5)new ResourceDecoderRegistry.Entry(InputStream.class, BitmapDrawable.class, new BitmapDrawableDecoder<>(resources, bitmapPool, new StreamBitmapDecoder(downsampler, arrayPool))
-6)new ResourceDecoderRegistry.Entry(ParcelFileDescriptor.class, BitmapDrawable.class, new BitmapDrawableDecoder<>(resources, bitmapPool, new VideoBitmapDecoder(bitmapPool)))
-7)new ResourceDecoderRegistry.Entry(GifDecoder.class, Bitmap.class, new GifFrameResourceDecoder(bitmapPool))
-8)new ResourceDecoderRegistry.Entry(File.class, File.class, new FileDecoder())
+###ResourceDecoderRegistry中的集合数据有：
+	+) new ResourceDecoderRegistry.Entry(ByteBuffer.class, GifDrawable.class, byteBufferGifDecoder)
+	+) new ResourceDecoderRegistry.Entry(InputStream.class, GifDrawable.class, new StreamGifDecoder(byteBufferGifDecoder, arrayPool))
+	1. new ResourceDecoderRegistry.Entry(ByteBuffer.class, Bitmap.class, new ByteBufferBitmapDecoder(downsampler))
+	2. new ResourceDecoderRegistry.Entry(InputStream.class, Bitmap.class, new StreamBitmapDecoder(downsampler,arrayPool))
+	3. new ResourceDecoderRegistry.Entry(ParcelFileDescriptor.class, Bitmap.class, new VideoBitmapDecoder(bitmapPool))
+	4. new ResourceDecoderRegistry.Entry(ByteBuffer.class, BitmapDrawable.class, new BitmapDrawableDecoder<>(resources, bitmapPool, new ByteBufferBitmapDecoder(downsampler)))
+	5. new ResourceDecoderRegistry.Entry(InputStream.class, BitmapDrawable.class, new BitmapDrawableDecoder<>(resources, bitmapPool, new StreamBitmapDecoder(downsampler, arrayPool))
+	6. new ResourceDecoderRegistry.Entry(ParcelFileDescriptor.class, BitmapDrawable.class, new BitmapDrawableDecoder<>(resources, bitmapPool, new VideoBitmapDecoder(bitmapPool)))
+	7. new ResourceDecoderRegistry.Entry(GifDecoder.class, Bitmap.class, new GifFrameResourceDecoder(bitmapPool))
+	8. new ResourceDecoderRegistry.Entry(File.class, File.class, new FileDecoder())
 
-ResourceEncoderRegistry中的集合数据有：
-1)new ResourceEncoderRegistry.Entry(Bitmap.class, new BitmapEncoder())
-2)new ResourceEncoderRegistry.Entry(BitmapDrawable.class, new BitmapDrawableEncoder(bitmapPool, new BitmapEncoder()))
-3)new ResourceEncoderRegistry.Entry(GifDrawable.class, new GifDrawableEncoder())
+###ResourceEncoderRegistry中的集合数据有：
+	1. new ResourceEncoderRegistry.Entry(Bitmap.class, new BitmapEncoder())
+	2. new ResourceEncoderRegistry.Entry(BitmapDrawable.class, new BitmapDrawableEncoder(bitmapPool, new BitmapEncoder()))
+	3. new ResourceEncoderRegistry.Entry(GifDrawable.class, new GifDrawableEncoder())
 
-DataRewinderRegistry中的集合数据有：
-*)<ByteBuffer.class, new ByteBufferRewinder.Factory()>
-*)<InputStream.class, new InputStreamRewinder.Factory(arrayPool)>
+###DataRewinderRegistry中的集合数据有：
+	*) <ByteBuffer.class, new ByteBufferRewinder.Factory()>
+	*) <InputStream.class, new InputStreamRewinder.Factory(arrayPool)>
 
-TranscoderRegistry中的集合数据有：
-1)new TranscoderRegistry.Entry(Bitmap.class, BitmapDrawable.class, new BitmapDrawableTranscoder(resources, bitmapPool))
-2)new TranscoderRegistry.Entry(Bitmap.class, byte[].class, new BitmapBytesTranscoder())
-3)new TranscoderRegistry.Entry(GifDrawable.class, byte[].class, new GifDrawableBytesTranscoder())
+###TranscoderRegistry中的集合数据有：
+	1. new TranscoderRegistry.Entry(Bitmap.class, BitmapDrawable.class, new BitmapDrawableTranscoder(resources, bitmapPool))
+	2. new TranscoderRegistry.Entry(Bitmap.class, byte[].class, new BitmapBytesTranscoder())
+	3. new TranscoderRegistry.Entry(GifDrawable.class, byte[].class, new GifDrawableBytesTranscoder())
 
-ImageHeaderParserRegistry中的集合数据有：
-1)new DefaultImageHeaderParser()
+###ImageHeaderParserRegistry中的集合数据有：
+	1. new DefaultImageHeaderParser()
 
-调用com.bumptech.glide.load.engine.DecodeHelper<Transcode>#getLoadData()，图片来源为远程网络的String字符串对象：
-1.在ModelLoaderRegistry数据集合中找出Entry第一个传参为String的数据项，通过上面的数据集合可以知道，符合条件的有
-    (1)new MultiModelLoaderFactory.Entry(String.class, InputStream.class, new DataUrlLoader.StreamFactory())
-    (2)new MultiModelLoaderFactory.Entry(String.class, InputStream.class, new StringLoader.StreamFactory())
-    (3)new MultiModelLoaderFactory.Entry(String.class, ParcelFileDescriptor.class, new StringLoader.FileDescriptorFactory())
-2.但由于DataUrlLoader#handles(String)大多数情况可能返回false，实际符合条件的也就(2)和(3)两项
-3.而在DataUrlLoader.StreamFactory#build(MultiModelLoaderFactory)中调用了MultiModelLoaderFactory.build(Uri.class, InputStream.class)
-4.那么，在ModelLoaderRegistry数据集合中找出Entry第一个传参为Uri，第二个传参为InputStream.class的数据项，符合条件的有
-    (1)new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new HttpUriLoader.Factory())
-    (2)new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new AssetUriLoader.StreamFactory(context.getAssets()))
-    (3)new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new MediaStoreImageThumbLoader.Factory(context))
-    (4)new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new MediaStoreVideoThumbLoader.Factory(context))
-    (5)new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new UriLoader.StreamFactory(context.getContentResolver()))
-    (6)new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new UrlUriLoader.StreamFactory())
+>调用com.bumptech.glide.load.engine.DecodeHelper<Transcode>#getLoadData()，图片来源为远程网络的String字符串对象：
+1. 在ModelLoaderRegistry数据集合中找出Entry第一个传参为String的数据项，通过上面的数据集合可以知道，符合条件的有
+    - new MultiModelLoaderFactory.Entry(String.class, InputStream.class, new DataUrlLoader.StreamFactory())
+    - new MultiModelLoaderFactory.Entry(String.class, InputStream.class, new StringLoader.StreamFactory())
+    - new MultiModelLoaderFactory.Entry(String.class, ParcelFileDescriptor.class, new StringLoader.FileDescriptorFactory())
+2. 但由于DataUrlLoader#handles(String)大多数情况可能返回false，实际符合条件的也就(2)和(3)两项
+3. 而在DataUrlLoader.StreamFactory#build(MultiModelLoaderFactory)中调用了MultiModelLoaderFactory.build(Uri.class, InputStream.class)
+4. 那么，在ModelLoaderRegistry数据集合中找出Entry第一个传参为Uri，第二个传参为InputStream.class的数据项，符合条件的有
+    - new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new HttpUriLoader.Factory())
+    - new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new AssetUriLoader.StreamFactory(context.getAssets()))
+    - new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new MediaStoreImageThumbLoader.Factory(context))
+    - new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new MediaStoreVideoThumbLoader.Factory(context))
+    - new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new UriLoader.StreamFactory(context.getContentResolver()))
+    - new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new UrlUriLoader.StreamFactory())
+
 
 ##ModelLoader
 *com.bumptech.glide.load.model.ModelLoader<Model,Data>.java*
