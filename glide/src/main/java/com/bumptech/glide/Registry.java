@@ -252,6 +252,12 @@ public class Registry {
      * 返回集合中实现了{@link ModelLoader}接口的类中{@link ModelLoader#handles(Object)}
      * 返回为{@code true}且未使用的所有数据项的列表，并且调用传参中实现
      * {@link ModelLoaderFactory}的对象的{@link ModelLoaderFactory#build(MultiModelLoaderFactory)}
+     *
+     * @param model 即请求图片的来源（如一个网址字符串、文件等），
+     *              和{@link MultiModelLoaderFactory.Entry#modelClass}对应起来
+     * @return 返回和传参基类相同 {@link MultiModelLoaderFactory.Entry#modelClass}所对应的
+     * {@link MultiModelLoaderFactory.Entry#factory}所调用
+     * {@link ModelLoaderFactory#build(MultiModelLoaderFactory)}创建的实例
      */
     public <Model> List<ModelLoader<Model, ?>> getModelLoaders(Model model) {
         List<ModelLoader<Model, ?>> result = modelLoaderRegistry.getModelLoaders(model);

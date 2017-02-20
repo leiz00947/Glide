@@ -452,6 +452,7 @@ public class Glide implements ComponentCallbacks2 {
      * @see #with(android.app.Fragment)
      * @see #with(Fragment)
      * @see #with(FragmentActivity)
+     * @see RequestManagerRetriever#get(Context)
      */
     public static RequestManager with(Context context) {
         RequestManagerRetriever retriever = RequestManagerRetriever.get();
@@ -466,6 +467,7 @@ public class Glide implements ComponentCallbacks2 {
      *
      * @param activity The activity to use.
      * @return A RequestManager for the given activity that can be used to start a load.
+     * @see RequestManagerRetriever#get(Activity)
      */
     public static RequestManager with(Activity activity) {
         RequestManagerRetriever retriever = RequestManagerRetriever.get();
@@ -479,6 +481,7 @@ public class Glide implements ComponentCallbacks2 {
      *
      * @param activity The activity to use.
      * @return A RequestManager for the given FragmentActivity that can be used to start a load.
+     * @see RequestManagerRetriever#get(FragmentActivity)
      */
     public static RequestManager with(FragmentActivity activity) {
         RequestManagerRetriever retriever = RequestManagerRetriever.get();
@@ -491,6 +494,7 @@ public class Glide implements ComponentCallbacks2 {
      *
      * @param fragment The fragment to use.
      * @return A RequestManager for the given Fragment that can be used to start a load.
+     * @see RequestManagerRetriever#get(android.app.Fragment)
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static RequestManager with(android.app.Fragment fragment) {
@@ -505,6 +509,7 @@ public class Glide implements ComponentCallbacks2 {
      *
      * @param fragment The fragment to use.
      * @return A RequestManager for the given Fragment that can be used to start a load.
+     * @see RequestManagerRetriever#get(Fragment)
      */
     public static RequestManager with(Fragment fragment) {
         RequestManagerRetriever retriever = RequestManagerRetriever.get();

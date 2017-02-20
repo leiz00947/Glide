@@ -81,7 +81,13 @@ public class Engine implements EngineJobListener, MemoryCache.ResourceRemovedLis
                 null, null, null, null, null, null);
     }
 
-    // Visible for testing.
+    /**
+     * Visible for testing.
+     * <p>
+     * 这里之所以不用私有修饰符（{@code private}），是为了方便单元测试可测
+     *
+     * @param keyFactory {@link EngineKeyFactory}
+     */
     Engine(MemoryCache cache,
            DiskCache.Factory diskCacheFactory,
            GlideExecutor diskCacheExecutor,
@@ -244,9 +250,8 @@ public class Engine implements EngineJobListener, MemoryCache.ResourceRemovedLis
     }
 
     /**
-     * 从{@code activeResources}中获取对应{@link Key}键的值，
-     * 从{@link #activeResources}中获取，若获取到的{@link EngineResource}已被回收，
-     * 那么将该条映射记录从{@link #activeResources}中移除
+     * 从{@link #activeResources}中获取对应{@link Key}键的值，若获取到的
+     * {@link EngineResource}已被回收，那么将该条映射记录从{@link #activeResources}中移除
      */
     private EngineResource<?> loadFromActiveResources(Key key, boolean isMemoryCacheable) {
         if (!isMemoryCacheable) {
@@ -284,8 +289,8 @@ public class Engine implements EngineJobListener, MemoryCache.ResourceRemovedLis
     }
 
     /**
-     * 根据给定的{@link Key},将在内存缓存中对应{@code Key}键的{@link Resource}值(如果有的话)
-     * 封装成一个{@link EngineResource}对象作为返回值,并将该{@link Key}从内存缓存中移除掉
+     * 根据给定的{@link Key},将在{@link #cache}（内存缓存）中对应{@code Key}键的{@link Resource}值
+     * （如果有的话）封装成一个{@link EngineResource}对象作为返回值,并将该{@link Key}从内存缓存中移除掉
      */
     @SuppressWarnings("unchecked")
     private EngineResource<?> getEngineResourceFromCache(Key key) {

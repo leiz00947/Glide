@@ -53,7 +53,13 @@ final class DecodeHelper<Transcode> {
      * 默认若调用{@link com.bumptech.glide.RequestManager#load(Object)}，则为{@link Drawable}类
      */
     private Class<Transcode> transcodeClass;
+    /**
+     * {@code true}表示{@link #getLoadData()}是第一次被调用
+     */
     private boolean isLoadDataSet;
+    /**
+     * {@code true}表示{@link #getCacheKeys()}是第一次被调用
+     */
     private boolean isCacheKeysSet;
     private Key signature;
     private Priority priority;
