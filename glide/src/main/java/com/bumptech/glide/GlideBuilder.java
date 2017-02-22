@@ -35,6 +35,9 @@ public final class GlideBuilder {
     private MemoryCache memoryCache;
     private GlideExecutor sourceExecutor;
     private GlideExecutor diskCacheExecutor;
+    /**
+     * 默认为内部存储
+     */
     private DiskCache.Factory diskCacheFactory;
     private MemorySizeCalculator memorySizeCalculator;
     private ConnectivityMonitorFactory connectivityMonitorFactory;

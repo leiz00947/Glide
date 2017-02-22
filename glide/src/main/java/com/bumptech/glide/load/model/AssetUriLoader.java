@@ -43,6 +43,9 @@ public class AssetUriLoader<Data> implements ModelLoader<Uri, Data> {
         return new LoadData<>(new ObjectKey(model), factory.buildFetcher(assetManager, assetPath));
     }
 
+    /**
+     * 判断是否符合{@code file:///android_asset}的形式
+     */
     @Override
     public boolean handles(Uri model) {
         return ContentResolver.SCHEME_FILE.equals(model.getScheme()) && !model.getPathSegments()

@@ -38,8 +38,7 @@ class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
     }
 
     @Override
-    public LoadData<Data> buildLoadData(Model model, int width, int height,
-                                        Options options) {
+    public LoadData<Data> buildLoadData(Model model, int width, int height, Options options) {
         Key sourceKey = null;
         int size = modelLoaders.size();
         List<DataFetcher<Data>> fetchers = new ArrayList<>(size);

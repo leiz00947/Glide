@@ -19,6 +19,9 @@ import java.util.Queue;
  * @param <B> Some useful type that may be expensive to create (URL, file path, etc).
  */
 public class ModelCache<A, B> {
+    /**
+     * 默认的容量个数，而非字节数
+     */
     private static final int DEFAULT_SIZE = 250;
 
     private final LruCache<ModelKey<A>, B> cache;
@@ -27,6 +30,9 @@ public class ModelCache<A, B> {
         this(DEFAULT_SIZE);
     }
 
+    /**
+     * 当存放超过指定大小时，会存放到{@link ModelKey#KEY_QUEUE}中去
+     */
     public ModelCache(int size) {
         cache = new LruCache<ModelKey<A>, B>(size) {
             @Override

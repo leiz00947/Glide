@@ -66,6 +66,9 @@ class DecodeJob<R> implements DataFetcherGenerator.FetcherReadyCallback,
     DiskCacheStrategy diskCacheStrategy;
     @Synthetic
     Options options;
+    /**
+     * @see EngineJob
+     */
     private Callback<R> callback;
     private int order;
     private Stage stage;

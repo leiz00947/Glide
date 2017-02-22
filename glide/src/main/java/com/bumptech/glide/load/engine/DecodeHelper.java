@@ -41,6 +41,9 @@ final class DecodeHelper<Transcode> {
      * 调用{@link com.bumptech.glide.request.RequestOptions#decodeTypeOf(Class)}来改变
      */
     private Class<?> resourceClass;
+    /**
+     * @see Engine#diskCacheProvider
+     */
     private DecodeJob.DiskCacheProvider diskCacheProvider;
     private Options options;
     /**
@@ -119,6 +122,9 @@ final class DecodeHelper<Transcode> {
         isCacheKeysSet = false;
     }
 
+    /**
+     * @see Engine.LazyDiskCacheProvider#getDiskCache()
+     */
     DiskCache getDiskCache() {
         return diskCacheProvider.getDiskCache();
     }
@@ -207,6 +213,9 @@ final class DecodeHelper<Transcode> {
             List<ModelLoader<Object, ?>> modelLoaders = glideContext.getRegistry().getModelLoaders(model);
             int size = modelLoaders.size();
             for (int i = 0; i < size; i++) {
+                /**
+                 * 很可能是一个{@link com.bumptech.glide.load.model.MultiModelLoader}对象
+                 */
                 ModelLoader<Object, ?> modelLoader = modelLoaders.get(i);
                 LoadData<?> current =
                         modelLoader.buildLoadData(model, width, height, options);

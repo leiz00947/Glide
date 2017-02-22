@@ -18,7 +18,8 @@ public final class MediaStoreUtil {
     }
 
     /**
-     * 判断Uri是MediaStore类型的格式
+     * 判断Uri是MediaStore类型的格式，即判断{@link Uri}是否是以
+     * {@code content://media/}的形式开头
      */
     public static boolean isMediaStoreUri(Uri uri) {
         return uri != null && ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())

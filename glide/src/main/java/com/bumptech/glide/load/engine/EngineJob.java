@@ -50,6 +50,9 @@ class EngineJob<R> implements DecodeJob.Callback<R>, Poolable {
      * 默认{@link Engine}对象
      */
     private final EngineJobListener listener;
+    /**
+     * @see com.bumptech.glide.GlideBuilder#diskCacheExecutor
+     */
     private final GlideExecutor diskCacheExecutor;
     private final GlideExecutor sourceExecutor;
     private final GlideExecutor sourceUnlimitedExecutor;

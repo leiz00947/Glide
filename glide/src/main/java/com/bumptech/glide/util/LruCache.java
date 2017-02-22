@@ -51,6 +51,8 @@ public class LruCache<T, Y> {
      * Returns the size of a given item, defaulting to one. The units must match those used in the
      * size passed in to the constructor. Subclasses can override this method to return sizes in
      * various units, usually bytes.
+     * <p>
+     * 默认返回1，表示容量个数，而不是以字节数计算
      *
      * @param item The item to get the size of.
      */
@@ -120,6 +122,9 @@ public class LruCache<T, Y> {
             return null;
         }
 
+        /**
+         * 返回与{@code key}关联的旧值
+         */
         final Y result = cache.put(key, item);
         if (item != null) {
             currentSize += getSize(item);

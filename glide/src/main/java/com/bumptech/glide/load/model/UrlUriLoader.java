@@ -14,6 +14,9 @@ import java.util.Set;
  * Handles http/https Uris by delegating to the {@link ModelLoader} for {@link GlideUrl GlideUrls}.
  * <p>
  * 用来处理http/https Uri的{@link ModelLoader}
+ * <p>
+ * 就功能上来说，该类和{@link com.bumptech.glide.load.model.stream.HttpUriLoader}类似，
+ * 只是前者加载完成后获取到的是数据流{@link InputStream}，而该类是泛型
  *
  * @param <Data> The type of data this Loader will obtain for a {@link Uri}.
  */
@@ -46,6 +49,8 @@ public class UrlUriLoader<Data> implements ModelLoader<Uri, Data> {
     /**
      * Loads {@link InputStream InputStreams} from {@link Uri Uris} with http
      * or https schemes.
+     * <p>
+     * 就功能上来说，和{@link com.bumptech.glide.load.model.stream.HttpUriLoader.Factory}等价
      */
     public static class StreamFactory implements ModelLoaderFactory<Uri, InputStream> {
 

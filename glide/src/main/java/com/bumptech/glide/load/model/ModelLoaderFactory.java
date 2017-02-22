@@ -2,6 +2,8 @@ package com.bumptech.glide.load.model;
 
 import android.content.Context;
 
+import com.bumptech.glide.Registry;
+
 /**
  * An interface for creating a {@link ModelLoader} for a given model type. Will be retained
  * statically so should not retain {@link Context} or any other objects that cannot be retained for
@@ -32,7 +34,12 @@ public interface ModelLoaderFactory<T, Y> {
     /**
      * A lifecycle method that will be called when this factory is about to replaced.
      * <p>
-     * 一个生命周期方法，当该工厂类将要被替换时会被调用（？）
+     * 一个生命周期方法，当该工厂类将要被替换时会被调用，即当重写
+     * {@link com.bumptech.glide.module.GlideModule}，并在其实现的
+     * {@link com.bumptech.glide.module.GlideModule#registerComponents(Context, Registry)}方法中
+     * 调用了{@link Registry#replace(Class, Class, ModelLoaderFactory)}的时候回调
+     * <p>
+     * 事实上，通过所有实现该接口的类的源码看出，所有实现该接口方法中都未实现任何动作
      */
     void teardown();
 }

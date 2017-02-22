@@ -2,6 +2,7 @@ package com.bumptech.glide.load.engine;
 
 import android.util.Log;
 
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.Encoder;
 import com.bumptech.glide.load.Key;
@@ -41,6 +42,9 @@ class SourceGenerator implements DataFetcherGenerator,
         this.cb = cb;
     }
 
+    /**
+     * 调用{@link DataFetcher#loadData(Priority, DataFetcher.DataCallback)}加载远程端图片
+     */
     @Override
     public boolean startNext() {
         if (dataToCache != null) {
@@ -72,6 +76,9 @@ class SourceGenerator implements DataFetcherGenerator,
         return loadDataListIndex < helper.getLoadData().size();
     }
 
+    /**
+     * 写入缓存文件
+     */
     private void cacheData(Object dataToCache) {
         long startTime = LogTime.getLogTime();
         try {
@@ -108,8 +115,10 @@ class SourceGenerator implements DataFetcherGenerator,
         DiskCacheStrategy diskCacheStrategy = helper.getDiskCacheStrategy();
         if (data != null && diskCacheStrategy.isDataCacheable(loadData.fetcher.getDataSource())) {
             dataToCache = data;
-            // We might be being called back on someone else's thread. Before doing anything, we should
-            // reschedule to get back onto Glide's thread.
+            /**
+             * We might be being called back on someone else's thread. Before doing anything,
+             * we should reschedule to get back onto Glide's thread.
+             */
             cb.reschedule();
         } else {
             cb.onDataFetcherReady(loadData.sourceKey, data, loadData.fetcher,

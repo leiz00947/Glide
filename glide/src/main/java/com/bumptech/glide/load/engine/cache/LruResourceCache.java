@@ -35,6 +35,9 @@ public class LruResourceCache extends LruCache<Key, Resource<?>> implements Memo
         }
     }
 
+    /**
+     * @return 获取传参的字节大小数
+     */
     @Override
     protected int getSize(Resource<?> item) {
         return item.getSize();
