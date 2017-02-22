@@ -36,4 +36,9 @@
         style="@style/mainButtonStyle"
         android:layout_below="@id/btn_giphy"
         android:text="Glide Svg Sample" />
+    <Button
+        android:id="@+id/btn_test"
+        style="@style/mainButtonStyle"
+        android:layout_below="@id/btn_giphy"
+        android:text="Test" />
 </RelativeLayout>

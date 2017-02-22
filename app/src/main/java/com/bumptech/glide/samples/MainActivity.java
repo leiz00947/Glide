@@ -25,12 +25,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button btnFlickr = (Button) findViewById(R.id.btn_flickr);
         Button btnGallery = (Button) findViewById(R.id.btn_gallery);
         Button btnContactUri = (Button) findViewById(R.id.btn_contacturi);
+        Button btnTest = (Button) findViewById(R.id.btn_test);
 
         btnSvg.setOnClickListener(this);
         btnGiphy.setOnClickListener(this);
         btnFlickr.setOnClickListener(this);
         btnGallery.setOnClickListener(this);
         btnContactUri.setOnClickListener(this);
+        btnTest.setOnClickListener(this);
     }
 
     @Override
@@ -50,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_contacturi:
                 skipActivity(ContactUriActivity.class);
+                break;
+            case R.id.btn_test:
+                skipActivity(TestActivity.class);
                 break;
         }
     }
