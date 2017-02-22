@@ -1,11 +1,11 @@
 # Glide
-图片加载框架
+谷歌推荐的Android图片加载框架
 
 ##写在前面
 >在Glide 3.7.0之前默认图片解码的色彩模式是**RGB_565**，而现在则是**ARGB_8888**
 
 ##Registry
-*com.bumptech.glide.Registry.java*
+*com.bumptech.glide.Registry.java*<br/>
 该类主要负责管理Glide初始注册的一些对象，其中具体注册对象有：
 - com.bumptech.glide.load.model.**odelLoaderRegistry**
 - com.bumptech.glide.provider.**EncoderRegistry**
@@ -14,7 +14,8 @@
 - com.bumptech.glide.load.data.**DataRewinderRegistry**
 - com.bumptech.glide.load.resource.transcode.**TranscoderRegistry**
 - com.bumptech.glide.provider.**ImageHeaderParserRegistry**
-Registry中的append和register方法是将传参数据添加到以上六个对象中的集合中去。
+
+>Registry中的append和register方法是将传参数据添加到以上六个对象中的集合中去。
 
 ###ModelLoaderRegistry中的集合数据有：
 	01. new MultiModelLoaderFactory.Entry(GifDecoder.class, GifDecoder.class, new UnitModelLoader.Factory<GifDecoder>())
@@ -76,26 +77,34 @@ Registry中的append和register方法是将传参数据添加到以上六个对�
 ###ImageHeaderParserRegistry中的集合数据有：
 	1. new DefaultImageHeaderParser()
 
->调用com.bumptech.glide.load.engine.DecodeHelper<Transcode>#getLoadData()，图片来源为远程网络的String字符串对象：
-1. 在ModelLoaderRegistry数据集合中找出Entry第一个传参为String的数据项，通过上面的数据集合可以知道，符合条件的有
-    - new MultiModelLoaderFactory.Entry(String.class, InputStream.class, new DataUrlLoader.StreamFactory())
-    - new MultiModelLoaderFactory.Entry(String.class, InputStream.class, new StringLoader.StreamFactory())
-    - new MultiModelLoaderFactory.Entry(String.class, ParcelFileDescriptor.class, new StringLoader.FileDescriptorFactory())
-2. 但由于DataUrlLoader#handles(String)大多数情况可能返回false，实际符合条件的也就(2)和(3)两项
-3. 而在DataUrlLoader.StreamFactory#build(MultiModelLoaderFactory)中调用了MultiModelLoaderFactory.build(Uri.class, InputStream.class)
-4. 那么，在ModelLoaderRegistry数据集合中找出Entry第一个传参为Uri，第二个传参为InputStream.class的数据项，符合条件的有
-    - new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new HttpUriLoader.Factory())
-    - new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new AssetUriLoader.StreamFactory(context.getAssets()))
-    - new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new MediaStoreImageThumbLoader.Factory(context))
-    - new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new MediaStoreVideoThumbLoader.Factory(context))
-    - new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new UriLoader.StreamFactory(context.getContentResolver()))
-    - new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new UrlUriLoader.StreamFactory())
+###应用
+	调用com.bumptech.glide.load.engine.DecodeHelper<Transcode>#getLoadData()，图片来源为远程网络的String字符串对象：
+	1. 在ModelLoaderRegistry数据集合中找出Entry第一个传参为String的数据项，通过上面的数据集合可以知道，符合条件的有
+		(1) new MultiModelLoaderFactory.Entry(String.class, InputStream.class, new DataUrlLoader.StreamFactory())
+		(2) new MultiModelLoaderFactory.Entry(String.class, InputStream.class, new StringLoader.StreamFactory())
+		(3) new MultiModelLoaderFactory.Entry(String.class, ParcelFileDescriptor.class, new StringLoader.FileDescriptorFactory())
+	2. 但由于DataUrlLoader#handles(String)大多数情况可能返回false，实际符合条件的也就(2)和(3)两项
+	3. 而在DataUrlLoader.StreamFactory#build(MultiModelLoaderFactory)中调用了MultiModelLoaderFactory.build(Uri.class, InputStream.class)
+	4. 那么，在ModelLoaderRegistry数据集合中找出Entry第一个传参为Uri，第二个传参为InputStream的数据项，符合条件的有
+		(1) new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new HttpUriLoader.Factory())
+		(2) new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new AssetUriLoader.StreamFactory(context.getAssets()))
+		(3) new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new MediaStoreImageThumbLoader.Factory(context))
+		(4) new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new MediaStoreVideoThumbLoader.Factory(context))
+		(5) new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new UriLoader.StreamFactory(context.getContentResolver()))
+		(6) new MultiModelLoaderFactory.Entry(Uri.class, InputStream.class, new UrlUriLoader.StreamFactory())
+	5. 由以上可知，会用一个MultiModelLoader存储ModelLoader实现类的集合，集合数据有：
+	    (1) com.bumptech.glide.load.model.stream.HttpUriLoader
+	    (2) com.bumptech.glide.load.model.AssetUriLoader
+	    (3) com.bumptech.glide.load.model.stream.MediaStoreImageThumbLoader
+	    (4) com.bumptech.glide.load.model.stream.MediaStoreVideoThumbLoader
+	    (5) com.bumptech.glide.load.model.UriLoader
+	    (6) com.bumptech.glide.load.model.UrlUriLoader
 
 
 ##ModelLoader
-*com.bumptech.glide.load.model.ModelLoader<Model,Data>.java*
+*com.bumptech.glide.load.model.ModelLoader<Model,Data>.java*<br/>
 所有已知实现类：
--  com.bumptech.glide.load.model.AssetUriLoader<Data>
+- com.bumptech.glide.load.model.AssetUriLoader<Data>
 - com.bumptech.glide.load.model.stream.BaseGlideUrlLoader<Model>
 - com.bumptech.glide.load.model.ByteArrayLoader<Data>
 - com.bumptech.glide.load.model.ByteBufferFileLoader
@@ -114,7 +123,8 @@ Registry中的append和register方法是将传参数据添加到以上六个对�
 - com.bumptech.glide.load.model.UriLoader<Data>
 - com.bumptech.glide.load.model.stream.UrlLoader
 - com.bumptech.glide.load.model.UrlUriLoader<Data>
-	> 接口功能说明：1.创建一个带DataFetcher对象的LoadData实例；2.判断图片地址是否符合常规格式
+
+>接口功能说明：1.创建一个带DataFetcher对象的LoadData实例；2.判断图片地址是否符合常规格式
 
 ##Option
 *com.bumptech.glide.load.Option<T>*
@@ -129,7 +139,7 @@ Registry中的append和register方法是将传参数据添加到以上六个对�
 - com.bumptech.glide.load.resource.gif.StreamGifDecoder.DISABLE_ANIMATION
 
 ##DataFetcher
-*com.bumptech.glide.load.data.DataFetcher<T>*
+*com.bumptech.glide.load.data.DataFetcher<T>*<br/>
 所有已知实现类：
 - com.bumptech.glide.load.data.AssetPathFetcher<T>
 - com.bumptech.glide.load.model.ByteArrayLoader.Fetcher<Data>
@@ -146,10 +156,11 @@ Registry中的append和register方法是将传参数据添加到以上六个对�
 - com.bumptech.glide.load.data.StreamLocalUriFetcher
 - com.bumptech.glide.load.data.mediastore.ThumbFetcher
 - com.bumptech.glide.load.model.UnitModelLoader.UnitFetcher<Model>
-	> 接口功能说明：用来进行加载资源数据操作，然后关闭流操作接口，提供取消操作的接口，以及获取数据来源
+
+>接口功能说明：用来进行加载资源数据操作，然后关闭流操作接口，提供取消操作的接口，以及获取数据来源
 
 ##Resource
-*com.bumptech.glide.load.engine.Resource<Z>*
+*com.bumptech.glide.load.engine.Resource<Z>*<br/>
 所有已知实现类：
 - com.bumptech.glide.load.resource.bitmap.BitmapDrawableResource
 - com.bumptech.glide.load.resource.bitmap.BitmapResource
@@ -161,10 +172,11 @@ Registry中的append和register方法是将传参数据添加到以上六个对�
 - com.bumptech.glide.load.resource.bitmap.LazyBitmapDrawableResource
 - com.bumptech.glide.load.engine.LockedResource<Z>
 - com.bumptech.glide.load.resource.SimpleResource<T>
-	> 接口功能说明：用来获取资源类型、资源对象、资源大小以及资源释放的操作
+
+>接口功能说明：用来获取资源类型、资源对象、资源大小以及资源释放的操作
 
 ##Transformation
-*com.bumptech.glide.load.Transformation<T>*
+*com.bumptech.glide.load.Transformation<T>*<br/>
 所有已知实现类：
 - com.bumptech.glide.load.resource.bitmap.BitmapDrawableTransformation
 - com.bumptech.glide.load.resource.bitmap.BitmapTransformation
@@ -176,27 +188,29 @@ Registry中的append和register方法是将传参数据添加到以上六个对�
 - com.bumptech.glide.load.MultiTransformation<T>
 - com.bumptech.glide.load.resource.bitmap.RoundedCorners
 - com.bumptech.glide.load.resource.UnitTransformation<T>
-	> 接口功能说明：对图片进行外形上的调整，比如缩放，圆形裁剪等；实际上，起作用的是CenterCrop、CenterInside、CircleCrop、FitCenter和RoundedCorners
+
+>接口功能说明：对图片进行外形上的调整，比如缩放，圆形裁剪等；实际上，起作用的是CenterCrop、CenterInside、CircleCrop、FitCenter和RoundedCorners
 
 ##Transition
-*com.bumptech.glide.request.transition.Transition<R>*
+*com.bumptech.glide.request.transition.Transition<R>*<br/>
 所有已知实现类：
 - com.bumptech.glide.request.transition.BitmapContainerTransitionFactory.BitmapGlideAnimation
 - com.bumptech.glide.request.transition.DrawableCrossFadeTransition
 - com.bumptech.glide.request.transition.NoTransition<R>
 - com.bumptech.glide.request.transition.ViewPropertyTransition<R>
 - com.bumptech.glide.request.transition.ViewTransition<R>
-	> 接口功能说明：对图片加载进行过渡的操作，包括过渡动画、渐变
+
+>接口功能说明：对图片加载进行过渡的操作，包括过渡动画、渐变
 
 ##TransitionOptions
-*com.bumptech.glide.TransitionOptions<CHILD extends TransitionOptions<CHILD,TranscodeType>,TranscodeType>*
+*com.bumptech.glide.TransitionOptions<CHILD extends TransitionOptions<CHILD,TranscodeType>,TranscodeType>*<br/>
 所有已知子类：
 - com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
 - com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 - com.bumptech.glide.GenericTransitionOptions<TranscodeType>
 
 ##Target
-*com.bumptech.glide.request.target.Target<R>*
+*com.bumptech.glide.request.target.Target<R>*<br/>
 所有已知实现类：
 - com.bumptech.glide.request.target.AppWidgetTarget
 - com.bumptech.glide.request.target.BaseTarget<Z>
@@ -215,22 +229,22 @@ Registry中的append和register方法是将传参数据添加到以上六个对�
 - com.bumptech.glide.request.target.ThumbnailImageViewTarget<T>
 - com.bumptech.glide.util.ViewPreloadSizeProvider.SizeViewTarget
 - com.bumptech.glide.request.target.ViewTarget<T extends android.view.View,Z>
-	> 接口功能说明：1.图片加载状态的过程（如加载失败、加载成功等）；2.通知图片宽高值变化的接口；3.设置获取Request
+
+>接口功能说明：1.图片加载状态的过程（如加载失败、加载成功等）；2.通知图片宽高值变化的接口；3.设置获取Request
 
 ##缓存包
 *com.bumptech.glide.load.engine.cache*
-1. 磁盘缓存com.bumptech.glide.load.engine.cache.*DiskCache*.java：
-	- SDCard的“Android/data/{应用包名}/cache”临时文件目录下（*ExternalCacheDiskCacheFactory*）
-	- “data/data/{应用包名}/cache”目录下（*InternalCacheDiskCacheFactory*）
-2. 内存缓存com.bumptech.glide.load.engine.cache.*MemoryCache*.java：
-	LruResourceCache
-3.	com.bumptech.glide.load.engine.cache.*MemorySizeCalculator*用来基于不同设备来进行内存分配
+- 磁盘缓存com.bumptech.glide.load.engine.cache.*DiskCache*.java：
+    - SDCard的"Android/data/{应用包名}/cache"临时文件目录下（*ExternalCacheDiskCacheFactory*）
+    - "data/data/{应用包名}/cache"目录下（*InternalCacheDiskCacheFactory*）
+- 内存缓存com.bumptech.glide.load.engine.cache.*MemoryCache*.java：LruResourceCache
+- com.bumptech.glide.load.engine.cache.*MemorySizeCalculator*用来基于不同设备来进行内存分配
 
 ##池
 	com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool.java：图片池
 
 ##ResourceDecoder
-*com.bumptech.glide.load.ResourceDecoder<T,Z>*
+*com.bumptech.glide.load.ResourceDecoder<T,Z>*<br/>
 所有已知实现类：
 - com.bumptech.glide.load.resource.bitmap.BitmapDrawableDecoder<DataType>
 - com.bumptech.glide.load.resource.bitmap.ByteBufferBitmapDecoder
@@ -240,18 +254,20 @@ Registry中的append和register方法是将传参数据添加到以上六个对�
 - com.bumptech.glide.load.resource.bitmap.StreamBitmapDecoder
 - com.bumptech.glide.load.resource.gif.StreamGifDecoder
 - com.bumptech.glide.load.resource.bitmap.VideoBitmapDecoder
-	> 接口功能说明：1.判断资源能否被解码；2.对资源进行解码操作
-	> com.bumptech.glide.load.resource.bitmap.Downsampler用来进行图片解码操作的一些算法
+
+>接口功能说明：1.判断资源能否被解码；2.对资源进行解码操作
+>com.bumptech.glide.load.resource.bitmap.Downsampler用来进行图片解码操作的一些算法
 
 ##Encoder
-*com.bumptech.glide.load.Encoder<T>*
+*com.bumptech.glide.load.Encoder<T>*<br/>
 所有已知实现类：
 - com.bumptech.glide.load.resource.bitmap.BitmapDrawableEncoder
 - com.bumptech.glide.load.resource.bitmap.BitmapEncoder
 - com.bumptech.glide.load.model.ByteBufferEncoder
 - com.bumptech.glide.load.resource.gif.GifDrawableEncoder
 - com.bumptech.glide.load.model.StreamEncoder
-	> ResourceDecoder主要是对图片进行缩放加工，而Encoder则主要是写入数据
+
+>ResourceDecoder主要是对图片进行缩放加工，而Encoder则主要是写入数据
 
 ##InputStream的扩展类
 - com.bumptech.glide.util.ExceptionCatchingInputStream
@@ -268,16 +284,17 @@ Registry中的append和register方法是将传参数据添加到以上六个对�
 - com.bumptech.glide.request.ThumbnailRequestCoordinator
 - com.bumptech.glide.request.RequestOptions
 - com.bumptech.glide.request.BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>>
-	> 通过RequestTracker来调用Request的begin方法
-	> 执行SingleRequest的begin方法时会调用Engine的load方法
-	> 用RequestBuilder来创建并执行一个Request（SingleRequest或ThumbnailRequestCoordinator）
-	> 用RequestManager来获取RequestBuilder和RequestOptions对象的引用
-	> RequestBuilder ——> RequestManager ——> RequestTracker
+
+>通过RequestTracker来调用Request的begin方法<br/>
+>执行SingleRequest的begin方法时会调用Engine的load方法<br/>
+>用RequestBuilder来创建并执行一个Request（SingleRequest或ThumbnailRequestCoordinator）<br/>
+>用RequestManager来获取RequestBuilder和RequestOptions对象的引用<br/>
+>RequestBuilder ——> RequestManager ——> RequestTracker
 
 ##Engine
 *com.bumptech.glide.load.engine.Engine*
-	> 在GlideBuilder中实例化Engine
-	> Engine中创建EngineJob和DecodeJob实例
+>在GlideBuilder中实例化Engine<br/>
+>Engine中创建EngineJob和DecodeJob实例
 
 ##DiskCacheStrategy
 *com.bumptech.glide.load.engine.DiskCacheStrategy*
@@ -287,12 +304,12 @@ Registry中的append和register方法是将传参数据添加到以上六个对�
 
 ##onResourceReady
 调用的先后顺序为：
-1. com.bumptech.glide.request.ResourceCallback#onResourceReady(Resource<?>, DataSource)
-2. com.bumptech.glide.request.target.Target<R>#onResourceReady(R, Transition<? super R>)
-3. com.bumptech.glide.request.RequestListener<R>#onResourceReady(R, Object, Target<R>, DataSource, boolean)
+- com.bumptech.glide.request.ResourceCallback#onResourceReady(Resource<?>, DataSource)
+- com.bumptech.glide.request.target.Target<R>#onResourceReady(R, Transition<? super R>)
+- com.bumptech.glide.request.RequestListener<R>#onResourceReady(R, Object, Target<R>, DataSource, boolean)
 
 ##DataCallback
-*com.bumptech.glide.load.data.DataFetcher.DataCallback<T>*
+*com.bumptech.glide.load.data.DataFetcher.DataCallback<T>*<br/>
 所有已知实现类：
 - com.bumptech.glide.load.engine.DataCacheGenerator
 - com.bumptech.glide.load.engine.ResourceCacheGenerator
@@ -300,9 +317,9 @@ Registry中的append和register方法是将传参数据添加到以上六个对�
 
 ##GlideModule
 *com.bumptech.glide.module.GlideModule*
-1. 该接口中提供了两个需要实现的方法：applyOptions(Context, GlideBuilder)和registerComponents(Context, Registry)
-2. 要将实现该接口的类在AndroidManifest.xml中注册，若工程进行了代码混淆，需要保留该实现类不被混淆
-3. 在AndroidManifest.xml中注册的该接口的实现类中可以在applyOptions(Context, GlideBuilder)内进行GlideBuilder提供的公共接口的操作，比如修改DecodeFormat的图片解码质量等
+- 该接口中提供了两个需要实现的方法：applyOptions(Context, GlideBuilder)和registerComponents(Context, Registry)
+- 要将实现该接口的类在AndroidManifest.xml中注册，若工程进行了代码混淆，需要保留该实现类不被混淆
+- 在AndroidManifest.xml中注册的该接口的实现类中可以在applyOptions(Context, GlideBuilder)内进行GlideBuilder提供的公共接口的操作，比如修改DecodeFormat的图片解码质量等
 
 ##预填充包
 *com.bumptech.glide.load.engine.prefill*
@@ -324,3 +341,9 @@ Registry中的append和register方法是将传参数据添加到以上六个对�
 	+)com.bumptech.glide.load.engine.EngineJob#start(DecodeJob<R>)
 	+)com.bumptech.glide.load.engine.DecodeJob#run()
 	3)com.bumptech.glide.request.SingleRequest#onResourceReady(Resource<?>, DataSource)(com.bumptech.glide.request.ResourceCallback)
+
+##Glide缓存机制
+
+##Glide中的线程
+
+##Glide运行场景
