@@ -3,6 +3,7 @@ package com.bumptech.glide;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
+import com.bumptech.glide.load.engine.LoadPath;
 import com.bumptech.glide.load.engine.cache.ExternalCacheDiskCacheFactory;
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory;
 import com.bumptech.glide.load.model.ModelLoader;
@@ -18,6 +19,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
@@ -48,7 +50,7 @@ public class RegistryTest {
         internalCache.build();
         ExternalCacheDiskCacheFactory externalCache = new ExternalCacheDiskCacheFactory(mActivity);
         externalCache.build();
-        System.out.println("internal path:"+mActivity.getCacheDir().getPath());
+        System.out.println("internal path:" + mActivity.getCacheDir().getPath());
 //        System.out.println("external path:"+mActivity.getExternalCacheDir().getPath());
     }
 
@@ -86,5 +88,12 @@ public class RegistryTest {
         List<ModelLoader<File, ?>> list = Glide.get(mActivity).getRegistry()
                 .getModelLoaders(file);
         System.out.println(list);
+    }
+
+    @Test
+    public void testGetLoadPath() {
+        LoadPath<ByteBuffer, Object, Drawable> loadPath = Glide.get(mActivity).getRegistry()
+                .getLoadPath(ByteBuffer.class, Object.class, Drawable.class);
+        System.out.println(loadPath);
     }
 }
