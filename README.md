@@ -342,8 +342,12 @@
 	+)com.bumptech.glide.load.engine.DecodeJob#run()
 	3)com.bumptech.glide.request.SingleRequest#onResourceReady(Resource<?>, DataSource)(com.bumptech.glide.request.ResourceCallback)
 
+##DiskCacheStrategy
+
 ##Glide缓存机制
 
 ##Glide中的线程
 
 ##Glide运行场景
+
+##Glide的优先级
