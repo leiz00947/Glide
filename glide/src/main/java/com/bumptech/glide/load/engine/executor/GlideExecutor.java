@@ -24,6 +24,13 @@ import java.util.regex.Pattern;
  * A prioritized {@link ThreadPoolExecutor} for running jobs in Glide.
  * <p>
  * 针对Glide进行优化的{@link ThreadPoolExecutor}
+ * <p>
+ * <ul>疑问：
+ * <li>{@link #executeSynchronously}在{@link #maybeWait(Future)}中起什么作用</li>
+ * <li>DiskCache线程池和Source线程池的具体工作</li>
+ * <li>{@code preventNetworkOperations}传参在创建DiskCache线程池时为true，而在创建
+ * Source线程池为false是什么情况</li>
+ * <li>{@link #calculateBestThreadCount()}中计算出来的cpuCount和availableProcessors的区别</li></ul>
  */
 public final class GlideExecutor extends ThreadPoolExecutor {
 
@@ -41,6 +48,9 @@ public final class GlideExecutor extends ThreadPoolExecutor {
     public static final int DEFAULT_DISK_CACHE_EXECUTOR_THREADS = 1;
 
     private static final String TAG = "GlideExecutor";
+    /**
+     * CPU名称的正则表达式
+     */
     private static final String CPU_NAME_REGEX = "cpu[0-9]+";
     private static final String CPU_LOCATION = "/sys/devices/system/cpu/";
     // Don't use more than four threads when automatically determining thread count..
@@ -65,7 +75,11 @@ public final class GlideExecutor extends ThreadPoolExecutor {
      * {@link UncaughtThrowableStrategy#DEFAULT}
      * uncaught throwable strategy.
      * <p>
-     * <p>Disk cache executors do not allow network operations on their threads.
+     * Disk cache executors do not allow network operations on their threads.
+     * <p>
+     * 创建一个固定线程数为1，任务队列无限制的线程池；捕获到异常时，记录异常日志
+     * <p>
+     * 创建的是读取{@code ROM}缓存的线程池
      */
     public static GlideExecutor newDiskCacheExecutor() {
         return newDiskCacheExecutor(DEFAULT_DISK_CACHE_EXECUTOR_THREADS,
@@ -76,7 +90,9 @@ public final class GlideExecutor extends ThreadPoolExecutor {
      * Returns a new fixed thread pool with the given thread count, thread name prefix,
      * and {@link UncaughtThrowableStrategy}.
      * <p>
-     * <p>Disk cache executors do not allow network operations on their threads.
+     * Disk cache executors do not allow network operations on their threads.
+     * <p>
+     * 创建一个固定数量核心线程，没有临时线程，但任务队列无大小限制的线程池；支持预防网络操作
      *
      * @param threadCount               The number of threads.
      * @param name                      The prefix for each thread name.
@@ -97,7 +113,10 @@ public final class GlideExecutor extends ThreadPoolExecutor {
      * {@link UncaughtThrowableStrategy#DEFAULT}
      * uncaught throwable strategy.
      * <p>
-     * <p>Source executors allow network operations on their threads.
+     * Source executors allow network operations on their threads.
+     * <p>
+     * 根据计算CPU核数，设置一个核心线程数不大于{@link #MAXIMUM_AUTOMATIC_THREAD_COUNT}，
+     * 不创建临时线程，任务队列无大小限制的线程池；对网络操作不进行干涉
      */
     public static GlideExecutor newSourceExecutor() {
         return newSourceExecutor(calculateBestThreadCount(), DEFAULT_SOURCE_EXECUTOR_NAME,
@@ -108,7 +127,9 @@ public final class GlideExecutor extends ThreadPoolExecutor {
      * Returns a new fixed thread pool with the given thread count, thread name prefix,
      * and {@link UncaughtThrowableStrategy}.
      * <p>
-     * <p>Source executors allow network operations on their threads.
+     * Source executors allow network operations on their threads.
+     * <p>
+     * 创建一个固定数量核心线程，没有临时线程，但任务队列无大小限制的线程池；不支持预防网络操作
      *
      * @param threadCount               The number of threads.
      * @param name                      The prefix for each thread name.
@@ -134,7 +155,9 @@ public final class GlideExecutor extends ThreadPoolExecutor {
      * "http://developer.android.com/reference/java/util/concurrent/ThreadPoolExecutor.html">
      * ThreadPoolExecutor documentation</a>.
      * <p>
-     * <p>Source executors allow network operations on their threads.
+     * Source executors allow network operations on their threads.
+     * <p>
+     * 创建一个无核心线程，但可以无限制创建临时线程的线程池，任务队列无大小限制
      */
     public static GlideExecutor newUnlimitedSourceExecutor() {
         return new GlideExecutor(0 /* corePoolSize */,
@@ -239,14 +262,18 @@ public final class GlideExecutor extends ThreadPoolExecutor {
     /**
      * Determines the number of cores available on the device.
      * <p>
-     * <p>{@link Runtime#availableProcessors()} returns the number of awake cores, which may not
+     * {@link Runtime#availableProcessors()} returns the number of awake cores, which may not
      * be the number of available cores depending on the device's current state. See
      * http://goo.gl/8H670N.
+     * <p>
+     * 根据CPU个数配置一个不大于{@link #MAXIMUM_AUTOMATIC_THREAD_COUNT}的线程数
      */
     public static int calculateBestThreadCount() {
-        // We override the current ThreadPolicy to allow disk reads.
-        // This shouldn't actually do disk-IO and accesses a device file.
-        // See: https://github.com/bumptech/glide/issues/1170
+        /**
+         * We override the current ThreadPolicy to allow disk reads.
+         * This shouldn't actually do disk-IO and accesses a device file.
+         * See: https://github.com/bumptech/glide/issues/1170
+         */
         ThreadPolicy originalPolicy = StrictMode.allowThreadDiskReads();
         File[] cpus = null;
         try {
@@ -268,12 +295,17 @@ public final class GlideExecutor extends ThreadPoolExecutor {
 
         int cpuCount = cpus != null ? cpus.length : 0;
         int availableProcessors = Math.max(1, Runtime.getRuntime().availableProcessors());
+        /**
+         * {@link cpuCount}和{@link availableProcessors}有什么区别呢？
+         */
         return Math.min(MAXIMUM_AUTOMATIC_THREAD_COUNT, Math.max(availableProcessors, cpuCount));
     }
 
     /**
      * A strategy for handling unexpected and uncaught {@link Throwable}s thrown by futures run on the
      * pool.
+     * <p>
+     * 异常处理策略
      */
     public enum UncaughtThrowableStrategy {
         /**
@@ -326,6 +358,11 @@ public final class GlideExecutor extends ThreadPoolExecutor {
         final boolean preventNetworkOperations;
         private int threadNum;
 
+        /**
+         * @param name                      线程名
+         * @param uncaughtThrowableStrategy 捕获到异常时，对异常的处理策略
+         * @param preventNetworkOperations  是否预防网络操作
+         */
         DefaultThreadFactory(String name, UncaughtThrowableStrategy uncaughtThrowableStrategy,
                              boolean preventNetworkOperations) {
             this.name = name;
@@ -338,10 +375,17 @@ public final class GlideExecutor extends ThreadPoolExecutor {
             final Thread result = new Thread(runnable, "glide-" + name + "-thread-" + threadNum) {
                 @Override
                 public void run() {
+                    /**
+                     * 设置线程的优先级
+                     */
                     android.os.Process.setThreadPriority(
                             android.os.Process.THREAD_PRIORITY_BACKGROUND
                                     + android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE);
                     if (preventNetworkOperations) {
+                        /**
+                         * 线程加入严苛模式（{@link StrictMode}），设置检测网络操作，
+                         * 并设置违规应用崩溃处罚
+                         */
                         StrictMode.setThreadPolicy(
                                 new ThreadPolicy.Builder()
                                         .detectNetwork()
