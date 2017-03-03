@@ -86,6 +86,8 @@ import java.util.List;
  * <p>
  * 一个简单独立的静态接口，通过{@link RequestBuilder}创建请求并维持一个{@link Engine}，
  * {@link BitmapPool}，{@link com.bumptech.glide.load.engine.cache.DiskCache}和{@link MemoryCache}
+ * <p>
+ * 之所以要实现{@link ComponentCallbacks2}接口，是为了方便管理集成{@code Glide}框架应用的内存
  */
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class Glide implements ComponentCallbacks2 {
@@ -549,6 +551,17 @@ public class Glide implements ComponentCallbacks2 {
         }
     }
 
+    /**
+     * 该回调是从API{@link android.os.Build.VERSION_CODES#ICE_CREAM_SANDWICH}开始被引入的
+     *
+     * @param level 参数为{@link ComponentCallbacks2#TRIM_MEMORY_UI_HIDDEN}、
+     *              {@link ComponentCallbacks2#TRIM_MEMORY_RUNNING_MODERATE}、
+     *              {@link ComponentCallbacks2#TRIM_MEMORY_RUNNING_LOW}、
+     *              {@link ComponentCallbacks2#TRIM_MEMORY_RUNNING_CRITICAL}、
+     *              {@link ComponentCallbacks2#TRIM_MEMORY_BACKGROUND}、
+     *              {@link ComponentCallbacks2#TRIM_MEMORY_MODERATE}、
+     *              {@link ComponentCallbacks2#TRIM_MEMORY_COMPLETE}当中的一个
+     */
     @Override
     public void onTrimMemory(int level) {
         trimMemory(level);

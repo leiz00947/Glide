@@ -22,6 +22,9 @@ import java.util.Collections;
  * <p>
  * Depending on the disk cache strategy, source data may first be written to disk and then
  * loaded from the cache file rather than returned directly.
+ * <p>
+ * 获取到远程端的图片原始数据后，为什么在{@link #onDataReady(Object)}要跳转到
+ * {@link DecodeJob#reschedule()}进行切换线程操作呢？
  */
 class SourceGenerator implements DataFetcherGenerator,
         DataFetcher.DataCallback<Object>,
@@ -33,6 +36,9 @@ class SourceGenerator implements DataFetcherGenerator,
 
     private int loadDataListIndex;
     private DataCacheGenerator sourceCacheGenerator;
+    /**
+     * 存放远程端图片的解码数据
+     */
     private Object dataToCache;
     private volatile LoadData<?> loadData;
     private DataCacheKey originalKey;
@@ -77,7 +83,7 @@ class SourceGenerator implements DataFetcherGenerator,
     }
 
     /**
-     * 写入缓存文件
+     * 将获取到的原始数据写入到缓存文件
      */
     private void cacheData(Object dataToCache) {
         long startTime = LogTime.getLogTime();

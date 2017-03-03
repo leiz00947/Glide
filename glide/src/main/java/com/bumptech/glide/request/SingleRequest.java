@@ -107,6 +107,9 @@ public final class SingleRequest<R> implements Request,
     private int overrideHeight;
     private Priority priority;
     private Target<R> target;
+    /**
+     * 这个需要用户在相应界面进行实现
+     */
     private RequestListener<R> requestListener;
     private Engine engine;
     /**
