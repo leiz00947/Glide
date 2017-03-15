@@ -98,7 +98,7 @@ class ThumbnailStreamOpener {
                 inputStream = contentResolver.openInputStream(thumbnailUri);
                 // openInputStream can throw NPEs.
             } catch (NullPointerException e) {
-                throw new FileNotFoundException("NPE opening uri: " + thumbnailUri);
+                throw (FileNotFoundException) new FileNotFoundException("NPE opening uri: " + thumbnailUri).initCause(e);
             }
         }
         return inputStream;
