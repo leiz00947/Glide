@@ -1,8 +1,5 @@
 package com.bumptech.glide.module;
 
-import android.content.Context;
-
-import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.Registry;
 
 /**
@@ -10,11 +7,8 @@ import com.bumptech.glide.Registry;
  * {@link com.bumptech.glide.GlideBuilder} and registering
  * {@link com.bumptech.glide.load.model.ModelLoader ModelLoaders}.
  * <p>
- * 一个允许配置Glide的接口，包括使用{@link GlideBuilder}设置选项和注册
- * {@link com.bumptech.glide.load.model.ModelLoader}
- * <p>
- * To use this interface:
- * <ol> <li> Implement the GlideModule interface in a class with public visibility, calling
+ * <p> To use this interface: <ol> <li> Implement the GlideModule interface in a class with public
+ * visibility, calling
  * {@link Registry#prepend(Class, Class, com.bumptech.glide.load.ResourceDecoder)} for each
  * {@link com.bumptech.glide.load.model.ModelLoader} you'd like to register:
  * <pre>
@@ -32,15 +26,13 @@ import com.bumptech.glide.Registry;
  *                      }
  *                  </code>
  *             </pre>
- * </li>
- * <li> Add your implementation to your list of keeps in your proguard.cfg file:
+ * </li> <li> Add your implementation to your list of keeps in your proguard.cfg file:
  * <pre>
  *                  {@code
  *                      -keepnames class * com.bumptech.glide.samples.flickr.FlickrGlideModule
  *                  }
  *              </pre>
- * </li>
- * <li> Add a metadata tag to your AndroidManifest.xml with your GlideModule implementation's
+ * </li> <li> Add a metadata tag to your AndroidManifest.xml with your GlideModule implementation's
  * fully qualified classname as the key, and {@code GlideModule} as the value:
  * <pre>
  *                 {@code
@@ -49,37 +41,19 @@ import com.bumptech.glide.Registry;
  *                          android:value="GlideModule" />
  *                 }
  *             </pre>
- * </li> </ol>
+ * </li> </ol> </p>
  * <p>
- * All implementations must be publicly visible and contain only an empty constructor so they
- * can be instantiated via reflection when Glide is lazily initialized.
+ * <p> All implementations must be publicly visible and contain only an empty constructor so they
+ * can be instantiated via reflection when Glide is lazily initialized. </p>
  * <p>
- * There is no defined order in which modules are called, so projects should be careful to avoid
+ * <p> There is no defined order in which modules are called, so projects should be careful to avoid
  * applying conflicting settings in different modules. If an application depends on libraries that
  * have conflicting modules, the application should consider avoiding the library modules and
- * instead providing their required dependencies in a single application module.
+ * instead providing their required dependencies in a single application module. </p>
+ *
+ * @deprecated Libraries should use {@link ChildGlideModule} and Applications should use
+ * {@link RootGlideModule}.
  */
-public interface GlideModule {
-
-    /**
-     * Lazily apply options to a {@link com.bumptech.glide.GlideBuilder} immediately before the Glide
-     * singleton is created.
-     * <p>
-     * <p> This method will be called once and only once per implementation. </p>
-     *
-     * @param context An Application {@link Context}.
-     * @param builder The {@link com.bumptech.glide.GlideBuilder} that will be used to create Glide.
-     */
-    void applyOptions(Context context, GlideBuilder builder);
-
-    /**
-     * Lazily register components immediately after the Glide singleton is created but before any
-     * requests can be started.
-     * <p>
-     * <p> This method will be called once and only once per implementation. </p>
-     *
-     * @param context  An Application {@link Context}.
-     * @param registry An {@link com.bumptech.glide.Registry} to use to register components.
-     */
-    void registerComponents(Context context, Registry registry);
+@Deprecated
+public interface GlideModule extends RegistersComponents, AppliesOptions {
 }

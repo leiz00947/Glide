@@ -1,0 +1,14 @@
+import org.gradle.internal.jvm.Jvm
+
+apply plugin: 'java'
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.squareup:javapoet:1.8.0'
+    compile 'com.google.auto.service:auto-service:1.0-rc3'
+    compile files(Jvm.current().getToolsJar())
+    testCompile 'com.google.testing.compile:compile-testing:0.10'
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
