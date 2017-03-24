@@ -9,8 +9,6 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
-import static com.bumptech.glide.annotation.compiler.ModuleAnnotationProcessor.INDEXER_NAME_PREFIX;
-
 /**
  * Generates an empty class with an annotation containing the class names of one or more
  * ChildGlideModules.
@@ -31,6 +29,7 @@ import static com.bumptech.glide.annotation.compiler.ModuleAnnotationProcessor.I
  * </pre>
  */
 final class GlideIndexerGenerator {
+    private static final String INDEXER_NAME_PREFIX = "GlideIndexer_";
 
     private GlideIndexerGenerator() {
     }
