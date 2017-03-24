@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.annotation.ExtendsRequestOptions;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.Option;
@@ -486,6 +487,7 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * <p>
      * 复制对象的一个副本，只是里面的大多数对象是浅拷贝
      */
+    @ExtendsRequestOptions(skipStaticMethod = true)
     @SuppressWarnings("unchecked")
     @Override
     public final CHILD clone() {
@@ -507,6 +509,7 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
         }
     }
 
+    @ExtendsRequestOptions(staticMethodName = "optionOf")
     public final <T> CHILD set(@NonNull Option<T> option, @NonNull T value) {
         if (isAutoCloneEnabled) {
             return clone().set(option, value);
@@ -518,6 +521,7 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
         return selfOrThrowIfLocked();
     }
 
+    @ExtendsRequestOptions(staticMethodName = "decodeTypeOf")
     public final CHILD decode(@NonNull Class<?> resourceClass) {
         if (isAutoCloneEnabled) {
             return clone().decode(resourceClass);
@@ -600,6 +604,10 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @see #optionalTransform(Class, Transformation)
      * @see #centerCrop(Context)
      */
+    @ExtendsRequestOptions(
+            staticMethodName = "optionalCenterCropTransform",
+            memoizeStaticMethod = true
+    )
     public CHILD optionalCenterCrop(Context context) {
         return optionalTransform(context, DownsampleStrategy.CENTER_OUTSIDE, new CenterCrop(context));
     }
@@ -614,6 +622,10 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @see #transform(Class, Transformation)
      * @see #optionalCenterCrop(Context)
      */
+    @ExtendsRequestOptions(
+            staticMethodName = "centerCropTransform",
+            memoizeStaticMethod = true
+    )
     public CHILD centerCrop(Context context) {
         return transform(context, DownsampleStrategy.CENTER_OUTSIDE, new CenterCrop(context));
     }
@@ -628,6 +640,10 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @see #optionalTransform(Class, Transformation)
      * @see #fitCenter(Context)
      */
+    @ExtendsRequestOptions(
+            staticMethodName = "optionalFitCenterTransform",
+            memoizeStaticMethod = true
+    )
     public CHILD optionalFitCenter(Context context) {
         return optionalTransform(context, DownsampleStrategy.FIT_CENTER, new FitCenter(context));
     }
@@ -642,6 +658,10 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @see #transform(Class, Transformation)
      * @see #optionalFitCenter(Context)
      */
+    @ExtendsRequestOptions(
+            staticMethodName = "fitCenterTransform",
+            memoizeStaticMethod = true
+    )
     public CHILD fitCenter(Context context) {
         return transform(context, DownsampleStrategy.FIT_CENTER, new FitCenter(context));
     }
@@ -655,6 +675,10 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @see #optionalTransform(Class, Transformation)
      * @see #centerInside(Context) (android.content.Context)
      */
+    @ExtendsRequestOptions(
+            staticMethodName = "optionalCenterInsideTransform",
+            memoizeStaticMethod = true
+    )
     public CHILD optionalCenterInside(Context context) {
         return optionalTransform(context, DownsampleStrategy.CENTER_INSIDE, new CenterInside(context));
     }
@@ -668,6 +692,10 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @see #transform(Class, Transformation)
      * @see #optionalCenterInside(Context) (android.content.Context)
      */
+    @ExtendsRequestOptions(
+            staticMethodName = "centerInsideTransform",
+            memoizeStaticMethod = true
+    )
     public CHILD centerInside(Context context) {
         return transform(context, DownsampleStrategy.CENTER_INSIDE, new CenterInside(context));
     }
@@ -681,6 +709,10 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @see #optionalTransform(Context, Transformation)
      * @see #circleCrop(Context)
      */
+    @ExtendsRequestOptions(
+            staticMethodName = "optionalCircleCropTransform",
+            memoizeStaticMethod = true
+    )
     public CHILD optionalCircleCrop(Context context) {
         return optionalTransform(context, DownsampleStrategy.CENTER_OUTSIDE, new CircleCrop(context));
     }
@@ -695,6 +727,10 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @see #transform(Class, Transformation)
      * @see #optionalCenterCrop(Context)
      */
+    @ExtendsRequestOptions(
+            staticMethodName = "circleCropTransform",
+            memoizeStaticMethod = true
+    )
     public CHILD circleCrop(Context context) {
         return transform(context, DownsampleStrategy.CENTER_OUTSIDE, new CircleCrop(context));
     }
@@ -733,6 +769,7 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @see #optionalTransform(Context, Transformation)
      * @see #optionalTransform(Class, Transformation)
      */
+    @ExtendsRequestOptions(staticMethodName = "bitmapTransform")
     public CHILD transform(Context context, @NonNull Transformation<Bitmap> transformation) {
         if (isAutoCloneEnabled) {
             return clone().transform(context, transformation);
@@ -758,6 +795,7 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @see #transform(Context, Transformation)
      * @see #transform(Class, Transformation)
      */
+    @ExtendsRequestOptions(staticMethodName = "optionalBitmapTransform")
     public CHILD optionalTransform(Context context, Transformation<Bitmap> transformation) {
         if (isAutoCloneEnabled) {
             return clone().optionalTransform(context, transformation);
@@ -831,6 +869,10 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * resource classes and allows unknown resource types to be transformed without throwing an
      * exception.
      */
+    @ExtendsRequestOptions(
+            staticMethodName = "noTransformation",
+            memoizeStaticMethod = true
+    )
     public final CHILD dontTransform() {
         if (isAutoCloneEnabled) {
             return clone().dontTransform();
@@ -862,6 +904,7 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
         return selfOrThrowIfLocked();
     }
 
+    @ExtendsRequestOptions(skipStaticMethod = true)
     public final CHILD apply(BaseRequestOptions<?> other) {
         if (isAutoCloneEnabled) {
             return clone().apply(other);
@@ -949,6 +992,7 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * Once locked, the only way to unlock is to use {@link #clone()}
      */
     @SuppressWarnings("unchecked")
+    @ExtendsRequestOptions(skipStaticMethod = true)
     public final CHILD lock() {
         isLocked = true;
         // This is the only place we should not check locked.
@@ -963,6 +1007,7 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * Auto clone is not retained by cloned objects returned from mutations. The cloned objects
      * are mutable and are not locked.
      */
+    @ExtendsRequestOptions(skipStaticMethod = true)
     public final CHILD autoLock() {
         if (isLocked && !isAutoCloneEnabled) {
             throw new IllegalStateException("You cannot auto lock an already locked options object"
