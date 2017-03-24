@@ -77,8 +77,6 @@ public class RequestManager implements LifecycleListener {
     private final ConnectivityMonitor connectivityMonitor;
 
     @NonNull
-    private BaseRequestOptions<?> defaultRequestOptions;
-    @NonNull
     private BaseRequestOptions<?> requestOptions;
 
     public RequestManager(Glide glide, Lifecycle lifecycle, RequestManagerTreeNode treeNode) {
@@ -91,6 +89,8 @@ public class RequestManager implements LifecycleListener {
      * @param factory   default {@link com.bumptech.glide.manager.DefaultConnectivityMonitorFactory}，
      *                  see {@link GlideBuilder#connectivityMonitorFactory}
      */
+    // Our usage is safe here.
+    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     RequestManager(
             Glide glide,
             Lifecycle lifecycle,
@@ -117,10 +117,17 @@ public class RequestManager implements LifecycleListener {
         }
         lifecycle.addListener(connectivityMonitor);
 
-        defaultRequestOptions = glide.getGlideContext().getDefaultRequestOptions();
-        requestOptions = defaultRequestOptions;
+        setRequestOptions(glide.getGlideContext().getDefaultRequestOptions());
 
         glide.registerRequestManager(this);
+    }
+
+    protected void setRequestOptions(@NonNull BaseRequestOptions<?> toSet) {
+        this.requestOptions = toSet.clone().autoLock();
+    }
+
+    private void updateRequestOptions(BaseRequestOptions<?> toUpdate) {
+        this.requestOptions.apply(toUpdate);
     }
 
     /**
@@ -141,9 +148,7 @@ public class RequestManager implements LifecycleListener {
      * @see RequestBuilder#apply(BaseRequestOptions)
      */
     public RequestManager applyDefaultRequestOptions(RequestOptions requestOptions) {
-        BaseRequestOptions<?> toMutate = this.requestOptions == defaultRequestOptions
-                ? this.requestOptions.clone() : this.defaultRequestOptions;
-        this.requestOptions = toMutate.apply(requestOptions);
+        updateRequestOptions(requestOptions);
         return this;
     }
 
@@ -164,8 +169,7 @@ public class RequestManager implements LifecycleListener {
      * @see #applyDefaultRequestOptions(RequestOptions)
      */
     public RequestManager setDefaultRequestOptions(RequestOptions requestOptions) {
-        this.defaultRequestOptions = requestOptions;
-        this.requestOptions = requestOptions;
+        setRequestOptions(requestOptions);
         return this;
     }
 
