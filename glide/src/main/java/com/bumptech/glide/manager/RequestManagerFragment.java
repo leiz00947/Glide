@@ -8,6 +8,7 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.util.Synthetic;
 
@@ -161,7 +162,7 @@ public class RequestManagerFragment extends Fragment {
      */
     private void registerFragmentWithRoot(Activity activity) {
         unregisterFragmentWithRoot();
-        rootRequestManagerFragment = RequestManagerRetriever.get()
+        rootRequestManagerFragment = Glide.get(activity).getRequestManagerRetriever()
                 .getRequestManagerFragment(activity.getFragmentManager(), null);
         /**
          * 只有{@link Activity}内嵌套的{@link Fragment}才会满足这个条件

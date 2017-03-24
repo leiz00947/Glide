@@ -105,6 +105,7 @@ public class Glide implements ComponentCallbacks2 {
     private final GlideContext glideContext;
     private final Registry registry;
     private final ArrayPool arrayPool;
+    private final RequestManagerRetriever requestManagerRetriever;
     private final ConnectivityMonitorFactory connectivityMonitorFactory;
     private final List<RequestManager> managers = new ArrayList<>();
     private MemoryCategory memoryCategory = MemoryCategory.NORMAL;
@@ -260,6 +261,7 @@ public class Glide implements ComponentCallbacks2 {
           MemoryCache memoryCache,
           BitmapPool bitmapPool,
           ArrayPool arrayPool,
+          RequestManagerRetriever requestManagerRetriever,
           ConnectivityMonitorFactory connectivityMonitorFactory,
           int logLevel,
           RequestOptions defaultRequestOptions) {
@@ -267,6 +269,7 @@ public class Glide implements ComponentCallbacks2 {
         this.bitmapPool = bitmapPool;
         this.arrayPool = arrayPool;
         this.memoryCache = memoryCache;
+        this.requestManagerRetriever = requestManagerRetriever;
         this.connectivityMonitorFactory = connectivityMonitorFactory;
 
         DecodeFormat decodeFormat = defaultRequestOptions.getOptions().get(Downsampler.DECODE_FORMAT);
@@ -465,6 +468,13 @@ public class Glide implements ComponentCallbacks2 {
     }
 
     /**
+     * Internal method.
+     */
+    public RequestManagerRetriever getRequestManagerRetriever() {
+        return requestManagerRetriever;
+    }
+
+    /**
      * Adjusts Glide's current and maximum memory usage based on the given {@link MemoryCategory}.
      * <p>
      * 基于给定的{@link MemoryCategory}来调整Glide当前和最大能使用的内存
@@ -492,6 +502,18 @@ public class Glide implements ComponentCallbacks2 {
         MemoryCategory oldCategory = this.memoryCategory;
         this.memoryCategory = memoryCategory;
         return oldCategory;
+    }
+
+    private static RequestManagerRetriever getRetriever(@Nullable Context context) {
+        // Context could be null for other reasons (ie the user passes in null), but in practice it will
+        // only occur due to errors with the Fragment lifecycle.
+        if (context == null) {
+            throw new IllegalArgumentException(
+                    "You cannot start a load on a Fragment where getActivity() returns null (which usually"
+                            + " occurs when getActivity() is called before the Fragment is attached or after the"
+                            + " Fragment is destroyed).");
+        }
+        return Glide.get(context).getRequestManagerRetriever();
     }
 
     /**
@@ -526,8 +548,7 @@ public class Glide implements ComponentCallbacks2 {
      * @see RequestManagerRetriever#get(Context)
      */
     public static RequestManager with(Context context) {
-        RequestManagerRetriever retriever = RequestManagerRetriever.get();
-        return retriever.get(context);
+        return getRetriever(context).get(context);
     }
 
     /**
@@ -541,8 +562,7 @@ public class Glide implements ComponentCallbacks2 {
      * @see RequestManagerRetriever#get(Activity)
      */
     public static RequestManager with(Activity activity) {
-        RequestManagerRetriever retriever = RequestManagerRetriever.get();
-        return retriever.get(activity);
+        return getRetriever(activity).get(activity);
     }
 
     /**
@@ -555,8 +575,7 @@ public class Glide implements ComponentCallbacks2 {
      * @see RequestManagerRetriever#get(FragmentActivity)
      */
     public static RequestManager with(FragmentActivity activity) {
-        RequestManagerRetriever retriever = RequestManagerRetriever.get();
-        return retriever.get(activity);
+        return getRetriever(activity).get(activity);
     }
 
     /**
@@ -569,8 +588,7 @@ public class Glide implements ComponentCallbacks2 {
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static RequestManager with(android.app.Fragment fragment) {
-        RequestManagerRetriever retriever = RequestManagerRetriever.get();
-        return retriever.get(fragment);
+        return getRetriever(fragment.getActivity()).get(fragment);
     }
 
     /**
@@ -583,8 +601,7 @@ public class Glide implements ComponentCallbacks2 {
      * @see RequestManagerRetriever#get(Fragment)
      */
     public static RequestManager with(Fragment fragment) {
-        RequestManagerRetriever retriever = RequestManagerRetriever.get();
-        return retriever.get(fragment);
+        return getRetriever(fragment.getActivity()).get(fragment);
     }
 
     public Registry getRegistry() {
