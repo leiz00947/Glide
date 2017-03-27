@@ -1,5 +1,7 @@
 package com.bumptech.glide.load.resource;
 
+import android.content.Context;
+
 import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.Resource;
 
@@ -30,7 +32,7 @@ public final class UnitTransformation<T> implements Transformation<T> {
     }
 
     @Override
-    public Resource<T> transform(Resource<T> resource, int outWidth, int outHeight) {
+    public Resource<T> transform(Context context, Resource<T> resource, int outWidth, int outHeight) {
         return resource;
     }
 

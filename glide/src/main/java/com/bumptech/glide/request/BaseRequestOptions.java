@@ -603,31 +603,69 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @param context Any {@link Context}.
      * @see #optionalTransform(Class, Transformation)
      * @see #centerCrop(Context)
+     * @deprecated Use {@link #optionalCenterCrop()}.
+     */
+    @Deprecated
+    @GlideOption(
+            staticMethodName = "optionalCenterCropTransform",
+            memoizeStaticMethod = true
+    )
+    public CHILD optionalCenterCrop(@SuppressWarnings("unused") Context context) {
+        return optionalCenterCrop();
+    }
+
+    /**
+     * Applies {@link com.bumptech.glide.load.resource.bitmap.CenterCrop} to all default types, and
+     * ignores unknown types.
+     * <p>
+     * <p>This will override previous calls to {@link #dontTransform()}.
+     *
+     * @see #optionalTransform(Class, com.bumptech.glide.load.Transformation)
+     * @see #centerCrop()
      */
     @GlideOption(
             staticMethodName = "optionalCenterCropTransform",
             memoizeStaticMethod = true
     )
-    public CHILD optionalCenterCrop(Context context) {
-        return optionalTransform(context, DownsampleStrategy.CENTER_OUTSIDE, new CenterCrop(context));
+    public CHILD optionalCenterCrop() {
+        return optionalTransform(DownsampleStrategy.CENTER_OUTSIDE, new CenterCrop());
     }
 
     /**
      * Applies {@link CenterCrop} to all default types and
      * throws an exception if asked to transform an unknown type.
      * <p>
-     * This will override previous calls to {@link #dontTransform()}.
+     * this will override previous calls to {@link #dontTransform()}.
      *
-     * @param context Any {@link Context}.
+     * @param context any {@link Context}.
      * @see #transform(Class, Transformation)
      * @see #optionalCenterCrop(Context)
+     * @deprecated Use {@link #centerCrop()}.
+     */
+    @Deprecated
+    @GlideOption(
+            staticMethodName = "centerCropTransform",
+            memoizeStaticMethod = true
+    )
+    public CHILD centerCrop(@SuppressWarnings("unused") Context context) {
+        return centerCrop();
+    }
+
+    /**
+     * Applies {@link com.bumptech.glide.load.resource.bitmap.CenterCrop} to all default types and
+     * throws an exception if asked to transform an unknown type.
+     * <p>
+     * <p>this will override previous calls to {@link #dontTransform()} ()}.
+     *
+     * @see #transform(Class, com.bumptech.glide.load.Transformation)
+     * @see #optionalCenterCrop()
      */
     @GlideOption(
             staticMethodName = "centerCropTransform",
             memoizeStaticMethod = true
     )
-    public CHILD centerCrop(Context context) {
-        return transform(context, DownsampleStrategy.CENTER_OUTSIDE, new CenterCrop(context));
+    public CHILD centerCrop() {
+        return transform(DownsampleStrategy.CENTER_OUTSIDE, new CenterCrop());
     }
 
     /**
@@ -639,13 +677,32 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @param context Any {@link Context}.
      * @see #optionalTransform(Class, Transformation)
      * @see #fitCenter(Context)
+     * @deprecated Use {@link #optionalFitCenter()}.
+     */
+    @Deprecated
+    @GlideOption(
+            staticMethodName = "optionalFitCenterTransform",
+            memoizeStaticMethod = true
+    )
+    public CHILD optionalFitCenter(@SuppressWarnings("unused") Context context) {
+        return optionalFitCenter();
+    }
+
+    /**
+     * Applies {@link com.bumptech.glide.load.resource.bitmap.FitCenter} to all default types, and
+     * ignores unknown types.
+     * <p>
+     * <p>This will override previous calls to {@link #dontTransform()}.
+     *
+     * @see #optionalTransform(Class, com.bumptech.glide.load.Transformation)
+     * @see #fitCenter()
      */
     @GlideOption(
             staticMethodName = "optionalFitCenterTransform",
             memoizeStaticMethod = true
     )
-    public CHILD optionalFitCenter(Context context) {
-        return optionalTransform(context, DownsampleStrategy.FIT_CENTER, new FitCenter(context));
+    public CHILD optionalFitCenter() {
+        return optionalTransform(DownsampleStrategy.FIT_CENTER, new FitCenter());
     }
 
     /**
@@ -657,13 +714,32 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @param context Any {@link Context}.
      * @see #transform(Class, Transformation)
      * @see #optionalFitCenter(Context)
+     * @deprecated Use {@link #fitCenter()}.
+     */
+    @Deprecated
+    @GlideOption(
+            staticMethodName = "fitCenterTransform",
+            memoizeStaticMethod = true
+    )
+    public CHILD fitCenter(@SuppressWarnings("unused") Context context) {
+        return fitCenter();
+    }
+
+    /**
+     * Applies {@link com.bumptech.glide.load.resource.bitmap.FitCenter} to all default types and
+     * throws an exception if asked to transform an unknown type.
+     * <p>
+     * <p>This will override previous calls to {@link #dontTransform()}.
+     *
+     * @see #transform(Class, com.bumptech.glide.load.Transformation)
+     * @see #optionalFitCenter()
      */
     @GlideOption(
             staticMethodName = "fitCenterTransform",
             memoizeStaticMethod = true
     )
-    public CHILD fitCenter(Context context) {
-        return transform(context, DownsampleStrategy.FIT_CENTER, new FitCenter(context));
+    public CHILD fitCenter() {
+        return transform(DownsampleStrategy.FIT_CENTER, new FitCenter());
     }
 
     /**
@@ -674,13 +750,32 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @param context Any {@link Context}.
      * @see #optionalTransform(Class, Transformation)
      * @see #centerInside(Context) (android.content.Context)
+     * @deprecated Use {@link #optionalCenterInside()}
+     */
+    @Deprecated
+    @GlideOption(
+            staticMethodName = "optionalCenterInsideTransform",
+            memoizeStaticMethod = true
+    )
+    public CHILD optionalCenterInside(@SuppressWarnings("unused") Context context) {
+        return optionalCenterInside();
+    }
+
+    /**
+     * Applies {@link com.bumptech.glide.load.resource.bitmap.CenterInside} to all default types, and
+     * ignores unknown types.
+     * <p>
+     * <p>This will override previous calls to {@link #dontTransform()}.
+     *
+     * @see #optionalTransform(Class, com.bumptech.glide.load.Transformation)
+     * @see #centerInside()
      */
     @GlideOption(
             staticMethodName = "optionalCenterInsideTransform",
             memoizeStaticMethod = true
     )
-    public CHILD optionalCenterInside(Context context) {
-        return optionalTransform(context, DownsampleStrategy.CENTER_INSIDE, new CenterInside(context));
+    public CHILD optionalCenterInside() {
+        return optionalTransform(DownsampleStrategy.CENTER_INSIDE, new CenterInside());
     }
 
     /**
@@ -691,13 +786,28 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @param context Any {@link Context}.
      * @see #transform(Class, Transformation)
      * @see #optionalCenterInside(Context) (android.content.Context)
+     * @deprecated Use {@link #centerInside()}
      */
+    @Deprecated
     @GlideOption(
             staticMethodName = "centerInsideTransform",
             memoizeStaticMethod = true
     )
-    public CHILD centerInside(Context context) {
-        return transform(context, DownsampleStrategy.CENTER_INSIDE, new CenterInside(context));
+    public CHILD centerInside(@SuppressWarnings("unused") Context context) {
+        return centerInside();
+    }
+
+    /**
+     * Applies {@link com.bumptech.glide.load.resource.bitmap.CenterInside} to all default types and
+     * throws an exception if asked to transform an unknown type.
+     * <p>
+     * <p>This will override previous calls to {@link #dontTransform()}.
+     *
+     * @see #transform(Class, com.bumptech.glide.load.Transformation)
+     * @see #optionalCenterInside()
+     */
+    public CHILD centerInside() {
+        return transform(DownsampleStrategy.CENTER_INSIDE, new CenterInside());
     }
 
     /**
@@ -708,13 +818,31 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @param context Any {@link Context}.
      * @see #optionalTransform(Context, Transformation)
      * @see #circleCrop(Context)
+     * @deprecated use {@link #optionalCircleCrop()}.
+     */
+    @Deprecated
+    @GlideOption(
+            staticMethodName = "optionalCircleCropTransform",
+            memoizeStaticMethod = true
+    )
+    public CHILD optionalCircleCrop(@SuppressWarnings("unused") Context context) {
+        return optionalCircleCrop();
+    }
+
+    /**
+     * Applies {@link CircleCrop} to all default types, and ignores unknown types.
+     * <p>
+     * <p>This will override previous calls to {@link #dontTransform()}.
+     *
+     * @see #optionalTransform(Transformation)
+     * @see #circleCrop()
      */
     @GlideOption(
             staticMethodName = "optionalCircleCropTransform",
             memoizeStaticMethod = true
     )
-    public CHILD optionalCircleCrop(Context context) {
-        return optionalTransform(context, DownsampleStrategy.CENTER_OUTSIDE, new CircleCrop(context));
+    public CHILD optionalCircleCrop() {
+        return optionalTransform(DownsampleStrategy.CENTER_OUTSIDE, new CircleCrop());
     }
 
     /**
@@ -726,33 +854,56 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * @param context Any {@link Context}.
      * @see #transform(Class, Transformation)
      * @see #optionalCenterCrop(Context)
+     * @deprecated Use {@link #circleCrop()}.
+     */
+    @Deprecated
+    @GlideOption(
+            staticMethodName = "circleCropTransform",
+            memoizeStaticMethod = true
+    )
+    public CHILD circleCrop(@SuppressWarnings("unused") Context context) {
+        return circleCrop();
+    }
+
+    /**
+     * Applies {@link CircleCrop} to all default types and throws an exception if asked to transform
+     * an unknown type.
+     * <p>
+     * <p>This will override previous calls to {@link #dontTransform()}.
+     *
+     * @see #transform(Class, Transformation)
+     * @see #optionalCenterCrop()
      */
     @GlideOption(
             staticMethodName = "circleCropTransform",
             memoizeStaticMethod = true
     )
-    public CHILD circleCrop(Context context) {
-        return transform(context, DownsampleStrategy.CENTER_OUTSIDE, new CircleCrop(context));
+    public CHILD circleCrop() {
+        return transform(DownsampleStrategy.CENTER_INSIDE, new CircleCrop());
     }
 
-    final CHILD optionalTransform(Context context, DownsampleStrategy downsampleStrategy,
+    // calling optionalTransform() on the result of clone() requires greater access.
+    @SuppressWarnings("WeakerAccess")
+    final CHILD optionalTransform(DownsampleStrategy downsampleStrategy,
                                   Transformation<Bitmap> transformation) {
         if (isAutoCloneEnabled) {
-            return clone().optionalTransform(context, downsampleStrategy, transformation);
+            return clone().optionalTransform(downsampleStrategy, transformation);
         }
 
         downsample(downsampleStrategy);
-        return optionalTransform(context, transformation);
+        return optionalTransform(transformation);
     }
 
-    final CHILD transform(Context context, DownsampleStrategy downsampleStrategy,
+    // calling transform() on the result of clone() requires greater access.
+    @SuppressWarnings("WeakerAccess")
+    final CHILD transform(DownsampleStrategy downsampleStrategy,
                           Transformation<Bitmap> transformation) {
         if (isAutoCloneEnabled) {
-            return clone().transform(context, downsampleStrategy, transformation);
+            return clone().transform(downsampleStrategy, transformation);
         }
 
         downsample(downsampleStrategy);
-        return transform(context, transformation);
+        return transform(transformation);
     }
 
     /**
@@ -768,14 +919,36 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      *                       {@link Bitmap}s.
      * @see #optionalTransform(Context, Transformation)
      * @see #optionalTransform(Class, Transformation)
+     * @deprecated See {@link #transform(Transformation)}.
+     */
+    @Deprecated
+    @GlideOption(staticMethodName = "bitmapTransform")
+    public CHILD transform(
+            @SuppressWarnings("unused") Context context, @NonNull Transformation<Bitmap> transformation) {
+        return transform(transformation);
+    }
+
+    /**
+     * Applies the given {@link com.bumptech.glide.load.Transformation} for
+     * {@link android.graphics.Bitmap Bitmaps} to the default types ({@link android.graphics.Bitmap},
+     * {@link android.graphics.drawable.BitmapDrawable}, and
+     * {@link com.bumptech.glide.load.resource.gif.GifDrawable})
+     * and throws an exception if asked to transform an unknown type.
+     * <p>
+     * <p>This will override previous calls to {@link #dontTransform()}.
+     *
+     * @param transformation Any {@link com.bumptech.glide.load.Transformation} for
+     *                       {@link android.graphics.Bitmap}s.
+     * @see #optionalTransform(com.bumptech.glide.load.Transformation)
+     * @see #optionalTransform(Class, com.bumptech.glide.load.Transformation)
      */
     @GlideOption(staticMethodName = "bitmapTransform")
-    public CHILD transform(Context context, @NonNull Transformation<Bitmap> transformation) {
+    public CHILD transform(@NonNull Transformation<Bitmap> transformation) {
         if (isAutoCloneEnabled) {
-            return clone().transform(context, transformation);
+            return clone().transform(transformation);
         }
 
-        optionalTransform(context, transformation);
+        optionalTransform(transformation);
         isTransformationRequired = true;
         fields |= TRANSFORMATION_REQUIRED;
         return selfOrThrowIfLocked();
@@ -794,18 +967,38 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      *                       {@link Bitmap}s.
      * @see #transform(Context, Transformation)
      * @see #transform(Class, Transformation)
+     * @deprecated Use {@link #optionalTransform(Transformation)}
      */
+    @Deprecated
     @GlideOption(staticMethodName = "optionalBitmapTransform")
     public CHILD optionalTransform(Context context, Transformation<Bitmap> transformation) {
+        return optionalTransform(transformation);
+    }
+
+    /**
+     * Applies the given {@link com.bumptech.glide.load.Transformation} for
+     * {@link android.graphics.Bitmap Bitmaps} to the default types ({@link android.graphics.Bitmap},
+     * {@link android.graphics.drawable.BitmapDrawable}, and
+     * {@link com.bumptech.glide.load.resource.gif.GifDrawable}) and ignores unknown types.
+     * <p>
+     * <p>This will override previous calls to {@link #dontTransform()}.
+     *
+     * @param transformation Any {@link com.bumptech.glide.load.Transformation} for
+     *                       {@link android.graphics.Bitmap}s.
+     * @see #transform(com.bumptech.glide.load.Transformation)
+     * @see #transform(Class, com.bumptech.glide.load.Transformation)
+     */
+    @GlideOption(staticMethodName = "optionalBitmapTransform")
+    public CHILD optionalTransform(Transformation<Bitmap> transformation) {
         if (isAutoCloneEnabled) {
-            return clone().optionalTransform(context, transformation);
+            return clone().optionalTransform(transformation);
         }
 
         optionalTransform(Bitmap.class, transformation);
         // TODO: remove BitmapDrawable decoder and this transformation.
         optionalTransform(BitmapDrawable.class,
-                new BitmapDrawableTransformation(context, transformation));
-        optionalTransform(GifDrawable.class, new GifDrawableTransformation(context, transformation));
+                new BitmapDrawableTransformation(transformation));
+        optionalTransform(GifDrawable.class, new GifDrawableTransformation(transformation));
         return selfOrThrowIfLocked();
     }
 

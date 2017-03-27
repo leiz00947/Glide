@@ -45,10 +45,6 @@ public final class GlideBuilder {
     @Nullable
     private RequestManagerFactory requestManagerFactory;
 
-    GlideBuilder() {
-        // Package private visibility.
-    }
-
     /**
      * Sets the {@link BitmapPool} implementation to use
      * to store and retrieve reused {@link android.graphics.Bitmap}s.
@@ -271,7 +267,7 @@ public final class GlideBuilder {
         return this;
     }
 
-    Glide createGlide(Context context) {
+    public Glide build(Context context) {
         if (sourceExecutor == null) {
             sourceExecutor = GlideExecutor.newSourceExecutor();
         }

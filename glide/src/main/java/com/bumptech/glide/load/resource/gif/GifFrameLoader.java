@@ -1,6 +1,5 @@
 package com.bumptech.glide.load.resource.gif;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
@@ -34,7 +33,6 @@ import static com.bumptech.glide.request.RequestOptions.signatureOf;
 class GifFrameLoader {
     private final GifDecoder gifDecoder;
     private final Handler handler;
-    private final Context context;
     private final List<FrameCallback> callbacks = new ArrayList<>();
     @Synthetic
     final RequestManager requestManager;
@@ -62,7 +60,6 @@ class GifFrameLoader {
             Transformation<Bitmap> transformation,
             Bitmap firstFrame) {
         this(
-                glide.getContext(),
                 glide.getBitmapPool(),
                 Glide.with(glide.getContext()),
                 gifDecoder,
@@ -74,7 +71,6 @@ class GifFrameLoader {
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     GifFrameLoader(
-            Context context,
             BitmapPool bitmapPool,
             RequestManager requestManager,
             GifDecoder gifDecoder,
@@ -86,7 +82,6 @@ class GifFrameLoader {
         if (handler == null) {
             handler = new Handler(Looper.getMainLooper(), new FrameLoaderCallback());
         }
-        this.context = context;
         this.bitmapPool = bitmapPool;
         this.handler = handler;
         this.requestBuilder = requestBuilder;
@@ -99,7 +94,7 @@ class GifFrameLoader {
     void setFrameTransformation(Transformation<Bitmap> transformation, Bitmap firstFrame) {
         this.transformation = Preconditions.checkNotNull(transformation);
         this.firstFrame = Preconditions.checkNotNull(firstFrame);
-        requestBuilder = requestBuilder.apply(new RequestOptions().transform(context, transformation));
+        requestBuilder = requestBuilder.apply(new RequestOptions().transform(transformation));
     }
 
     Transformation<Bitmap> getFrameTransformation() {
