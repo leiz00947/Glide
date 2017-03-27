@@ -1,7 +1,5 @@
 package com.bumptech.glide;
 
-import static com.bumptech.glide.request.RequestOptions.signatureOf;
-
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,6 +26,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.UUID;
 
+import static com.bumptech.glide.request.RequestOptions.signatureOf;
+
 /**
  * A generic class that can handle setting options and staring loads for generic resource types.
  * <p>
@@ -39,7 +39,9 @@ import java.util.UUID;
 public class RequestBuilder<TranscodeType> implements Cloneable {
     private static final TransitionOptions<?, ?> DEFAULT_ANIMATION_OPTIONS =
             new GenericTransitionOptions<Object>();
-    private static final BaseRequestOptions<?> DOWNLOAD_ONLY_OPTIONS =
+    // Used in generated subclasses
+    @SuppressWarnings("WeakerAccess")
+    static final BaseRequestOptions<?> DOWNLOAD_ONLY_OPTIONS =
             new RequestOptions().diskCacheStrategy(DiskCacheStrategy.DATA).priority(Priority.LOW)
                     .skipMemoryCache(true);
 
@@ -56,7 +58,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
     private final BaseRequestOptions<?> defaultRequestOptions;
 
     @NonNull
-    private BaseRequestOptions<?> requestOptions;
+    BaseRequestOptions<?> requestOptions;
     @SuppressWarnings("unchecked")
     private TransitionOptions<?, ? super TranscodeType> transitionOptions =
             (TransitionOptions<?, ? super TranscodeType>) DEFAULT_ANIMATION_OPTIONS;
@@ -102,10 +104,13 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      */
     public RequestBuilder<TranscodeType> apply(@NonNull BaseRequestOptions<?> requestOptions) {
         Preconditions.checkNotNull(requestOptions);
-        BaseRequestOptions<?> toMutate = defaultRequestOptions == this.requestOptions
-                ? this.requestOptions.clone() : this.requestOptions;
-        this.requestOptions = toMutate.apply(requestOptions);
+        this.requestOptions = getMutableOptions().apply(requestOptions);
         return this;
+    }
+
+    BaseRequestOptions<?> getMutableOptions() {
+        return defaultRequestOptions == this.requestOptions
+                ? this.requestOptions.clone() : this.requestOptions;
     }
 
     /**
@@ -561,7 +566,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
         return getDownloadOnlyRequest().submit(width, height);
     }
 
-    private RequestBuilder<File> getDownloadOnlyRequest() {
+    RequestBuilder<File> getDownloadOnlyRequest() {
         return new RequestBuilder<>(File.class, this).apply(DOWNLOAD_ONLY_OPTIONS);
     }
 

@@ -55,7 +55,7 @@ public class RequestManager implements LifecycleListener {
     private static final RequestOptions DOWNLOAD_ONLY_OPTIONS =
             diskCacheStrategyOf(DiskCacheStrategy.DATA).priority(Priority.LOW).skipMemoryCache(true);
 
-    private final Glide glide;
+    protected final Glide glide;
     @Synthetic
     final Lifecycle lifecycle;
     /**
