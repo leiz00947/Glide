@@ -5,6 +5,7 @@ import com.bumptech.glide.annotation.GlideExtension;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.squareup.javapoet.ClassName;
@@ -15,6 +16,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -95,7 +97,8 @@ final class RequestManagerGenerator {
     }
 
     @Nullable
-    TypeSpec generate(TypeSpec requestOptions, TypeSpec requestBuilder, Set<String> glideExtensions) {
+    TypeSpec generate(
+            @Nullable TypeSpec requestOptions, TypeSpec requestBuilder, Set<String> glideExtensions) {
         generatedRequestBuilderClassName =
                 ClassName.get(
                         RequestBuilderGenerator.GENERATED_REQUEST_BUILDER_PACKAGE_NAME, requestBuilder.name);
@@ -111,7 +114,10 @@ final class RequestManagerGenerator {
                 .addMethod(generateCallSuperConstructor())
                 .addMethods(generateAdditionalRequestManagerMethods(glideExtensions))
                 .addMethods(generateRequestManagerMethodOverrides())
-                .addMethod(generateOverrideSetRequestOptions(requestOptions))
+                .addMethods(
+                        FluentIterable.from(
+                                Collections.singletonList(generateOverrideSetRequestOptions(requestOptions)))
+                                .filter(Predicates.<MethodSpec>notNull()))
                 .build();
     }
 
@@ -249,7 +255,12 @@ final class RequestManagerGenerator {
      * generated subclass type to avoid inadvertent errors where a different subclass is applied that
      * accidentally wipes out some logic in overidden methods in our generated subclass.
      */
-    private MethodSpec generateOverrideSetRequestOptions(TypeSpec generatedRequestOptions) {
+    @Nullable
+    private MethodSpec generateOverrideSetRequestOptions(@Nullable TypeSpec generatedRequestOptions) {
+        if (generatedRequestOptions == null) {
+            return null;
+        }
+
         Elements elementUtils = processingEnv.getElementUtils();
         TypeElement baseRequestOptionsType =
                 elementUtils.getTypeElement(

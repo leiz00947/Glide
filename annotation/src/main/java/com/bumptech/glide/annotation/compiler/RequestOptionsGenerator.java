@@ -1,5 +1,8 @@
 package com.bumptech.glide.annotation.compiler;
 
+import static com.bumptech.glide.annotation.ExtendsRequestOptions.OVERRIDE_EXTEND;
+import static com.bumptech.glide.annotation.ExtendsRequestOptions.OVERRIDE_NONE;
+
 import com.bumptech.glide.annotation.ExtendsRequestOptions;
 import com.bumptech.glide.annotation.GlideExtension;
 import com.google.common.base.Strings;
@@ -27,9 +30,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
-
-import static com.bumptech.glide.annotation.ExtendsRequestOptions.OVERRIDE_EXTEND;
-import static com.bumptech.glide.annotation.ExtendsRequestOptions.OVERRIDE_NONE;
 
 /**
  * Generates a new implementation of {@link com.bumptech.glide.request.BaseRequestOptions}
@@ -74,6 +74,9 @@ final class RequestOptionsGenerator {
     private static final String BASE_REQUEST_OPTIONS_SIMPLE_NAME = "BaseRequestOptions";
     static final String BASE_REQUEST_OPTIONS_QUALIFIED_NAME =
             BASE_REQUEST_OPTIONS_PACKAGE_NAME + "." + BASE_REQUEST_OPTIONS_SIMPLE_NAME;
+
+    static final String REQUEST_OPTIONS_PACKAGE_NAME = "com.bumptech.glide.request";
+    static final String REQUEST_OPTIONS_SIMPLE_NAME = "RequestOptions";
 
     private final ProcessingEnvironment processingEnvironment;
     private ProcessorUtil processorUtil;
