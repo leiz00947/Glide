@@ -4,10 +4,12 @@ import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.bumptech.glide.load.DecodeFormat;
+import com.bumptech.glide.load.ImageHeaderParser;
 import com.bumptech.glide.load.ImageHeaderParserUtils;
 import com.bumptech.glide.load.Option;
 import com.bumptech.glide.load.Options;
@@ -18,7 +20,6 @@ import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy.SampleSizeRoun
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.util.Preconditions;
 import com.bumptech.glide.util.Util;
-import com.bumptech.glide.load.ImageHeaderParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -487,31 +488,26 @@ public final class Downsampler {
                 + ", thread: " + Thread.currentThread().getName());
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static String getInBitmapString(BitmapFactory.Options options) {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
-                ? getBitmapString(options.inBitmap) : null;
+        return getBitmapString(options.inBitmap);
     }
 
+    @Nullable
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private static String getBitmapString(Bitmap bitmap) {
-        final String result;
         if (bitmap == null) {
-            result = null;
-        } else {
-            String sizeString = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
-                    ? " (" + bitmap.getAllocationByteCount() + ")" : "";
-            result = "[" + bitmap.getWidth() + "x" + bitmap.getHeight() + "] " + bitmap.getConfig()
-                    + sizeString;
+            return null;
         }
-        return result;
+        String sizeString = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
+                ? " (" + bitmap.getAllocationByteCount() + ")" : "";
+        return "[" + bitmap.getWidth() + "x" + bitmap.getHeight() + "] " + bitmap.getConfig()
+                + sizeString;
     }
 
     // BitmapFactory throws an IllegalArgumentException if any error occurs attempting to decode a
     // file when inBitmap is non-null, including those caused by partial or corrupt data. We still log
     // the error because the IllegalArgumentException is supposed to catch errors reusing Bitmaps, so
     // want some useful log output. In most cases this can be safely treated as a normal IOException.
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static IOException newIoExceptionForInBitmapAssertion(IllegalArgumentException e,
                                                                   int outWidth, int outHeight, String outMimeType, BitmapFactory.Options options) {
         return new IOException("Exception decoding bitmap"
@@ -524,20 +520,16 @@ public final class Downsampler {
     /**
      * 设置{@link BitmapFactory.Options#inBitmap}属性
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static void setInBitmap(BitmapFactory.Options options, BitmapPool bitmapPool, int width,
                                     int height) {
-        if (Build.VERSION_CODES.HONEYCOMB <= Build.VERSION.SDK_INT) {
-            // BitmapFactory will clear out the Bitmap before writing to it, so getDirty is safe.
-            options.inBitmap = bitmapPool.getDirty(width, height, options.inPreferredConfig);
-        }
+        // BitmapFactory will clear out the Bitmap before writing to it, so getDirty is safe.
+        options.inBitmap = bitmapPool.getDirty(width, height, options.inPreferredConfig);
     }
 
     /**
      * 获取{@link #OPTIONS_QUEUE}队列头的{@link BitmapFactory.Options}，若为空，则重新创建一个，
      * 并将其中属性重置
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static synchronized BitmapFactory.Options getDefaultOptions() {
         BitmapFactory.Options decodeBitmapOptions;
         synchronized (OPTIONS_QUEUE) {
@@ -564,7 +556,6 @@ public final class Downsampler {
     /**
      * 重置{@link BitmapFactory.Options}选项
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static void resetOptions(BitmapFactory.Options decodeBitmapOptions) {
         /**
          * 设置临时存储的字节数组
@@ -615,31 +606,29 @@ public final class Downsampler {
          */
         decodeBitmapOptions.outMimeType = null;
 
-        if (Build.VERSION_CODES.HONEYCOMB <= Build.VERSION.SDK_INT) {
-            /**
-             * 使用{@link BitmapFactory.Options#inBitmap}前，每创建一个{@link Bitmap}需要独占一块内存，
-             * 使用{@link BitmapFactory.Options#inBitmap}后，多个{@link Bitmap}会复用同一块内存。
-             * <p>
-             * 所以使用{@link BitmapFactory.Options#inBitmap}能够大大提高内存的利用效率，
-             * 但是它也有几个限制条件：
-             * <ol><li>在SDK 11 -> 18之间，重用的{@link Bitmap}大小必须是一致的，
-             * 例如给{@link BitmapFactory.Options#inBitmap}赋值的图片大小为100-100，
-             * 那么新申请的{@link Bitmap}必须也为100-100才能够被重用。从SDK 19开始，
-             * 新申请的{@link Bitmap}大小必须小于或者等于已经赋值过的{@link Bitmap}大小</li>
-             * <li>新申请的{@link Bitmap}与旧的{@link Bitmap}必须有相同的解码格式，例如大家都是
-             * {@link Bitmap.Config#ARGB_8888}的，如果前面的{@link Bitmap}是
-             * {@link Bitmap.Config#ARGB_8888}，那么就不能支持{@link Bitmap.Config#ARGB_4444}
-             * 与{@link Bitmap.Config#RGB_565}格式的{@link Bitmap}了，
-             * 不过可以通过创建一个包含多种典型可重用{@link Bitmap}的对象池，
-             * 这样后续的{@link Bitmap}创建都能够找到合适的“模板”去进行重用</li>
-             * <li>{@link BitmapFactory.Options#inMutable}要设置为{@code true}</li></ol>
-             */
-            decodeBitmapOptions.inBitmap = null;
-            /**
-             * 配置Bitmap是否可以更改，比如：在Bitmap上隔几个像素加一条线段
-             */
-            decodeBitmapOptions.inMutable = true;
-        }
+        /**
+         * 使用{@link BitmapFactory.Options#inBitmap}前，每创建一个{@link Bitmap}需要独占一块内存，
+         * 使用{@link BitmapFactory.Options#inBitmap}后，多个{@link Bitmap}会复用同一块内存。
+         * <p>
+         * 所以使用{@link BitmapFactory.Options#inBitmap}能够大大提高内存的利用效率，
+         * 但是它也有几个限制条件：
+         * <ol><li>在SDK 11 -> 18之间，重用的{@link Bitmap}大小必须是一致的，
+         * 例如给{@link BitmapFactory.Options#inBitmap}赋值的图片大小为100-100，
+         * 那么新申请的{@link Bitmap}必须也为100-100才能够被重用。从SDK 19开始，
+         * 新申请的{@link Bitmap}大小必须小于或者等于已经赋值过的{@link Bitmap}大小</li>
+         * <li>新申请的{@link Bitmap}与旧的{@link Bitmap}必须有相同的解码格式，例如大家都是
+         * {@link Bitmap.Config#ARGB_8888}的，如果前面的{@link Bitmap}是
+         * {@link Bitmap.Config#ARGB_8888}，那么就不能支持{@link Bitmap.Config#ARGB_4444}
+         * 与{@link Bitmap.Config#RGB_565}格式的{@link Bitmap}了，
+         * 不过可以通过创建一个包含多种典型可重用{@link Bitmap}的对象池，
+         * 这样后续的{@link Bitmap}创建都能够找到合适的“模板”去进行重用</li>
+         * <li>{@link BitmapFactory.Options#inMutable}要设置为{@code true}</li></ol>
+         */
+        decodeBitmapOptions.inBitmap = null;
+        /**
+         * 配置Bitmap是否可以更改，比如：在Bitmap上隔几个像素加一条线段
+         */
+        decodeBitmapOptions.inMutable = true;
     }
 
     /**

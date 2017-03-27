@@ -590,7 +590,6 @@ public class Glide implements ComponentCallbacks2 {
      * @return A RequestManager for the given Fragment that can be used to start a load.
      * @see RequestManagerRetriever#get(android.app.Fragment)
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static RequestManager with(android.app.Fragment fragment) {
         return getRetriever(fragment.getActivity()).get(fragment);
     }

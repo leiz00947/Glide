@@ -88,7 +88,6 @@ public class FixedSizeDrawable extends Drawable {
         wrapped.setFilterBitmap(filter);
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public Callback getCallback() {
         return wrapped.getCallback();

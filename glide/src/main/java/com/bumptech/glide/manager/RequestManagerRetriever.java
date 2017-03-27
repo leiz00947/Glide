@@ -127,9 +127,8 @@ public class RequestManagerRetriever implements Handler.Callback {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public RequestManager get(Activity activity) {
-        if (Util.isOnBackgroundThread() || Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+        if (Util.isOnBackgroundThread()) {
             return get(activity.getApplicationContext());
         } else {
             assertNotDestroyed(activity);
@@ -186,7 +185,6 @@ public class RequestManagerRetriever implements Handler.Callback {
     /**
      * 每一个{@link Activity}或{@link android.app.Fragment}对应一个{@link RequestManager}实例
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private RequestManager fragmentGet(Context context, android.app.FragmentManager fm,
                                        android.app.Fragment parentHint) {
         RequestManagerFragment current = getRequestManagerFragment(fm, parentHint);
