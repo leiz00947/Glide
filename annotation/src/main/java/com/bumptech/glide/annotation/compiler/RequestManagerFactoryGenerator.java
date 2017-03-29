@@ -67,7 +67,7 @@ final class RequestManagerFactoryGenerator {
 
     }
 
-    TypeSpec generate(TypeSpec generatedRequestManagerSpec) {
+    TypeSpec generate(String generatedCodePackageName, TypeSpec generatedRequestManagerSpec) {
         return TypeSpec.classBuilder(GENERATED_REQUEST_MANAGER_FACTORY_SIMPLE_NAME)
                 .addModifiers(Modifier.FINAL)
                 .addSuperinterface(ClassName.get(requestManagerFactoryInterface))
@@ -82,9 +82,7 @@ final class RequestManagerFactoryGenerator {
                                 .addParameter(ClassName.get(requestManagerTreeNodeType), "treeNode")
                                 .addStatement(
                                         "return new $T(glide, lifecycle, treeNode)",
-                                        ClassName.get(
-                                                RequestManagerGenerator.GENERATED_REQUEST_MANAGER_PACKAGE_NAME,
-                                                generatedRequestManagerSpec.name))
+                                        ClassName.get(generatedCodePackageName, generatedRequestManagerSpec.name))
                                 .build()
                 )
                 .build();
