@@ -184,7 +184,7 @@ final class ProcessorUtil {
                         new Function<ParameterSpec, Object>() {
                             @Override
                             public Object apply(ParameterSpec input) {
-                                return input.name;
+                                return input.type;
                             }
                         }));
     }
