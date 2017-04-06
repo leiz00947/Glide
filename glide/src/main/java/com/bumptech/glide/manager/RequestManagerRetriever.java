@@ -25,8 +25,8 @@ import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.util.Preconditions;
 import com.bumptech.glide.util.Util;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -183,8 +183,9 @@ public class RequestManagerRetriever implements Handler.Callback {
         return get(fragment);
     }
 
-    private static void findAllSupportFragmentsWithViews(@Nullable List<Fragment> topLevelFragments,
-                                                         Map<View, Fragment> result) {
+    private static void findAllSupportFragmentsWithViews(
+            @Nullable Collection<Fragment> topLevelFragments,
+            Map<View, Fragment> result) {
         if (topLevelFragments == null) {
             return;
         }
