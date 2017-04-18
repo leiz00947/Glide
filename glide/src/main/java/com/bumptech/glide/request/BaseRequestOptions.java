@@ -749,7 +749,7 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      *
      * @param context Any {@link Context}.
      * @see #optionalTransform(Class, Transformation)
-     * @see #centerInside(Context) (android.content.Context)
+     * @see #centerInside()
      * @deprecated Use {@link #optionalCenterInside()}
      */
     @Deprecated
@@ -782,26 +782,6 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * Applies {@link CenterInside} to all default types and throws an exception if asked to transform an unknown type.
      * <p>
      * This will override previous calls to {@link #dontTransform()}.
-     *
-     * @param context Any {@link Context}.
-     * @see #transform(Class, Transformation)
-     * @see #optionalCenterInside(Context) (android.content.Context)
-     * @deprecated Use {@link #centerInside()}
-     */
-    @Deprecated
-    @GlideOption(
-            staticMethodName = "centerInsideTransform",
-            memoizeStaticMethod = true
-    )
-    public CHILD centerInside(@SuppressWarnings("unused") Context context) {
-        return centerInside();
-    }
-
-    /**
-     * Applies {@link com.bumptech.glide.load.resource.bitmap.CenterInside} to all default types and
-     * throws an exception if asked to transform an unknown type.
-     * <p>
-     * <p>This will override previous calls to {@link #dontTransform()}.
      *
      * @see #transform(Class, com.bumptech.glide.load.Transformation)
      * @see #optionalCenterInside()
