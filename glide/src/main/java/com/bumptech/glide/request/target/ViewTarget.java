@@ -3,6 +3,7 @@ package com.bumptech.glide.request.target;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.util.Log;
@@ -225,11 +226,8 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
         void getSize(SizeReadyCallback cb) {
             int currentWidth = getViewWidthOrParam();
             int currentHeight = getViewHeightOrParam();
-            /**
-             * 若{@link currentWidth}或{@link currentHeight}任何一个被赋值为{@link PENDING_SIZE}，
-             * 则条件不成立
-             */
-            if (isSizeValid(currentWidth) && isSizeValid(currentHeight)) {
+            // 若currentWidth或currentHeight任何一个被赋值为PENDING_SIZE，则条件不成立
+            if (isViewStateValid() && isSizeValid(currentWidth) && isSizeValid(currentHeight)) {
                 int paddingAdjustedWidth = currentWidth == WindowManager.LayoutParams.WRAP_CONTENT
                         ? currentWidth
                         : currentWidth - ViewCompat.getPaddingStart(view) - ViewCompat.getPaddingEnd(view);
@@ -245,9 +243,7 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
                     cbs.add(cb);
                 }
                 if (layoutListener == null) {
-                    /**
-                     * {@link ViewTreeObserver}是观察{@link View}对象的监听器
-                     */
+                    // ViewTreeObserver是观察View对象的监听器
                     final ViewTreeObserver observer = view.getViewTreeObserver();
                     layoutListener = new SizeDeterminerLayoutListener(this);
                     observer.addOnPreDrawListener(layoutListener);
@@ -268,6 +264,13 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
             }
             layoutListener = null;
             cbs.clear();
+        }
+
+        private boolean isViewStateValid() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                return view.isLaidOut();
+            }
+            return !view.isLayoutRequested();
         }
 
         /**
