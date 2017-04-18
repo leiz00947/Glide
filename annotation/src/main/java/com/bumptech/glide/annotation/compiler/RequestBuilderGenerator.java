@@ -106,7 +106,7 @@ final class RequestBuilderGenerator {
      * A set of method names to avoid overriding from BaseRequestOptions.
      */
     private static final ImmutableSet<String> EXCLUDED_METHODS_FROM_BASE_REQUEST_OPTIONS =
-            ImmutableSet.of("clone", "apply", "autoLock", "lock");
+            ImmutableSet.of("clone", "apply", "autoLock", "lock", "autoClone");
 
     private final ProcessingEnvironment processingEnv;
     private final ProcessorUtil processorUtil;
