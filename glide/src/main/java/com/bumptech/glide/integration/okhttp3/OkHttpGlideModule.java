@@ -18,7 +18,7 @@ import java.io.InputStream;
  * module will be merged in by manifest merger. For other build systems or for more more
  * information, see {@link GlideModule}.
  *
- * @deprecated Replaced by {@link OkHttpChildGlideModule} for Applications that use Glide's
+ * @deprecated Replaced by {@link OkHttpLibraryGlideModule} for Applications that use Glide's
  * annotations.
  */
 @Deprecated
