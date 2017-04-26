@@ -676,7 +676,6 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      *
      * @param context Any {@link Context}.
      * @see #optionalTransform(Class, Transformation)
-     * @see #fitCenter(Context)
      * @deprecated Use {@link #optionalFitCenter()}.
      */
     @Deprecated
@@ -710,26 +709,6 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * throws an exception if asked to transform an unknown type.
      * <p>
      * This will override previous calls to {@link #dontTransform()}.
-     *
-     * @param context Any {@link Context}.
-     * @see #transform(Class, Transformation)
-     * @see #optionalFitCenter(Context)
-     * @deprecated Use {@link #fitCenter()}.
-     */
-    @Deprecated
-    @GlideOption(
-            staticMethodName = "fitCenterTransform",
-            memoizeStaticMethod = true
-    )
-    public CHILD fitCenter(@SuppressWarnings("unused") Context context) {
-        return fitCenter();
-    }
-
-    /**
-     * Applies {@link com.bumptech.glide.load.resource.bitmap.FitCenter} to all default types and
-     * throws an exception if asked to transform an unknown type.
-     * <p>
-     * <p>This will override previous calls to {@link #dontTransform()}.
      *
      * @see #transform(Class, com.bumptech.glide.load.Transformation)
      * @see #optionalFitCenter()
