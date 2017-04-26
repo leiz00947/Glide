@@ -1,7 +1,5 @@
 package com.bumptech.glide.annotation.compiler;
 
-import static com.bumptech.glide.annotation.compiler.GlideAnnotationProcessor.DEBUG;
-
 import com.bumptech.glide.annotation.GlideExtension;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -43,30 +41,32 @@ import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
+import static com.bumptech.glide.annotation.compiler.GlideAnnotationProcessor.DEBUG;
+
 /**
  * Utilities for writing classes and logging.
  */
 final class ProcessorUtil {
     private static final String GLIDE_MODULE_PACKAGE_NAME = "com.bumptech.glide.module";
-    private static final String ROOT_GLIDE_MODULE_SIMPLE_NAME = "RootGlideModule";
+    private static final String APP_GLIDE_MODULE_SIMPLE_NAME = "AppGlideModule";
     private static final String CHILD_GLIDE_MODULE_SIMPLE_NAME = "ChildGlideModule";
-    private static final String ROOT_GLIDE_MODULE_QUALIFIED_NAME =
-            GLIDE_MODULE_PACKAGE_NAME + "." + ROOT_GLIDE_MODULE_SIMPLE_NAME;
+    private static final String APP_GLIDE_MODULE_QUALIFIED_NAME =
+            GLIDE_MODULE_PACKAGE_NAME + "." + APP_GLIDE_MODULE_SIMPLE_NAME;
     private static final String CHILD_GLIDE_MODULE_QUALIFIED_NAME =
             GLIDE_MODULE_PACKAGE_NAME + "." + CHILD_GLIDE_MODULE_SIMPLE_NAME;
     private static final String COMPILER_PACKAGE_NAME =
             GlideAnnotationProcessor.class.getPackage().getName();
 
     private final ProcessingEnvironment processingEnv;
-    private final TypeElement rootGlideModuleType;
+    private final TypeElement appGlideModuleType;
     private final TypeElement childGlideModuleType;
     private int round;
 
     ProcessorUtil(ProcessingEnvironment processingEnv) {
         this.processingEnv = processingEnv;
 
-        rootGlideModuleType =
-                processingEnv.getElementUtils().getTypeElement(ROOT_GLIDE_MODULE_QUALIFIED_NAME);
+        appGlideModuleType =
+                processingEnv.getElementUtils().getTypeElement(APP_GLIDE_MODULE_QUALIFIED_NAME);
         childGlideModuleType =
                 processingEnv.getElementUtils().getTypeElement(CHILD_GLIDE_MODULE_QUALIFIED_NAME);
     }
@@ -75,9 +75,9 @@ final class ProcessorUtil {
         round++;
     }
 
-    boolean isRootGlideModule(TypeElement element) {
+    boolean isAppGlideModule(TypeElement element) {
         return processingEnv.getTypeUtils().isAssignable(element.asType(),
-                rootGlideModuleType.asType());
+                appGlideModuleType.asType());
     }
 
     boolean isChildGlideModule(TypeElement element) {
