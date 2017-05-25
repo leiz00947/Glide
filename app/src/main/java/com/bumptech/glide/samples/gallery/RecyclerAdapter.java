@@ -42,7 +42,7 @@ class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListViewHolde
     this.data = data;
     requestBuilder = requestManager
         .asDrawable()
-        .apply(fitCenterTransform(context));
+        .apply(fitCenterTransform());
 
     setHasStableIds(true);
 
