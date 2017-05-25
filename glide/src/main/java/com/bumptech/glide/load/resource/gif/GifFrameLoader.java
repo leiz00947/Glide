@@ -156,7 +156,7 @@ class GifFrameLoader {
     }
 
     int getLoopCount() {
-        return gifDecoder.getLoopCount();
+        return gifDecoder.getTotalIterationCount();
     }
 
     private void start() {

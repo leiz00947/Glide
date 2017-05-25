@@ -16,6 +16,14 @@ import java.util.List;
  * @see <a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt">GIF 89a Specification</a>
  */
 public class GifHeader {
+    /**
+     * The "Netscape" loop count which means loop forever.
+     */
+    public static final int NETSCAPE_LOOP_COUNT_FOREVER = 0;
+    /**
+     * Indicates that this header has no "Netscape" loop count.
+     */
+    public static final int NETSCAPE_LOOP_COUNT_DOES_NOT_EXIST = -1;
 
     @ColorInt
     int[] gct = null;
@@ -52,7 +60,7 @@ public class GifHeader {
     int pixelAspect;
     @ColorInt
     int bgColor;
-    int loopCount;
+    int loopCount = NETSCAPE_LOOP_COUNT_DOES_NOT_EXIST;
 
     public int getHeight() {
         return height;

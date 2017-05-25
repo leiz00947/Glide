@@ -21,6 +21,8 @@ import com.bumptech.glide.util.Preconditions;
 
 import java.nio.ByteBuffer;
 
+import static com.bumptech.glide.gifdecoder.GifDecoder.TOTAL_ITERATION_COUNT_FOREVER;
+
 /**
  * An animated {@link Drawable} that plays the frames of an animated GIF.
  * <p>
@@ -327,7 +329,9 @@ public class GifDrawable extends Drawable implements GifFrameLoader.FrameCallbac
         }
 
         if (loopCount == LOOP_INTRINSIC) {
-            maxLoopCount = state.frameLoader.getLoopCount();
+            int intrinsicCount = state.frameLoader.getLoopCount();
+            maxLoopCount =
+                    (intrinsicCount == TOTAL_ITERATION_COUNT_FOREVER) ? LOOP_FOREVER : intrinsicCount;
         } else {
             maxLoopCount = loopCount;
         }
