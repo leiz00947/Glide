@@ -602,7 +602,6 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      *
      * @param context Any {@link Context}.
      * @see #optionalTransform(Class, Transformation)
-     * @see #centerCrop(Context)
      * @deprecated Use {@link #optionalCenterCrop()}.
      */
     @Deprecated
@@ -629,26 +628,6 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
     )
     public CHILD optionalCenterCrop() {
         return optionalTransform(DownsampleStrategy.CENTER_OUTSIDE, new CenterCrop());
-    }
-
-    /**
-     * Applies {@link CenterCrop} to all default types and
-     * throws an exception if asked to transform an unknown type.
-     * <p>
-     * this will override previous calls to {@link #dontTransform()}.
-     *
-     * @param context any {@link Context}.
-     * @see #transform(Class, Transformation)
-     * @see #optionalCenterCrop(Context)
-     * @deprecated Use {@link #centerCrop()}.
-     */
-    @Deprecated
-    @GlideOption(
-            staticMethodName = "centerCropTransform",
-            memoizeStaticMethod = true
-    )
-    public CHILD centerCrop(@SuppressWarnings("unused") Context context) {
-        return centerCrop();
     }
 
     /**
