@@ -596,24 +596,6 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
     }
 
     /**
-     * Applies {@link CenterCrop} to all default types, and ignores unknown types.
-     * <p>
-     * This will override previous calls to {@link #dontTransform()}.
-     *
-     * @param context Any {@link Context}.
-     * @see #optionalTransform(Class, Transformation)
-     * @deprecated Use {@link #optionalCenterCrop()}.
-     */
-    @Deprecated
-    @GlideOption(
-            staticMethodName = "optionalCenterCropTransform",
-            memoizeStaticMethod = true
-    )
-    public CHILD optionalCenterCrop(@SuppressWarnings("unused") Context context) {
-        return optionalCenterCrop();
-    }
-
-    /**
      * Applies {@link com.bumptech.glide.load.resource.bitmap.CenterCrop} to all default types, and
      * ignores unknown types.
      * <p>
@@ -773,7 +755,6 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      *
      * @param context Any {@link Context}.
      * @see #transform(Class, Transformation)
-     * @see #optionalCenterCrop(Context)
      * @deprecated Use {@link #circleCrop()}.
      */
     @Deprecated
