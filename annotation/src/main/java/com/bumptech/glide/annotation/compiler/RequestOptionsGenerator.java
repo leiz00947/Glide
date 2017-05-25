@@ -579,8 +579,10 @@ final class RequestOptionsGenerator {
         private final TypeName returnType;
         private final List<TypeName> parameterTypes;
         private final Set<Modifier> modifiers;
+        private final String name;
 
         MethodSignature(MethodSpec spec) {
+            name = spec.name;
             modifiers = spec.modifiers;
             returnType = spec.returnType;
             parameterTypes =
@@ -598,7 +600,8 @@ final class RequestOptionsGenerator {
         public boolean equals(Object o) {
             if (o instanceof MethodSignature) {
                 MethodSignature other = (MethodSignature) o;
-                return returnType.equals(other.returnType)
+                return name.equals(other.name)
+                        && returnType.equals(other.returnType)
                         && parameterTypes.equals(other.parameterTypes)
                         && modifiers.equals(other.modifiers);
             }
@@ -607,7 +610,7 @@ final class RequestOptionsGenerator {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(returnType, parameterTypes, modifiers);
+            return Objects.hashCode(name, returnType, parameterTypes, modifiers);
         }
     }
 }
