@@ -253,7 +253,7 @@ final class RequestManagerGenerator {
     }
 
     /**
-     * The {@link com.bumptech.glide.request.BaseRequestOptions} subclass should always be our
+     * The {@link com.bumptech.glide.request.RequestOptions} subclass should always be our
      * generated subclass type to avoid inadvertent errors where a different subclass is applied that
      * accidentally wipes out some logic in overidden methods in our generated subclass.
      */
@@ -265,9 +265,9 @@ final class RequestManagerGenerator {
         }
 
         Elements elementUtils = processingEnv.getElementUtils();
-        TypeElement baseRequestOptionsType =
+        TypeElement requestOptionsType =
                 elementUtils.getTypeElement(
-                        RequestOptionsGenerator.BASE_REQUEST_OPTIONS_QUALIFIED_NAME);
+                        RequestOptionsGenerator.REQUEST_OPTIONS_QUALIFIED_NAME);
         TypeElement androidNonNullType =
                 elementUtils.getTypeElement("android.support.annotation.NonNull");
 
@@ -283,7 +283,7 @@ final class RequestManagerGenerator {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PROTECTED)
                 .addParameter(
-                        ParameterSpec.builder(ClassName.get(baseRequestOptionsType), parameterName)
+                        ParameterSpec.builder(ClassName.get(requestOptionsType), parameterName)
                                 .addAnnotation(ClassName.get(androidNonNullType))
                                 .build())
                 .beginControlFlow("if ($N instanceof $L)",

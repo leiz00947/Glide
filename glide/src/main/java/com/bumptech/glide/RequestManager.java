@@ -19,7 +19,6 @@ import com.bumptech.glide.manager.LifecycleListener;
 import com.bumptech.glide.manager.RequestManagerTreeNode;
 import com.bumptech.glide.manager.RequestTracker;
 import com.bumptech.glide.manager.TargetTracker;
-import com.bumptech.glide.request.BaseRequestOptions;
 import com.bumptech.glide.request.Request;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
@@ -77,7 +76,7 @@ public class RequestManager implements LifecycleListener {
     private final ConnectivityMonitor connectivityMonitor;
 
     @NonNull
-    private BaseRequestOptions<?> requestOptions;
+    private RequestOptions requestOptions;
 
     public RequestManager(Glide glide, Lifecycle lifecycle, RequestManagerTreeNode treeNode) {
         this(glide, lifecycle, treeNode, new RequestTracker(), glide.getConnectivityMonitorFactory());
@@ -122,11 +121,11 @@ public class RequestManager implements LifecycleListener {
         glide.registerRequestManager(this);
     }
 
-    protected void setRequestOptions(@NonNull BaseRequestOptions<?> toSet) {
+    protected void setRequestOptions(@NonNull RequestOptions toSet) {
         this.requestOptions = toSet.clone().autoClone();
     }
 
-    private void updateRequestOptions(BaseRequestOptions<?> toUpdate) {
+    private void updateRequestOptions(RequestOptions toUpdate) {
         this.requestOptions.apply(toUpdate);
     }
 
@@ -145,7 +144,7 @@ public class RequestManager implements LifecycleListener {
      * <p>The modified options will only be applied to loads started after this method is called.
      *
      * @return This request manager.
-     * @see RequestBuilder#apply(BaseRequestOptions)
+     * @see RequestBuilder#apply(RequestOptions)
      */
     public RequestManager applyDefaultRequestOptions(RequestOptions requestOptions) {
         updateRequestOptions(requestOptions);
@@ -475,7 +474,7 @@ public class RequestManager implements LifecycleListener {
         requestTracker.runRequest(request);
     }
 
-    BaseRequestOptions<?> getDefaultRequestOptions() {
+    RequestOptions getDefaultRequestOptions() {
         return requestOptions;
     }
 

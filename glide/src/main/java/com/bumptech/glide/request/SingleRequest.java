@@ -102,7 +102,7 @@ public final class SingleRequest<R> implements Request,
     /**
      * 默认情况下为{@link com.bumptech.glide.GlideBuilder#defaultRequestOptions}
      */
-    private BaseRequestOptions<?> requestOptions;
+    private RequestOptions requestOptions;
     private int overrideWidth;
     private int overrideHeight;
     private Priority priority;
@@ -129,7 +129,7 @@ public final class SingleRequest<R> implements Request,
     /**
      * 从{@link #POOL}对象池中取一个对象作为返回值，若获取的对象为空，则创建一个新的
      * {@link SingleRequest}对象作为返回值；然后调用
-     * {@link SingleRequest#init(GlideContext, Object, Class, BaseRequestOptions,
+     * {@link SingleRequest#init(GlideContext, Object, Class, RequestOptions,
      * int, int, Priority, Target, RequestListener, RequestCoordinator, Engine, TransitionFactory)}
      *
      * @param model           资源来源（如{@link java.io.InputStream}、{@link java.net.URL}、远程网址等）
@@ -144,7 +144,7 @@ public final class SingleRequest<R> implements Request,
             GlideContext glideContext,
             Object model,
             Class<R> transcodeClass,
-            BaseRequestOptions<?> requestOptions,
+            RequestOptions requestOptions,
             int overrideWidth,
             int overrideHeight,
             Priority priority,
@@ -183,7 +183,7 @@ public final class SingleRequest<R> implements Request,
             GlideContext glideContext,
             Object model,
             Class<R> transcodeClass,
-            BaseRequestOptions<?> requestOptions,
+            RequestOptions requestOptions,
             int overrideWidth,
             int overrideHeight,
             Priority priority,
@@ -410,7 +410,7 @@ public final class SingleRequest<R> implements Request,
     /**
      * A callback method that should never be invoked directly.
      * <p>
-     * 一般的，根据{@link BaseRequestOptions#getSizeMultiplier()}对宽高值传参进行调整，然后执行
+     * 一般的，根据{@link RequestOptions#getSizeMultiplier()}对宽高值传参进行调整，然后执行
      * {@link Engine#load(GlideContext, Object, Key, int, int, Class, Class, Priority,
      * DiskCacheStrategy, Map, boolean, Options, boolean, boolean, boolean, ResourceCallback)}
      */
@@ -468,7 +468,7 @@ public final class SingleRequest<R> implements Request,
 
     /**
      * 判断是否是刚开始加载图片的状态，即{@link #status}不为{@link Status#COMPLETE}（也可以理解为显示
-     * {@link BaseRequestOptions#getPlaceholderDrawable()}的状态）
+     * {@link RequestOptions#getPlaceholderDrawable()}的状态）
      */
     private boolean isFirstReadyResource() {
         return requestCoordinator == null || !requestCoordinator.isAnyResourceSet();
