@@ -85,12 +85,9 @@ final class AppModuleProcessor {
         // in a project.
         String generatedCodePackageName = appModule.getEnclosingElement().toString();
 
-        TypeSpec generatedRequestOptions = null;
-        if (!indexedClassNames.extensions.isEmpty()) {
-            generatedRequestOptions =
-                    requestOptionsGenerator.generate(generatedCodePackageName, indexedClassNames.extensions);
-            writeRequestOptions(generatedCodePackageName, generatedRequestOptions);
-        }
+        TypeSpec generatedRequestOptions =
+                requestOptionsGenerator.generate(generatedCodePackageName, indexedClassNames.extensions);
+        writeRequestOptions(generatedCodePackageName, generatedRequestOptions);
 
         TypeSpec generatedRequestBuilder =
                 requestBuilderGenerator.generate(generatedCodePackageName, generatedRequestOptions);
