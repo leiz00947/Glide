@@ -795,7 +795,6 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
      * This will override previous calls to {@link #dontTransform()}.
      *
      * @param context Any {@link Context}.
-     * @see #optionalTransform(Context, Transformation)
      * @see #circleCrop(Context)
      * @deprecated use {@link #optionalCircleCrop()}.
      */
@@ -909,26 +908,6 @@ public abstract class BaseRequestOptions<CHILD extends BaseRequestOptions<CHILD>
         isTransformationRequired = true;
         fields |= TRANSFORMATION_REQUIRED;
         return selfOrThrowIfLocked();
-    }
-
-    /**
-     * Applies the given {@link Transformation} for
-     * {@link Bitmap Bitmaps} to the default types ({@link Bitmap},
-     * {@link BitmapDrawable}, and
-     * {@link GifDrawable}) and ignores unknown types.
-     * <p>
-     * This will override previous calls to {@link #dontTransform()}.
-     *
-     * @param context        Any {@link Context}.
-     * @param transformation Any {@link Transformation} for
-     *                       {@link Bitmap}s.
-     * @see #transform(Class, Transformation)
-     * @deprecated Use {@link #optionalTransform(Transformation)}
-     */
-    @Deprecated
-    @GlideOption(staticMethodName = "optionalBitmapTransform")
-    public CHILD optionalTransform(Context context, Transformation<Bitmap> transformation) {
-        return optionalTransform(transformation);
     }
 
     /**
