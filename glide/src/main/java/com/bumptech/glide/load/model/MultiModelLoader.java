@@ -1,5 +1,6 @@
 package com.bumptech.glide.load.model;
 
+import android.support.annotation.Nullable;
 import android.support.v4.util.Pools.Pool;
 
 import com.bumptech.glide.Priority;
@@ -79,6 +80,7 @@ class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
         private int currentIndex;
         private Priority priority;
         private DataCallback<? super Data> callback;
+        @Nullable
         private List<Exception> exceptions;
 
         MultiFetcher(List<DataFetcher<Data>> fetchers, Pool<List<Exception>> exceptionListPool) {
@@ -98,7 +100,9 @@ class MultiModelLoader<Model, Data> implements ModelLoader<Model, Data> {
 
         @Override
         public void cleanup() {
-            exceptionListPool.release(exceptions);
+            if (exceptions != null) {
+                exceptionListPool.release(exceptions);
+            }
             exceptions = null;
             for (DataFetcher<Data> fetcher : fetchers) {
                 fetcher.cleanup();
