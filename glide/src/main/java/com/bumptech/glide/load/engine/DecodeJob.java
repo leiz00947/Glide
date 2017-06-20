@@ -277,6 +277,9 @@ class DecodeJob<R> implements DataFetcherGenerator.FetcherReadyCallback,
                 throw e;
             }
         } finally {
+            if (currentFetcher != null) {
+                currentFetcher.cleanup();
+            }
             TraceCompat.endSection();
         }
     }
