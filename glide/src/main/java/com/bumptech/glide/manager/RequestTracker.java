@@ -30,8 +30,7 @@ public class RequestTracker {
             Collections.newSetFromMap(new WeakHashMap<Request, Boolean>());
     // A set of requests that have not completed and are queued to be run again. We use this list to
     // maintain hard references to these requests to ensure that they are not garbage collected
-    // before
-    // they start running or while they are paused. See #346.
+    // before they start running or while they are paused. See #346.
     /**
      * 用来存放延迟请求的集合（比如当前应用处于暂停状态，那么就将请求添加到这个集合中，当应用再次唤醒，
      * 那么再执行这里面存放的延迟请求）
@@ -64,8 +63,12 @@ public class RequestTracker {
      * 清除请求并将该请求从存放所有请求的集合中移除掉
      */
     public boolean clearRemoveAndRecycle(Request request) {
-        boolean isOwnedByUs =
-                request != null && (requests.remove(request) || pendingRequests.remove(request));
+        if (request == null) {
+            return false;
+        }
+        boolean isOwnedByUs = requests.remove(request);
+        // Avoid short circuiting.
+        isOwnedByUs = pendingRequests.remove(request) || isOwnedByUs;
         if (isOwnedByUs) {
             request.clear();
             request.recycle();
