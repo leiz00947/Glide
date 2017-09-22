@@ -23,7 +23,7 @@ import com.bumptech.glide.load.DataSource;
 public interface DataFetcher<T> {
 
     /**
-     * Callback that should be called when data has been loaded and is available, or when the load fails.
+     * Callback that must be called when data has been loaded and is available, or when the load fails.
      * <p>
      * 当数据完成加载或加载失败时的回调接口
      *
@@ -45,20 +45,26 @@ public interface DataFetcher<T> {
     }
 
     /**
-     * Synchronously fetch data from which a resource can be decoded.
+     * Fetch data from which a resource can be decoded.
+     * <p>
+     * <p> This will always be called on background thread so it is safe to perform long running tasks
+     * here. Any third party libraries called must be thread safe (or move the work to another thread)
+     * since this method will be called from a thread in a
+     * {@link java.util.concurrent.ExecutorService}
+     * that may have more than one background thread. </p>
+     * <p>
+     * You <b>MUST</b> use the {@link DataCallback} once the request is complete.
      * <p>
      * 加载资源（可以将加载后的资源数据保存下来，比如以流的形式），然后回调{@link DataCallback}接口
      * <p>
-     * This will always be called on
-     * background thread so it is safe to perform long running tasks here. Any third party libraries
-     * called must be thread safe since this method will be called from a thread in a {@link
-     * java.util.concurrent.ExecutorService} that may have more than one background thread.
+     * You are free to move the fetch work to another thread and call the callback from there.
      * <p>
      * This method will only be called when the corresponding resource is not in the cache.
      * <p>
      * Note - this method will be run on a background thread so blocking I/O is safe.
      *
      * @param priority The priority with which the request should be completed.
+     * @param callback The callback to use when the request is complete
      * @see #cleanup() where the data retuned will be cleaned up
      */
     void loadData(Priority priority, DataCallback<? super T> callback);
