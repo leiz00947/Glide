@@ -1,6 +1,7 @@
 package com.bumptech.glide.load.data;
 
 import android.content.res.AssetManager;
+import android.support.annotation.NonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +26,7 @@ public class StreamAssetPathFetcher extends AssetPathFetcher<InputStream> {
         data.close();
     }
 
+    @NonNull
     @Override
     public Class<InputStream> getDataClass() {
         return InputStream.class;

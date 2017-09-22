@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.bumptech.glide.Priority;
@@ -85,11 +86,13 @@ public final class MediaStoreFileLoader implements ModelLoader<Uri, File> {
             // Do nothing.
         }
 
+        @NonNull
         @Override
         public Class<File> getDataClass() {
             return File.class;
         }
 
+        @NonNull
         @Override
         public DataSource getDataSource() {
             return DataSource.LOCAL;

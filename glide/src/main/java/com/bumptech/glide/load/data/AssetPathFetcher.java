@@ -1,6 +1,7 @@
 package com.bumptech.glide.load.data;
 
 import android.content.res.AssetManager;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
@@ -57,6 +58,7 @@ public abstract class AssetPathFetcher<T> implements DataFetcher<T> {
         // Do nothing.
     }
 
+    @NonNull
     @Override
     public DataSource getDataSource() {
         return DataSource.LOCAL;
