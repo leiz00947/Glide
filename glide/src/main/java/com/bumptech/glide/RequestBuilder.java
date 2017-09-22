@@ -376,14 +376,19 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
             throw new IllegalArgumentException("You must call #load() before calling #into()");
         }
 
+        requestOptions.lock();
+        Request request = buildRequest(target);
+
         Request previous = target.getRequest();
 
         if (previous != null) {
+            if (request.isEquivalentTo(previous)) {
+                request.recycle();
+                return target;
+            }
             requestManager.clear(target);
         }
 
-        requestOptions.lock();
-        Request request = buildRequest(target);
         target.setRequest(request);
         requestManager.track(target, request);
 
