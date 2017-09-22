@@ -99,6 +99,7 @@ public class Glide implements ComponentCallbacks2 {
     private static final String DEFAULT_DISK_CACHE_DIR = "image_manager_disk_cache";
     private static final String TAG = "Glide";
     private static volatile Glide glide;
+    private static volatile boolean isInitializing;
 
     private final Engine engine;
     private final BitmapPool bitmapPool;
@@ -165,7 +166,15 @@ public class Glide implements ComponentCallbacks2 {
         if (glide == null) {
             synchronized (Glide.class) {
                 if (glide == null) {
+                    // In the thread running initGlide(), one or more classes may call Glide.get(context).
+                    // Without this check, those calls could trigger infinite recursion.
+                    if (isInitializing) {
+                        throw new IllegalStateException("You cannot call Glide.get() in registerComponents(),"
+                                + " use the provided Glide instance instead");
+                    }
+                    isInitializing = true;
                     initGlide(context);
+                    isInitializing = false;
                 }
             }
         }
@@ -174,7 +183,7 @@ public class Glide implements ComponentCallbacks2 {
     }
 
     @VisibleForTesting
-    public static void init(Glide glide) {
+    public static synchronized void init(Glide glide) {
         Glide.glide = glide;
     }
 
@@ -182,7 +191,7 @@ public class Glide implements ComponentCallbacks2 {
      * 将单例Glide实例置空
      */
     @VisibleForTesting
-    public static void tearDown() {
+    public static synchronized void tearDown() {
         glide = null;
     }
 
@@ -229,13 +238,14 @@ public class Glide implements ComponentCallbacks2 {
         if (annotationGeneratedModule != null) {
             annotationGeneratedModule.applyOptions(applicationContext, builder);
         }
-        glide = builder.build(applicationContext);
+        Glide glide = builder.build(applicationContext);
         for (GlideModule module : manifestModules) {
             module.registerComponents(applicationContext, glide, glide.registry);
         }
         if (annotationGeneratedModule != null) {
             annotationGeneratedModule.registerComponents(applicationContext, glide, glide.registry);
         }
+        Glide.glide = glide;
     }
 
     @Nullable
