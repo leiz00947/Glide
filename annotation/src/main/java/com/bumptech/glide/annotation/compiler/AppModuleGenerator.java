@@ -9,24 +9,22 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
 import com.squareup.javapoet.WildcardTypeName;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
 /**
  * Generates a new implementation of a AppGlideModule that calls all included LibraryGlideModules
  * and the original AppGlideModule.
- * <p>
+ *
  * <p>The generated class will always call the AppGlideModule last to give it priority over choices
  * made or classes registered in LibraryGlideModules.
- * <p>
+ *
  * <p>Android logging is included to allow developers to see exactly which modules are included at
  * runtime.
- * <p>
+ *
  * <p>The generated class looks something like this:
  * <pre>
  * <code>
@@ -183,6 +181,7 @@ final class AppModuleGenerator {
                         .addModifiers(Modifier.PUBLIC)
                         .addAnnotation(Override.class)
                         .addParameter(ClassName.get("android.content", "Context"), "context")
+                        .addParameter(ClassName.get("com.bumptech.glide", "Glide"), "glide")
                         .addParameter(ClassName.get("com.bumptech.glide", "Registry"), "registry");
 
         for (String glideModule : libraryGlideModuleClassNames) {
@@ -191,10 +190,10 @@ final class AppModuleGenerator {
             }
             ClassName moduleClassName = ClassName.bestGuess(glideModule);
             registerComponents.addStatement(
-                    "new $T().registerComponents(context, registry)", moduleClassName);
+                    "new $T().registerComponents(context, glide, registry)", moduleClassName);
         }
         // Order matters here. The AppGlideModule must be called last.
-        registerComponents.addStatement("appGlideModule.registerComponents(context, registry)");
+        registerComponents.addStatement("appGlideModule.registerComponents(context, glide, registry)");
         return registerComponents.build();
     }
 

@@ -1,22 +1,21 @@
 package com.bumptech.glide.integration.okhttp3;
 
 import android.content.Context;
-
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.Registry;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.module.GlideModule;
-
 import java.io.InputStream;
 
 /**
- * A {@link GlideModule} implementation to replace Glide's default
+ * A {@link com.bumptech.glide.module.GlideModule} implementation to replace Glide's default
  * {@link java.net.HttpURLConnection} based {@link com.bumptech.glide.load.model.ModelLoader}
  * with an OkHttp based {@link com.bumptech.glide.load.model.ModelLoader}.
- * <p>
- * If you're using gradle, you can include this module simply by depending on the aar, the
+ *
+ * <p> If you're using gradle, you can include this module simply by depending on the aar, the
  * module will be merged in by manifest merger. For other build systems or for more more
- * information, see {@link GlideModule}.
+ * information, see {@link com.bumptech.glide.module.GlideModule}. </p>
  *
  * @deprecated Replaced by {@link OkHttpLibraryGlideModule} for Applications that use Glide's
  * annotations.
@@ -29,7 +28,7 @@ public class OkHttpGlideModule implements GlideModule {
     }
 
     @Override
-    public void registerComponents(Context context, Registry registry) {
+    public void registerComponents(Context context, Glide glide, Registry registry) {
         registry.replace(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory());
     }
 }
