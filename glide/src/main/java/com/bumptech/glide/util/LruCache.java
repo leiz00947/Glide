@@ -61,6 +61,13 @@ public class LruCache<T, Y> {
     }
 
     /**
+     * Returns the number of entries stored in cache.
+     */
+    protected int getCount() {
+        return cache.size();
+    }
+
+    /**
      * A callback called whenever an item is evicted from the cache. Subclasses can override.
      *
      * @param key  The key of the evicted item.
