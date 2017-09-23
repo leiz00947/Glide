@@ -35,33 +35,32 @@ public final class MemorySizeCalculator {
         int getHeightPixels();
     }
 
-    MemorySizeCalculator(Context context, ActivityManager activityManager,
-                         ScreenDimensions screenDimensions, float memoryCacheScreens, float bitmapPoolScreens,
-                         int targetArrayPoolSize, float maxSizeMultiplier, float lowMemoryMaxSizeMultiplier) {
-        this.context = context;
+    private MemorySizeCalculator(MemorySizeCalculator.Builder builder) {
+        this.context = builder.context;
         /**
          * 若设备为低内存设备，则将数组池大小减少一半
          */
-        arrayPoolSize = isLowMemoryDevice(activityManager)
-                ? targetArrayPoolSize / LOW_MEMORY_BYTE_ARRAY_POOL_DIVISOR
-                : targetArrayPoolSize;
-        final int maxSize = getMaxSize(activityManager, maxSizeMultiplier, lowMemoryMaxSizeMultiplier);
+        arrayPoolSize = isLowMemoryDevice(builder.activityManager)
+                ? builder.arrayPoolSizeBytes / LOW_MEMORY_BYTE_ARRAY_POOL_DIVISOR
+                : builder.arrayPoolSizeBytes;
+        int maxSize = getMaxSize(
+                builder.activityManager, builder.maxSizeMultiplier, builder.lowMemoryMaxSizeMultiplier);
 
         /**
          * 每个像素点占用4个字节，整个屏幕的像素点所占用的总字节数
          */
-        final int screenSize = screenDimensions.getWidthPixels()
-                * screenDimensions.getHeightPixels()
-                * BYTES_PER_ARGB_8888_PIXEL;
+        int screenSize = builder.screenDimensions.getWidthPixels() *
+                builder.screenDimensions.getHeightPixels() *
+                BYTES_PER_ARGB_8888_PIXEL;
 
         /**
          * 默认4张全屏图的大小，作为图片池占用的内存大小
          */
-        int targetPoolSize = Math.round(screenSize * bitmapPoolScreens);
+        int targetPoolSize = Math.round(screenSize * builder.bitmapPoolScreens);
         /**
          * 默认2张全屏图的大小，作为缓存占用的内存大小
          */
-        int targetMemoryCacheSize = Math.round(screenSize * memoryCacheScreens);
+        int targetMemoryCacheSize = Math.round(screenSize * builder.memoryCacheScreens);
         /**
          * 该进程可用的内存除开数组池后还剩余的内存大小（该值可用来分配图片池所占内存和
          * 缓存所占内存）
@@ -76,9 +75,9 @@ public final class MemorySizeCalculator {
             memoryCacheSize = targetMemoryCacheSize;
             bitmapPoolSize = targetPoolSize;
         } else {
-            float part = availableSize / (bitmapPoolScreens + memoryCacheScreens);
-            memoryCacheSize = Math.round(part * memoryCacheScreens);
-            bitmapPoolSize = Math.round(part * bitmapPoolScreens);
+            float part = availableSize / (builder.bitmapPoolScreens + builder.memoryCacheScreens);
+            memoryCacheSize = Math.round(part * builder.memoryCacheScreens);
+            bitmapPoolSize = Math.round(part * builder.bitmapPoolScreens);
         }
 
         if (Log.isLoggable(TAG, Log.DEBUG)) {
@@ -96,9 +95,9 @@ public final class MemorySizeCalculator {
                             + ", max size: "
                             + toMb(maxSize)
                             + ", memoryClass: "
-                            + activityManager.getMemoryClass()
+                            + builder.activityManager.getMemoryClass()
                             + ", isLowMemoryDevice: "
-                            + isLowMemoryDevice(activityManager));
+                            + isLowMemoryDevice(builder.activityManager));
         }
     }
 
@@ -274,9 +273,7 @@ public final class MemorySizeCalculator {
         }
 
         public MemorySizeCalculator build() {
-            return new MemorySizeCalculator(context, activityManager, screenDimensions,
-                    memoryCacheScreens, bitmapPoolScreens, arrayPoolSizeBytes, maxSizeMultiplier,
-                    lowMemoryMaxSizeMultiplier);
+            return new MemorySizeCalculator(this);
         }
     }
 
