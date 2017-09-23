@@ -15,6 +15,7 @@ import com.bumptech.glide.load.Option;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.model.stream.HttpGlideUrlLoader;
 import com.bumptech.glide.load.resource.bitmap.BitmapDrawableTransformation;
 import com.bumptech.glide.load.resource.bitmap.BitmapEncoder;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
@@ -317,6 +318,13 @@ public class RequestOptions implements Cloneable {
     }
 
     /**
+     * Returns a {@link RequestOptions} object with {@link #timeout(int)} set.
+     */
+    public static RequestOptions timeoutOf(int timeout) {
+        return new RequestOptions().timeout(timeout);
+    }
+
+    /**
      * Returns a {@link com.bumptech.glide.request.RequestOptions} with {@link
      * #encodeQuality(int)} called with the given quality.
      */
@@ -329,6 +337,7 @@ public class RequestOptions implements Cloneable {
      * Returns a {@link com.bumptech.glide.request.RequestOptions} with {@link
      * #encodeFormat(android.graphics.Bitmap.CompressFormat)} called with the given format.
      */
+    @SuppressWarnings("WeakerAccess") // Public API
     public static RequestOptions encodeFormatOf(@NonNull Bitmap.CompressFormat format) {
         return new RequestOptions().encodeFormat(format);
     }
@@ -726,6 +735,20 @@ public class RequestOptions implements Cloneable {
     }
 
     /**
+     * Sets the time position of the frame to extract from a video.
+     * <p>
+     * <p>This is a component option specific to {@link VideoBitmapDecoder}. If the default video
+     * decoder is replaced or skipped because of your configuration, this option may be ignored.
+     *
+     * @param frameTimeMicros The time position in microseconds of the desired frame. If negative, the
+     *                        Android framework implementation return a representative frame.
+     * @see VideoBitmapDecoder#TARGET_FRAME
+     */
+    public RequestOptions frame(long frameTimeMicros) {
+        return set(VideoBitmapDecoder.TARGET_FRAME, frameTimeMicros);
+    }
+
+    /**
      * Sets the {@link DecodeFormat} to use when decoding {@link Bitmap} objects using
      * {@link Downsampler}.
      * <p>
@@ -734,27 +757,40 @@ public class RequestOptions implements Cloneable {
      * ({@link android.media.MediaMetadataRetriever} for example), or that the decoder may choose to
      * ignore the requested format if it can't display the image (i.e. RGB_565 is requested, but the
      * image has alpha).
+     * <p>
+     * <p>This is a component option specific to {@link Downsampler}. If the defautlt Bitmap decoder
+     * is replaced or skipped because of your configuration, this option may be ignored.
+     *
+     * @see Downsampler#DECODE_FORMAT
      */
     public RequestOptions format(@NonNull DecodeFormat format) {
         return set(Downsampler.DECODE_FORMAT, Preconditions.checkNotNull(format));
     }
 
     /**
-     * Sets the time position of the frame to extract from a video.
-     *
-     * @param frameTimeMicros The time position in microseconds of the desired frame. If negative, the
-     *                        Android framework implementation return a representative frame.
-     */
-    public RequestOptions frame(long frameTimeMicros) {
-        return set(VideoBitmapDecoder.TARGET_FRAME, frameTimeMicros);
-    }
-
-    /**
      * Sets the {@link DownsampleStrategy} to use when decoding {@link Bitmap Bitmaps} using
      * {@link Downsampler}.
+     * <p>
+     * <p>This is a component option specific to {@link Downsampler}. If the defautlt Bitmap decoder
+     * is replaced or skipped because of your configuration, this option may be ignored.
      */
     public RequestOptions downsample(@NonNull DownsampleStrategy strategy) {
         return set(Downsampler.DOWNSAMPLE_STRATEGY, Preconditions.checkNotNull(strategy));
+    }
+
+    /**
+     * Sets the read and write timeout for the http requests used to load the image.
+     * <p>
+     * <p>This is a component option specific to Glide's default networking library and
+     * {@link com.bumptech.glide.load.model.stream.HttpGlideUrlLoader}. If you use any other
+     * networking library including Glide's Volley or OkHttp integration libraries, this option will
+     * be ignored.
+     *
+     * @param timeoutMs The read and write timeout in milliseconds.
+     * @see com.bumptech.glide.load.model.stream.HttpGlideUrlLoader#TIMEOUT
+     */
+    public RequestOptions timeout(int timeoutMs) {
+        return set(HttpGlideUrlLoader.TIMEOUT, timeoutMs);
     }
 
     /**
