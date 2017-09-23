@@ -1,10 +1,5 @@
 package com.bumptech.glide.samples.flickr;
 
-import static com.bumptech.glide.GenericTransitionOptions.withNoTransition;
-import static com.bumptech.glide.request.RequestOptions.centerCropTransform;
-import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
-import static com.bumptech.glide.request.RequestOptions.priorityOf;
-
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -30,6 +25,11 @@ import com.bumptech.glide.util.FixedPreloadSizeProvider;
 
 import java.util.Collections;
 import java.util.List;
+
+import static com.bumptech.glide.GenericTransitionOptions.withNoTransition;
+import static com.bumptech.glide.request.RequestOptions.centerCropTransform;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
+import static com.bumptech.glide.request.RequestOptions.priorityOf;
 
 /**
  * A fragment that shows square image thumbnails whose size is determined by the fragment's
@@ -78,7 +78,7 @@ public class FlickrPhotoGrid extends Fragment implements PhotoViewer {
                 .asDrawable()
                 .transition(withNoTransition())
                 .apply(diskCacheStrategyOf(DiskCacheStrategy.DATA)
-                        .centerCrop(getActivity())
+                        .centerCrop()
                         .override(Api.SQUARE_THUMB_SIZE));
 
         preloadRequest =
