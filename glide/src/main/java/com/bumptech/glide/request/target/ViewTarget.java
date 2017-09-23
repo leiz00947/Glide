@@ -187,7 +187,11 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
          * 通知控件宽高值已变化
          */
         private void notifyCbs(int width, int height) {
-            for (SizeReadyCallback cb : cbs) {
+            // One or more callbacks may trigger the removal of one or more additional callbacks, so we
+            // need a copy of the list to avoid a concurrent modification exception. One place this
+            // happens is when a full request completes from the in memory cache while its thumbnail is
+            // still being loaded asynchronously. See #2237.
+            for (SizeReadyCallback cb : new ArrayList<>(cbs)) {
                 cb.onSizeReady(width, height);
             }
         }
@@ -240,6 +244,12 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
             }
         }
 
+        /**
+         * The callback may be called anyway if it is removed by another {@link SizeReadyCallback} or
+         * otherwise removed while we're notifying the list of callbacks.
+         * <p>
+         * <p>See #2237.
+         */
         void removeCallback(SizeReadyCallback cb) {
             cbs.remove(cb);
         }
