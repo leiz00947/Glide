@@ -2,6 +2,7 @@ package com.bumptech.glide.load.resource.bitmap;
 
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.annotation.Nullable;
@@ -38,10 +39,10 @@ import java.util.Set;
  * 降低采样解码，并且根据<em>EXIF</em>的方向信息进行旋转
  */
 public final class Downsampler {
-    private static final String TAG = "Downsampler";
+    static final String TAG = "Downsampler";
     /**
      * Indicates the {@link com.bumptech.glide.load.DecodeFormat} that will be used in conjunction
-     * with the image format to determine the {@link Bitmap.Config} to provide to
+     * with the image format to determine the {@link Config} to provide to
      * {@link BitmapFactory.Options#inPreferredConfig} when decoding the image.
      */
     public static final Option<DecodeFormat> DECODE_FORMAT = Option.memory(
@@ -106,6 +107,7 @@ public final class Downsampler {
     private final DisplayMetrics displayMetrics;
     private final ArrayPool byteArrayPool;
     private final List<ImageHeaderParser> parsers;
+    private final HardwareConfigState hardwareConfigState = HardwareConfigState.getInstance();
 
     public Downsampler(List<ImageHeaderParser> parsers, DisplayMetrics displayMetrics,
                        BitmapPool bitmapPool, ArrayPool byteArrayPool) {
@@ -205,15 +207,12 @@ public final class Downsampler {
          */
         int degreesToRotate = TransformationUtils.getExifOrientationDegrees(orientation);
 
-        options.inPreferredConfig = getConfig(is, decodeFormat);
-        if (options.inPreferredConfig != Bitmap.Config.ARGB_8888) {
-            options.inDither = true;
-        }
         int targetWidth = requestedWidth == Target.SIZE_ORIGINAL ? sourceWidth : requestedWidth;
         int targetHeight = requestedHeight == Target.SIZE_ORIGINAL ? sourceHeight : requestedHeight;
 
         calculateScaling(downsampleStrategy, degreesToRotate, sourceWidth, sourceHeight, targetWidth,
                 targetHeight, options);
+        calculateConfig(is, decodeFormat, options, targetWidth, targetHeight);
 
         boolean isKitKatOrGreater = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         // Prior to KitKat, the inBitmap size must exactly match the size of the bitmap we're decoding.
@@ -400,11 +399,24 @@ public final class Downsampler {
         return false;
     }
 
-    private Bitmap.Config getConfig(InputStream is, DecodeFormat format) throws IOException {
+    private void calculateConfig(
+            InputStream is,
+            DecodeFormat format,
+            BitmapFactory.Options optionsWithScaling,
+            int targetWidth,
+            int targetHeight)
+            throws IOException {
+
+        if (hardwareConfigState.setHardwareConfigIfAllowed(
+                targetWidth, targetHeight, optionsWithScaling)) {
+            return;
+        }
+
         // Changing configs can cause skewing on 4.1, see issue #128.
         if (format == DecodeFormat.PREFER_ARGB_8888
                 || Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN) {
-            return Bitmap.Config.ARGB_8888;
+            optionsWithScaling.inPreferredConfig = Config.ARGB_8888;
+            return;
         }
 
         boolean hasAlpha = false;
@@ -417,7 +429,13 @@ public final class Downsampler {
             }
         }
 
-        return hasAlpha ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565;
+        optionsWithScaling.inPreferredConfig =
+                hasAlpha ? Config.ARGB_8888 : Config.RGB_565;
+        if (optionsWithScaling.inPreferredConfig == Config.RGB_565
+                || optionsWithScaling.inPreferredConfig == Config.ARGB_4444
+                || optionsWithScaling.inPreferredConfig == Config.ALPHA_8) {
+            optionsWithScaling.inDither = true;
+        }
     }
 
     /**
@@ -538,6 +556,10 @@ public final class Downsampler {
      */
     private static void setInBitmap(BitmapFactory.Options options, BitmapPool bitmapPool, int width,
                                     int height) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                && options.inPreferredConfig == Config.HARDWARE) {
+            return;
+        }
         // BitmapFactory will clear out the Bitmap before writing to it, so getDirty is safe.
         options.inBitmap = bitmapPool.getDirty(width, height, options.inPreferredConfig);
     }
@@ -633,9 +655,9 @@ public final class Downsampler {
          * 那么新申请的{@link Bitmap}必须也为100-100才能够被重用。从SDK 19开始，
          * 新申请的{@link Bitmap}大小必须小于或者等于已经赋值过的{@link Bitmap}大小</li>
          * <li>新申请的{@link Bitmap}与旧的{@link Bitmap}必须有相同的解码格式，例如大家都是
-         * {@link Bitmap.Config#ARGB_8888}的，如果前面的{@link Bitmap}是
-         * {@link Bitmap.Config#ARGB_8888}，那么就不能支持{@link Bitmap.Config#ARGB_4444}
-         * 与{@link Bitmap.Config#RGB_565}格式的{@link Bitmap}了，
+         * {@link Config#ARGB_8888}的，如果前面的{@link Bitmap}是
+         * {@link Config#ARGB_8888}，那么就不能支持{@link Config#ARGB_4444}
+         * 与{@link Config#RGB_565}格式的{@link Bitmap}了，
          * 不过可以通过创建一个包含多种典型可重用{@link Bitmap}的对象池，
          * 这样后续的{@link Bitmap}创建都能够找到合适的“模板”去进行重用</li>
          * <li>{@link BitmapFactory.Options#inMutable}要设置为{@code true}</li></ol>
