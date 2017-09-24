@@ -554,11 +554,16 @@ public final class Downsampler {
     /**
      * 设置{@link BitmapFactory.Options#inBitmap}属性
      */
+    // Avoid short circuiting SDK checks.
+    @SuppressWarnings("PMD.CollapsibleIfStatements")
+    @TargetApi(Build.VERSION_CODES.O)
     private static void setInBitmap(BitmapFactory.Options options, BitmapPool bitmapPool, int width,
                                     int height) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-                && options.inPreferredConfig == Config.HARDWARE) {
-            return;
+        // Avoid short circuiting, it appears to break on some devices.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (options.inPreferredConfig == Config.HARDWARE) {
+                return;
+            }
         }
         // BitmapFactory will clear out the Bitmap before writing to it, so getDirty is safe.
         options.inBitmap = bitmapPool.getDirty(width, height, options.inPreferredConfig);

@@ -252,6 +252,7 @@ public class LruBitmapPool implements BitmapPool {
         return strategy;
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
     private static Set<Bitmap.Config> getDefaultAllowedConfigs() {
         Set<Bitmap.Config> configs = new HashSet<>();
         configs.addAll(Arrays.asList(Bitmap.Config.values()));

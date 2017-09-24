@@ -35,7 +35,8 @@ public final class MemorySizeCalculator {
         int getHeightPixels();
     }
 
-    private MemorySizeCalculator(MemorySizeCalculator.Builder builder) {
+    // Package private to avoid PMD warning.
+    MemorySizeCalculator(MemorySizeCalculator.Builder builder) {
         this.context = builder.context;
         /**
          * 若设备为低内存设备，则将数组池大小减少一半
@@ -49,9 +50,9 @@ public final class MemorySizeCalculator {
         /**
          * 每个像素点占用4个字节，整个屏幕的像素点所占用的总字节数
          */
-        int screenSize = builder.screenDimensions.getWidthPixels() *
-                builder.screenDimensions.getHeightPixels() *
-                BYTES_PER_ARGB_8888_PIXEL;
+        int widthPixels = builder.screenDimensions.getWidthPixels();
+        int heightPixels = builder.screenDimensions.getHeightPixels();
+        int screenSize = widthPixels * heightPixels * BYTES_PER_ARGB_8888_PIXEL;
 
         /**
          * 默认4张全屏图的大小，作为图片池占用的内存大小
