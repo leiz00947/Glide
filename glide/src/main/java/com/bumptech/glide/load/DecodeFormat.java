@@ -19,6 +19,9 @@ public enum DecodeFormat {
      * should return {@link android.graphics.Bitmap.Config#ARGB_8888} for
      * {@link android.graphics.Bitmap#getConfig()} when possible.
      * <p>
+     * <p>On Android O+, this format will will use ARGB_8888 only when it's not possible to use
+     * {@link android.graphics.Bitmap.Config#HARDWARE}.
+     * <p>
      * GIF images decoded by {@link android.graphics.BitmapFactory} currently use an internal
      * hidden format that is returned as null from {@link android.graphics.Bitmap#getConfig()}. Since
      * we cannot force {@link android.graphics.BitmapFactory} to always return our desired config,
@@ -27,11 +30,20 @@ public enum DecodeFormat {
     PREFER_ARGB_8888,
 
     /**
+     * Identical to {@link #PREFER_ARGB_8888} but prevents Glide from using {@link
+     * android.graphics.Bitmap.Config#HARDWARE} on Android O+
+     */
+    PREFER_ARGB_8888_DISALLOW_HARDWARE,
+
+    /**
      * Bitmaps decoded from image formats that support and/or use alpha (some types of PNGs, GIFs etc)
      * should return {@link android.graphics.Bitmap.Config#ARGB_8888} for
      * {@link android.graphics.Bitmap#getConfig()}. Bitmaps decoded from formats that don't support or
      * use alpha should return {@link android.graphics.Bitmap.Config#RGB_565} for
      * {@link android.graphics.Bitmap#getConfig()}.
+     * <p>
+     * <p>On Android O+, this format will will use ARGB_8888 only when it's not possible to use
+     * {@link android.graphics.Bitmap.Config#HARDWARE}.
      */
     PREFER_RGB_565;
 
