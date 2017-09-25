@@ -205,7 +205,7 @@ public final class GlideBuilder {
      */
     @Deprecated
     public GlideBuilder setDecodeFormat(DecodeFormat decodeFormat) {
-        defaultRequestOptions.apply(new RequestOptions().format(decodeFormat));
+        defaultRequestOptions = defaultRequestOptions.apply(new RequestOptions().format(decodeFormat));
         return this;
     }
 
