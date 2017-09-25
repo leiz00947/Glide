@@ -50,5 +50,5 @@ public enum DecodeFormat {
     /**
      * The default value for DecodeFormat.
      */
-    public static final DecodeFormat DEFAULT = PREFER_ARGB_8888;
+    public static final DecodeFormat DEFAULT = PREFER_ARGB_8888_DISALLOW_HARDWARE;
 }
