@@ -598,7 +598,6 @@ public final class Downsampler {
     /**
      * 设置{@link BitmapFactory.Options#inBitmap}属性
      */
-    // Avoid short circuiting SDK checks.
     @SuppressWarnings("PMD.CollapsibleIfStatements")
     @TargetApi(Build.VERSION_CODES.O)
     private static void setInBitmap(BitmapFactory.Options options, BitmapPool bitmapPool, int width,
