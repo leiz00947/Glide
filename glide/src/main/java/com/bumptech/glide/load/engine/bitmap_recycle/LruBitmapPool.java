@@ -17,9 +17,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * An {@link BitmapPool} implementation that uses an
+ * An {@link com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool} implementation that uses an
  * {@link com.bumptech.glide.load.engine.bitmap_recycle.LruPoolStrategy} to bucket {@link Bitmap}s
- * and then uses an LRU eviction policy to evict {@link Bitmap}s from the least
+ * and then uses an LRU eviction policy to evict {@link android.graphics.Bitmap}s from the least
  * recently used bucket in order to keep the pool below a given maximum size limit.
  * <p>
  * {@link BitmapPool}的实现类，使用{@link LruPoolStrategy}来存放{@link Bitmap}并用LRU策略来维持Pool大小
@@ -62,7 +62,7 @@ public class LruBitmapPool implements BitmapPool {
      * Constructor for LruBitmapPool.
      *
      * @param maxSize        The initial maximum size of the pool in bytes.
-     * @param allowedConfigs A white listed put of {@link Bitmap.Config} that are
+     * @param allowedConfigs A white listed put of {@link android.graphics.Bitmap.Config} that are
      *                       allowed to be put into the pool. Configs not in the allowed put will be
      *                       rejected.
      */
@@ -149,16 +149,23 @@ public class LruBitmapPool implements BitmapPool {
         return result;
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
+    private static void assertNotHardwareConfig(Bitmap.Config config) {
+        // Avoid short circuiting on sdk int since it breaks on some versions of Android.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return;
+        }
+
+        if (config == Bitmap.Config.HARDWARE) {
+            throw new IllegalArgumentException("Cannot create a mutable Bitmap with config: " + config
+                    + ". Consider setting Downsampler#ALLOW_HARDWARE_CONFIG to false in your RequestOptions"
+                    + " and/or in GlideBuilder.setDefaultRequestOptions");
+        }
+    }
+
     @Nullable
     private synchronized Bitmap getDirtyOrNull(int width, int height, Bitmap.Config config) {
-        // Avoid short circuiting on sdk int since it breaks on some versions of Android.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (config == Bitmap.Config.HARDWARE) {
-                throw new IllegalArgumentException("Cannot create a mutable Bitmap with config: " + config
-                        + ". Consider setting Downsampler#ALLOW_HARDWARE_CONFIG to false in your RequestOptions"
-                        + " and/or in GlideBuilder.setDefaultRequestOptions");
-            }
-        }
+        assertNotHardwareConfig(config);
         // Config will be null for non public config types, which can lead to transformations naively
         // passing in null as the requested config here. See issue #194.
         final Bitmap result = strategy.get(width, height, config != null ? config : DEFAULT_CONFIG);
