@@ -68,6 +68,27 @@ public final class Downsampler {
     public static final Option<Boolean> FIX_BITMAP_SIZE_TO_REQUESTED_DIMENSIONS =
             Option.memory("com.bumptech.glide.load.resource.bitmap.Downsampler.FixBitmapSize", false);
 
+    /**
+     * Indicates that it's safe or unsafe to decode {@link Bitmap}s with
+     * {@link Bitmap.Config#HARDWARE}.
+     * <p>
+     * <p>Callers should almost never set this value to {@code true} manually. Glide will already do
+     * so when Glide believes it's safe to do (when no transformations are applied). Instead, callers
+     * can set this value to {@code false} to prevent Glide from decoding hardware bitmaps if Glide
+     * is unable to detect that hardware bitmaps are unsafe. For example, you should set this to
+     * {@code false} if you plan to draw it to a software {@link android.graphics.Canvas} or if you
+     * plan to inspect the {@link Bitmap}s pixels with {@link Bitmap#getPixel(int, int)} or
+     * {@link Bitmap#getPixels(int[], int, int, int, int, int, int)}.
+     * <p>
+     * <p>Callers can disable hardware {@link Bitmap}s for all loads using
+     * {@link com.bumptech.glide.GlideBuilder#setDefaultRequestOptions(RequestOptions)}.
+     * <p>
+     * <p>This option is ignored unless we're on Android O+.
+     */
+    public static final Option<Boolean> ALLOW_HARDWARE_CONFIG =
+            Option.memory(
+                    "com.bumtpech.glide.load.resource.bitmap.Downsampler.AllowHardwareDecode", null);
+
     private static final String WBMP_MIME_TYPE = "image/vnd.wap.wbmp";
     private static final String ICO_MIME_TYPE = "image/x-ico";
     private static final Set<String> NO_DOWNSAMPLE_PRE_N_MIME_TYPES =
@@ -176,11 +197,16 @@ public final class Downsampler {
         DecodeFormat decodeFormat = options.get(DECODE_FORMAT);
         DownsampleStrategy downsampleStrategy = options.get(DOWNSAMPLE_STRATEGY);
         boolean fixBitmapToRequestedDimensions = options.get(FIX_BITMAP_SIZE_TO_REQUESTED_DIMENSIONS);
+        boolean isHardwareConfigAllowed = options.get(ALLOW_HARDWARE_CONFIG) != null
+                ? options.get(ALLOW_HARDWARE_CONFIG) : false;
+        if (decodeFormat == DecodeFormat.PREFER_ARGB_8888_DISALLOW_HARDWARE) {
+            isHardwareConfigAllowed = false;
+        }
 
         try {
             Bitmap result = decodeFromWrappedStreams(is, bitmapFactoryOptions,
-                    downsampleStrategy, decodeFormat, requestedWidth, requestedHeight,
-                    fixBitmapToRequestedDimensions, callbacks);
+                    downsampleStrategy, decodeFormat, isHardwareConfigAllowed, requestedWidth,
+                    requestedHeight, fixBitmapToRequestedDimensions, callbacks);
             return BitmapResource.obtain(result, bitmapPool);
         } finally {
             releaseOptions(bitmapFactoryOptions);
@@ -191,9 +217,10 @@ public final class Downsampler {
     /**
      * 返回缩放并旋转后的图片
      */
-    private Bitmap decodeFromWrappedStreams(InputStream is, BitmapFactory.Options options,
-                                            DownsampleStrategy downsampleStrategy, DecodeFormat decodeFormat,
-                                            int requestedWidth, int requestedHeight, boolean fixBitmapToRequestedDimensions,
+    private Bitmap decodeFromWrappedStreams(InputStream is,
+                                            BitmapFactory.Options options, DownsampleStrategy downsampleStrategy,
+                                            DecodeFormat decodeFormat, boolean isHardwareConfigAllowed, int requestedWidth,
+                                            int requestedHeight, boolean fixBitmapToRequestedDimensions,
                                             DecodeCallbacks callbacks) throws IOException {
 
         int[] sourceDimensions = getDimensions(is, options, callbacks, bitmapPool);
@@ -212,7 +239,7 @@ public final class Downsampler {
 
         calculateScaling(downsampleStrategy, degreesToRotate, sourceWidth, sourceHeight, targetWidth,
                 targetHeight, options);
-        calculateConfig(is, decodeFormat, options, targetWidth, targetHeight);
+        calculateConfig(is, decodeFormat, isHardwareConfigAllowed, options, targetWidth, targetHeight);
 
         boolean isKitKatOrGreater = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         // Prior to KitKat, the inBitmap size must exactly match the size of the bitmap we're decoding.
@@ -402,13 +429,14 @@ public final class Downsampler {
     private void calculateConfig(
             InputStream is,
             DecodeFormat format,
+            boolean isHardwareConfigAllowed,
             BitmapFactory.Options optionsWithScaling,
             int targetWidth,
             int targetHeight)
             throws IOException {
 
         if (hardwareConfigState.setHardwareConfigIfAllowed(
-                targetWidth, targetHeight, optionsWithScaling)) {
+                targetWidth, targetHeight, optionsWithScaling, format, isHardwareConfigAllowed)) {
             return;
         }
 

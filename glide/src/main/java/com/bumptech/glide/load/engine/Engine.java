@@ -179,6 +179,7 @@ public class Engine implements EngineJobListener, MemoryCache.ResourceRemovedLis
             DiskCacheStrategy diskCacheStrategy,
             Map<Class<?>, Transformation<?>> transformations,
             boolean isTransformationRequired,
+            boolean isScaleOnlyOrNoTransform,
             Options options,
             boolean isMemoryCacheable,
             boolean useUnlimitedSourceExecutorPool,
@@ -232,6 +233,7 @@ public class Engine implements EngineJobListener, MemoryCache.ResourceRemovedLis
                 diskCacheStrategy,
                 transformations,
                 isTransformationRequired,
+                isScaleOnlyOrNoTransform,
                 onlyRetrieveFromCache,
                 options,
                 engineJob);
@@ -504,6 +506,7 @@ public class Engine implements EngineJobListener, MemoryCache.ResourceRemovedLis
                                DiskCacheStrategy diskCacheStrategy,
                                Map<Class<?>, Transformation<?>> transformations,
                                boolean isTransformationRequired,
+                               boolean isScaleOnlyOrNoTransform,
                                boolean onlyRetrieveFromCache,
                                Options options,
                                DecodeJob.Callback<R> callback) {
@@ -521,6 +524,7 @@ public class Engine implements EngineJobListener, MemoryCache.ResourceRemovedLis
                     diskCacheStrategy,
                     transformations,
                     isTransformationRequired,
+                    isScaleOnlyOrNoTransform,
                     onlyRetrieveFromCache,
                     options,
                     callback,
