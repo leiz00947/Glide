@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.Key;
@@ -31,6 +32,7 @@ import com.bumptech.glide.load.resource.gif.StreamGifDecoder;
 import com.bumptech.glide.signature.EmptySignature;
 import com.bumptech.glide.util.Preconditions;
 import com.bumptech.glide.util.Util;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -410,9 +412,9 @@ public class RequestOptions implements Cloneable {
 
     /**
      * Sets the {@link DiskCacheStrategy} to use for this load.
-     *
+     * <p>
      * <p> Defaults to {@link DiskCacheStrategy#AUTOMATIC}. </p>
-     *
+     * <p>
      * <p> For most applications {@link DiskCacheStrategy#RESOURCE} is
      * ideal. Applications that use the same resource multiple times in multiple sizes and are willing
      * to trade off some speed and disk space in return for lower bandwidth usage may want to consider
@@ -487,15 +489,14 @@ public class RequestOptions implements Cloneable {
     /**
      * Sets an {@link Drawable} to display if the model provided to
      * {@link com.bumptech.glide.RequestBuilder#load(Object)} is {@code null}.
-     *
+     * <p>
      * <p> If a fallback is not set, null models will cause the error drawable to be displayed. If the
      * error drawable is not set, the placeholder will be displayed.
      *
-     * @see #placeholder(Drawable)
-     * @see #placeholder(int)
-     *
      * @param drawable The drawable to display as a placeholder.
      * @return This request builder.
+     * @see #placeholder(Drawable)
+     * @see #placeholder(int)
      */
     public RequestOptions fallback(Drawable drawable) {
         if (isAutoCloneEnabled) {
@@ -511,15 +512,14 @@ public class RequestOptions implements Cloneable {
     /**
      * Sets a resource to display if the model provided to
      * {@link com.bumptech.glide.RequestBuilder#load(Object)} is {@code null}.
-     *
+     * <p>
      * <p> If a fallback is not set, null models will cause the error drawable to be displayed. If
      * the error drawable is not set, the placeholder will be displayed.
      *
-     * @see #placeholder(Drawable)
-     * @see #placeholder(int)
-     *
      * @param resourceId The id of the resource to use as a fallback.
      * @return This request builder.
+     * @see #placeholder(Drawable)
+     * @see #placeholder(int)
      */
     public RequestOptions fallback(int resourceId) {
         if (isAutoCloneEnabled) {
@@ -586,7 +586,7 @@ public class RequestOptions implements Cloneable {
 
     /**
      * Allows the loaded resource to skip the memory cache.
-     *
+     * <p>
      * <p> Note - this is not a guarantee. If a request is already pending for this resource and that
      * request is not also skipping the memory cache, the resource will be cached in memory.</p>
      *
@@ -629,9 +629,9 @@ public class RequestOptions implements Cloneable {
      * Overrides the {@link com.bumptech.glide.request.target.Target}'s width and height with the
      * given size.
      *
-     * @see #override(int, int)
      * @param size The width and height to use.
      * @return This request builder.
+     * @see #override(int, int)
      */
     public RequestOptions override(int size) {
         return override(size, size);
@@ -640,7 +640,7 @@ public class RequestOptions implements Cloneable {
     /**
      * Sets some additional data to be mixed in to the memory and disk cache keys allowing the caller
      * more control over when cached data is invalidated.
-     *
+     * <p>
      * <p> Note - The signature does not replace the cache key, it is purely additive. </p>
      *
      * @param signature A unique non-null {@link Key} representing the current
@@ -660,12 +660,12 @@ public class RequestOptions implements Cloneable {
 
     /**
      * Returns a copy of this request builder with all of the options put so far on this builder.
-     *
+     * <p>
      * <p> This method returns a "deep" copy in that all non-immutable arguments are copied such that
      * changes to one builder will not affect the other builder. However, in addition to immutable
      * arguments, the current model is not copied copied so changes to the model will affect both
      * builders. </p>
-     *
+     * <p>
      * <p> Even if this object was locked, the cloned object returned from this method will not be
      * locked. </p>
      */
@@ -737,13 +737,13 @@ public class RequestOptions implements Cloneable {
 
     /**
      * Sets the time position of the frame to extract from a video.
-     *
+     * <p>
      * <p>This is a component option specific to {@link VideoBitmapDecoder}. If the default video
      * decoder is replaced or skipped because of your configuration, this option may be ignored.
      *
-     * @see VideoBitmapDecoder#TARGET_FRAME
      * @param frameTimeMicros The time position in microseconds of the desired frame. If negative, the
      *                        Android framework implementation return a representative frame.
+     * @see VideoBitmapDecoder#TARGET_FRAME
      */
     public RequestOptions frame(long frameTimeMicros) {
         return set(VideoBitmapDecoder.TARGET_FRAME, frameTimeMicros);
@@ -752,13 +752,13 @@ public class RequestOptions implements Cloneable {
     /**
      * Sets the {@link DecodeFormat} to use when decoding {@link Bitmap} objects using
      * {@link Downsampler}.
-     *
+     * <p>
      * <p>{@link DecodeFormat} is a request, not a requirement. It's possible the resource will be
      * decoded using a decoder that cannot control the format
      * ({@link android.media.MediaMetadataRetriever} for example), or that the decoder may choose to
      * ignore the requested format if it can't display the image (i.e. RGB_565 is requested, but the
      * image has alpha).
-     *
+     * <p>
      * <p>This is a component option specific to {@link Downsampler}. If the defautlt Bitmap decoder
      * is replaced or skipped because of your configuration, this option may be ignored.
      *
@@ -771,7 +771,7 @@ public class RequestOptions implements Cloneable {
     /**
      * Sets the {@link DownsampleStrategy} to use when decoding {@link Bitmap Bitmaps} using
      * {@link Downsampler}.
-     *
+     * <p>
      * <p>This is a component option specific to {@link Downsampler}. If the defautlt Bitmap decoder
      * is replaced or skipped because of your configuration, this option may be ignored.
      */
@@ -781,14 +781,14 @@ public class RequestOptions implements Cloneable {
 
     /**
      * Sets the read and write timeout for the http requests used to load the image.
-     *
+     * <p>
      * <p>This is a component option specific to Glide's default networking library and
      * {@link com.bumptech.glide.load.model.stream.HttpGlideUrlLoader}. If you use any other
      * networking library including Glide's Volley or OkHttp integration libraries, this option will
      * be ignored.
      *
-     * @see com.bumptech.glide.load.model.stream.HttpGlideUrlLoader#TIMEOUT
      * @param timeoutMs The read and write timeout in milliseconds.
+     * @see com.bumptech.glide.load.model.stream.HttpGlideUrlLoader#TIMEOUT
      */
     public RequestOptions timeout(int timeoutMs) {
         return set(HttpGlideUrlLoader.TIMEOUT, timeoutMs);
@@ -797,7 +797,7 @@ public class RequestOptions implements Cloneable {
     /**
      * Applies {@link com.bumptech.glide.load.resource.bitmap.CenterCrop} to all default types, and
      * ignores unknown types.
-     *
+     * <p>
      * <p>This will override previous calls to {@link #dontTransform()}.
      *
      * @see #optionalTransform(Class, Transformation)
@@ -810,7 +810,7 @@ public class RequestOptions implements Cloneable {
     /**
      * Applies {@link CenterCrop} to all default types and
      * throws an exception if asked to transform an unknown type.
-     *
+     * <p>
      * <p>this will override previous calls to {@link #dontTransform()} ()}.
      *
      * @see #transform(Class, Transformation)
@@ -821,10 +821,9 @@ public class RequestOptions implements Cloneable {
     }
 
     /**
-     *
      * Applies {@link FitCenter} and to all default types, {@link DownsampleStrategy#FIT_CENTER} to
      * image types, and ignores unknown types.
-     *
+     * <p>
      * <p>This will override previous calls to {@link #dontTransform()} and previous calls to
      * {@link #downsample(DownsampleStrategy)}.
      *
@@ -839,7 +838,7 @@ public class RequestOptions implements Cloneable {
      * Applies {@link FitCenter} and to all default types, {@link DownsampleStrategy#FIT_CENTER} to
      * image types, and throws an exception if asked to transform an unknown
      * type.
-     *
+     * <p>
      * <p>This will override previous calls to {@link #dontTransform()} and previous calls to
      * {@link #downsample(DownsampleStrategy)}.
      *
@@ -853,7 +852,7 @@ public class RequestOptions implements Cloneable {
     /**
      * Applies {@link com.bumptech.glide.load.resource.bitmap.CenterInside} to all default types,
      * {@link DownsampleStrategy#CENTER_INSIDE} to image types, and ignores unknown types.
-     *
+     * <p>
      * <p>This will override previous calls to {@link #dontTransform()} and previous calls to
      * {@link #downsample(DownsampleStrategy)}.
      *
@@ -867,7 +866,7 @@ public class RequestOptions implements Cloneable {
     /**
      * Applies {@link CenterInside} to all default types, {@link DownsampleStrategy#CENTER_INSIDE} to
      * image types and throws an exception if asked to transform an unknown type.
-     *
+     * <p>
      * <p>This will override previous calls to {@link #dontTransform()} and previous calls to
      * {@link #downsample(DownsampleStrategy)}.
      *
@@ -880,7 +879,7 @@ public class RequestOptions implements Cloneable {
 
     /**
      * Applies {@link CircleCrop} to all default types, and ignores unknown types.
-     *
+     * <p>
      * <p>This will override previous calls to {@link #dontTransform()}.
      *
      * @see #optionalTransform(Transformation)
@@ -893,7 +892,7 @@ public class RequestOptions implements Cloneable {
     /**
      * Applies {@link CircleCrop} to all default types and throws an exception if asked to transform
      * an unknown type.
-     *
+     * <p>
      * <p>This will override previous calls to {@link #dontTransform()}.
      *
      * @see #transform(Class, Transformation)
@@ -953,7 +952,7 @@ public class RequestOptions implements Cloneable {
      * {@link android.graphics.drawable.BitmapDrawable}, and
      * {@link com.bumptech.glide.load.resource.gif.GifDrawable})
      * and throws an exception if asked to transform an unknown type.
-     *
+     * <p>
      * <p>This will override previous calls to {@link #dontTransform()}.
      *
      * @param transformation Any {@link Transformation} for {@link Bitmap}s.
@@ -977,7 +976,7 @@ public class RequestOptions implements Cloneable {
      * {@link android.graphics.drawable.BitmapDrawable}, and
      * {@link com.bumptech.glide.load.resource.gif.GifDrawable})
      * and throws an exception if asked to transform an unknown type.
-     *
+     * <p>
      * <p>This will override previous calls to {@link #dontTransform()}.
      *
      * @param transformations One or more {@link Transformation}s for {@link Bitmap}s.
@@ -1001,7 +1000,7 @@ public class RequestOptions implements Cloneable {
      * {@link Bitmap Bitmaps} to the default types ({@link Bitmap},
      * {@link android.graphics.drawable.BitmapDrawable}, and
      * {@link com.bumptech.glide.load.resource.gif.GifDrawable}) and ignores unknown types.
-     *
+     * <p>
      * <p>This will override previous calls to {@link #dontTransform()}.
      *
      * @param transformation Any {@link Transformation} for {@link Bitmap}s.
@@ -1024,15 +1023,15 @@ public class RequestOptions implements Cloneable {
     /**
      * Applies the given {@link Transformation} for any decoded resource of
      * the given type and allows unknown resource types to be ignored.
-     *
+     * <p>
      * <p> Users can apply different transformations for each resource class. Applying a
      * {@link Transformation} for a resource type that already has a
      * {@link Transformation} will override the previous call. </p>
-     *
+     * <p>
      * <p> If any calls are made to the non-optional transform methods, then attempting to transform
      * an unknown resource class will throw an exception. To allow unknown types, users must always
      * call the optional version of each method. </p>
-     *
+     * <p>
      * <p>This will override previous calls to {@link #dontTransform()}.
      *
      * @param resourceClass  The type of resource to transform.
@@ -1059,7 +1058,7 @@ public class RequestOptions implements Cloneable {
     /**
      * Applies the given {@link Transformation} for any decoded resource of
      * the given type and throws if asked to transform an unknown resource type.
-     *
+     * <p>
      * <p>This will override previous calls to {@link #dontTransform()}.
      *
      * @param resourceClass  The type of resource to transform.
@@ -1101,7 +1100,7 @@ public class RequestOptions implements Cloneable {
     /**
      * Disables resource decoders that return animated resources so any resource returned will be
      * static.
-     *
+     * <p>
      * <p> To disable transitions (fades etc) use
      * {@link com.bumptech.glide.TransitionOptions#dontTransition()}</p>
      */
@@ -1253,7 +1252,7 @@ public class RequestOptions implements Cloneable {
 
     /**
      * Throws if any further mutations are attempted.
-     *
+     * <p>
      * <p> Once locked, the only way to unlock is to use {@link #clone()} </p>
      */
     @SuppressWarnings("unchecked")
@@ -1267,7 +1266,7 @@ public class RequestOptions implements Cloneable {
      * Similar to {@link #lock()} except that mutations cause a {@link #clone()} operation to happen
      * before the mutation resulting in all methods returning a new Object and leaving the original
      * locked object unmodified.
-     *
+     * <p>
      * <p>Auto clone is not retained by cloned objects returned from mutations. The cloned objects
      * are mutable and are not locked.
      */
@@ -1286,6 +1285,10 @@ public class RequestOptions implements Cloneable {
             throw new IllegalStateException("You cannot modify locked RequestOptions, consider clone()");
         }
         return this;
+    }
+
+    protected boolean isAutoCloneEnabled() {
+        return isAutoCloneEnabled;
     }
 
     @NonNull
