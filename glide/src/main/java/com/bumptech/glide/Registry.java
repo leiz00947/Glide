@@ -15,7 +15,6 @@ import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.model.ModelLoader;
 import com.bumptech.glide.load.model.ModelLoaderFactory;
 import com.bumptech.glide.load.model.ModelLoaderRegistry;
-import com.bumptech.glide.load.model.MultiModelLoaderFactory;
 import com.bumptech.glide.load.resource.transcode.ResourceTranscoder;
 import com.bumptech.glide.load.resource.transcode.TranscoderRegistry;
 import com.bumptech.glide.provider.EncoderRegistry;
@@ -71,8 +70,31 @@ public class Registry {
      * <p>
      * <p>If multiple {@link Encoder}s are registered for the same type or super type, the
      * {@link Encoder} that is registered first will be used.
+     *
+     * @deprecated Use the equivalent {@link #append(Class, Class, ModelLoaderFactory)} method
+     * instead.
      */
+    @Deprecated
     public <Data> Registry register(Class<Data> dataClass, Encoder<Data> encoder) {
+        return append(dataClass, encoder);
+    }
+
+    /**
+     * Appends the given {@link Encoder} onto the list of available {@link Encoder}s so that it is
+     * attempted after all earlier and default {@link Encoder}s for the given data class.
+     * <p>
+     * <p>The {@link Encoder} will be used both for the exact data class and any subtypes. For
+     * example, registering an {@link Encoder} for {@link java.io.InputStream} will result in the
+     * {@link Encoder} being used for
+     * {@link android.content.res.AssetFileDescriptor.AutoCloseInputStream},
+     * {@link java.io.FileInputStream} and any other subclass.
+     * <p>
+     * <p>If multiple {@link Encoder}s are registered for the same type or super type, the
+     * {@link Encoder} that is registered first will be used.
+     *
+     * @see #prepend(Class, Encoder)
+     */
+    public <Data> Registry append(Class<Data> dataClass, Encoder<Data> encoder) {
         encoderRegistry.append(dataClass, encoder);
         return this;
     }
@@ -85,6 +107,8 @@ public class Registry {
      * <p>This method allows you to replace the default {@link Encoder} because it ensures
      * the registered {@link Encoder} will run first. If multiple {@link Encoder}s are registered for
      * the same type or super type, the {@link Encoder} that is registered first will be used.
+     *
+     * @see #append(Class, Encoder)
      */
     public <Data> Registry prepend(Class<Data> dataClass, Encoder<Data> encoder) {
         encoderRegistry.prepend(dataClass, encoder);
@@ -147,9 +171,9 @@ public class Registry {
     }
 
     /**
-     * Registers the given {@link ResourceEncoder} for the given resource class
-     * ({@link android.graphics.Bitmap}, {@link com.bumptech.glide.load.resource.gif.GifDrawable}
-     * etc).
+     * Appends the given {@link ResourceEncoder} into the list of available {@link ResourceEncoder}s
+     * so that it is attempted after all earlier and default {@link ResourceEncoder}s for the given
+     * data type.
      * <p>
      * <p>The {@link ResourceEncoder} will be used both for the exact resource class and any subtypes.
      * For example, registering an {@link ResourceEncoder} for
@@ -159,17 +183,38 @@ public class Registry {
      * <p>
      * <p>If multiple {@link ResourceEncoder}s are registered for the same type or super type, the
      * {@link ResourceEncoder} that is registered first will be used.
+     *
+     * @deprecated Use the equivalent {@link #append(Class, ResourceEncoder)} method instead.
      */
-    public <TResource> Registry register(Class<TResource> resourceClass,
-                                         ResourceEncoder<TResource> encoder) {
+    @Deprecated
+    public <TResource> Registry register(
+            Class<TResource> resourceClass, ResourceEncoder<TResource> encoder) {
+        return append(resourceClass, encoder);
+    }
+
+    /**
+     * Appends the given {@link ResourceEncoder} into the list of available {@link ResourceEncoder}s
+     * so that it is attempted after all earlier and default {@link ResourceEncoder}s for the given
+     * data type.
+     * <p>
+     * <p>The {@link ResourceEncoder} will be used both for the exact resource class and any subtypes.
+     * For example, registering an {@link ResourceEncoder} for
+     * {@link android.graphics.drawable.Drawable} (not recommended) will result in the
+     * {@link ResourceEncoder} being used for {@link android.graphics.drawable.BitmapDrawable} and
+     * {@link com.bumptech.glide.load.resource.gif.GifDrawable} and any other subclass.
+     * <p>
+     * <p>If multiple {@link ResourceEncoder}s are registered for the same type or super type, the
+     * {@link ResourceEncoder} that is registered first will be used.
+     *
+     * @see #prepend(Class, ResourceEncoder)
+     */
+    public <TResource> Registry append(
+            Class<TResource> resourceClass, ResourceEncoder<TResource> encoder) {
         resourceEncoderRegistry.append(resourceClass, encoder);
         return this;
     }
 
     /**
-     * Registers a new {@link com.bumptech.glide.load.data.DataRewinder.Factory} to handle a
-     * non-default data type that can be rewind to allow for efficient reads of file headers.
-     * <p>
      * Prepends the given {@link ResourceEncoder} into the list of available {@link ResourceEncoder}s
      * so that it is attempted before all later and default {@link ResourceEncoder}s for the given
      * data type.
@@ -178,9 +223,11 @@ public class Registry {
      * the registered {@link ResourceEncoder} will run first. If multiple {@link ResourceEncoder}s are
      * registered for the same type or super type, the {@link ResourceEncoder} that is registered
      * first will be used.
+     *
+     * @see #append(Class, ResourceEncoder)
      */
-    public <TResource> Registry prepend(Class<TResource> resourceClass,
-                                        ResourceEncoder<TResource> encoder) {
+    public <TResource> Registry prepend(
+            Class<TResource> resourceClass, ResourceEncoder<TResource> encoder) {
         resourceEncoderRegistry.prepend(resourceClass, encoder);
         return this;
     }
@@ -205,8 +252,7 @@ public class Registry {
      * @param transcoder     The {@link ResourceTranscoder} to register.
      */
     public <TResource, Transcode> Registry register(Class<TResource> resourceClass,
-                                                    Class<Transcode> transcodeClass,
-                                                    ResourceTranscoder<TResource, Transcode> transcoder) {
+                                                    Class<Transcode> transcodeClass, ResourceTranscoder<TResource, Transcode> transcoder) {
         transcoderRegistry.register(resourceClass, transcodeClass, transcoder);
         return this;
     }
@@ -444,7 +490,7 @@ public class Registry {
     }
 
     /**
-     * Thrown when no {@link ModelLoader} is registered for a given
+     * Thrown when no {@link com.bumptech.glide.load.model.ModelLoader} is registered for a given
      * model class.
      */
     public static class NoModelLoaderAvailableException extends MissingComponentException {
