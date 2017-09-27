@@ -18,22 +18,22 @@ import java.util.List;
 /**
  * A base {@link Target} for loading {@link android.graphics.Bitmap}s into {@link View}s that
  * provides default implementations for most most methods and can determine the size of views using
- * a {@link ViewTreeObserver.OnDrawListener}.
+ * a {@link android.view.ViewTreeObserver.OnDrawListener}.
  * <p>
  * 继承{@link BaseTarget}的抽象类，用来加载{@link android.graphics.Bitmap}到默认实现大多数方法并可以
  * 通过使用一个{@link ViewTreeObserver.OnDrawListener}来决定其大小的{@link View}
  * <p>
- * To detect {@link View} reuse in {@link android.widget.ListView} or any {@link
+ * <p> To detect {@link View} reuse in {@link android.widget.ListView} or any {@link
  * android.view.ViewGroup} that reuses views, this class uses the {@link View#setTag(Object)} method
  * to store some metadata so that if a view is reused, any previous loads or resources from previous
- * loads can be cancelled or reused.
+ * loads can be cancelled or reused. </p>
  * <p>
- * Any calls to {@link View#setTag(Object)}} on a View given to this class will result in
+ * <p> Any calls to {@link View#setTag(Object)}} on a View given to this class will result in
  * excessive allocations and and/or {@link IllegalArgumentException}s. If you must call {@link
  * View#setTag(Object)} on a view, consider using {@link BaseTarget} or {@link SimpleTarget}
- * instead.
+ * instead. </p>
  * <p>
- * Subclasses must call super in {@link #onLoadCleared(Drawable)}
+ * <p> Subclasses must call super in {@link #onLoadCleared(Drawable)} </p>
  *
  * @param <T> The specific subclass of view wrapped by this target.
  * @param <Z> The resource type this target will receive.
@@ -53,17 +53,17 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
     }
 
     /**
-     * Returns the wrapped {@link View}.
+     * Returns the wrapped {@link android.view.View}.
      */
     public T getView() {
         return view;
     }
 
     /**
-     * Determines the size of the view by first checking {@link View#getWidth()} and
-     * {@link View#getHeight()}. If one or both are zero, it then checks the view's
+     * Determines the size of the view by first checking {@link android.view.View#getWidth()} and
+     * {@link android.view.View#getHeight()}. If one or both are zero, it then checks the view's
      * {@link LayoutParams}. If one or both of the params width and height are less than or equal to
-     * zero, it then adds an {@link ViewTreeObserver.OnPreDrawListener} which waits until
+     * zero, it then adds an {@link android.view.ViewTreeObserver.OnPreDrawListener} which waits until
      * the view has been measured before calling the callback with the view's drawn width and height.
      *
      * @param cb {@inheritDoc}
@@ -95,14 +95,14 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
     }
 
     /**
-     * Returns any stored request using {@link View#getTag()}.
+     * Returns any stored request using {@link android.view.View#getTag()}.
      * <p>
      * <p> For Glide to function correctly, Glide must be the only thing that calls {@link
      * View#setTag(Object)}. If the tag is cleared or put to another object type, Glide will not be
      * able to retrieve and cancel previous loads which will not only prevent Glide from reusing
      * resource, but will also result in incorrect images being loaded and lots of flashing of images
-     * in lists. As a result, this will throw an {@link IllegalArgumentException} if {@link
-     * View#getTag()}} returns a non null object that is not an {@link
+     * in lists. As a result, this will throw an {@link java.lang.IllegalArgumentException} if {@link
+     * android.view.View#getTag()}} returns a non null object that is not an {@link
      * com.bumptech.glide.request.Request}. </p>
      */
     @Override
@@ -269,22 +269,44 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
             cbs.clear();
         }
 
-        private boolean isViewStateAndSizeValid(int width, int height) {
-            return isViewStateValid() && isSizeValid(width) && isSizeValid(height);
+        private boolean isViewStateAndSizeValid(int currentWidth, int currentHeight) {
+            LayoutParams params = view.getLayoutParams();
+
+            int paramWidth;
+            int paramHeight;
+            if (params == null) {
+                paramWidth = 0;
+                paramHeight = 0;
+            } else {
+                paramWidth = params.width;
+                paramHeight = params.height;
+            }
+            return isDimensionValid(paramWidth, currentWidth)
+                    && isDimensionValid(paramHeight, currentHeight);
         }
 
-        private boolean isViewStateValid() {
-            // We consider the view state as valid if the view has
-            // non-null layout params and a non-zero layout width and height.
-            if (view.getLayoutParams() != null
-                    && view.getLayoutParams().width > 0
-                    && view.getLayoutParams().height > 0) {
+        private boolean isDimensionValid(int layoutParam, int dimen) {
+            // If the layout parameter is a fixed size and the padding adjusted parameter (dimen in this
+            // case) is valid, we can trust that the size won't change due to a layout pass.
+            if (layoutParam > 0 && dimen > 0) {
                 return true;
             }
 
-            // Avoid using isLaidOut because it appears to be false after a View is re-attached to a
-            // RecyclerView if the View's size before and after the attach are the same. See #1981.
-            return !view.isLayoutRequested();
+            // SIZE_ORIGINAL is not dependent on a layout pass.
+            if (dimen == Target.SIZE_ORIGINAL) {
+                return true;
+            }
+
+            // TODO: Is this correct? The view's parent could change size after a layout.
+            // We're making an assumption that MATCH_PARENT won't change after it has been set once, so
+            // future layout passes typically won't change it. This probably will break in some cases.
+            if (layoutParam == LayoutParams.MATCH_PARENT && dimen > 0) {
+                return true;
+            }
+
+            // We can trust a non-zero dimension if no layout pass is pending, otherwise we're going to
+            // have to wait for a layout pass.
+            return dimen > 0 && !view.isLayoutRequested();
         }
 
         /**
@@ -313,29 +335,15 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
          */
         private int getTargetDimen(int viewSize, int paramSize, int paddingSize) {
             int adjustedViewSize = viewSize - paddingSize;
-            if (isSizeValid(adjustedViewSize)) {
-                return adjustedViewSize;
-            }
-
-            if (paramSize == PENDING_SIZE) {
-                return PENDING_SIZE;
-            }
-
             if (paramSize == LayoutParams.WRAP_CONTENT) {
                 return SIZE_ORIGINAL;
             } else if (paramSize > 0) {
                 return paramSize - paddingSize;
+            } else if (adjustedViewSize > 0) {
+                return adjustedViewSize;
             } else {
                 return PENDING_SIZE;
             }
-        }
-
-        /**
-         * 判断数值是否可取，即若传参为{@link LayoutParams#WRAP_CONTENT}或任何大于0的值，
-         * 则返回{@code true}，否则返回{@code false}
-         */
-        private boolean isSizeValid(int size) {
-            return size > 0 || size == SIZE_ORIGINAL;
         }
 
         /**
