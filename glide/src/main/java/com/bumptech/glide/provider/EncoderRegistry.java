@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Contains an unordered list of {@link Encoder}s capable of encoding arbitrary data types.
+ * Contains an ordered list of {@link Encoder}s capable of encoding arbitrary data types.
  * <p>
  * 包含一个任意数据类型的无序可编码的{@link Encoder}集合
  */
@@ -31,8 +31,12 @@ public class EncoderRegistry {
         return null;
     }
 
-    public synchronized <T> void add(Class<T> dataClass, Encoder<T> encoder) {
+    public synchronized <T> void append(Class<T> dataClass, Encoder<T> encoder) {
         encoders.add(new Entry<>(dataClass, encoder));
+    }
+
+    public synchronized <T> void prepend(Class<T> dataClass, Encoder<T> encoder) {
+        encoders.add(0, new Entry<>(dataClass, encoder));
     }
 
     private static final class Entry<T> {
