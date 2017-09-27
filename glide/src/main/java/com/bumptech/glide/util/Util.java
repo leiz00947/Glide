@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Looper;
 
+import com.bumptech.glide.load.model.Model;
 import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayDeque;
@@ -207,6 +208,16 @@ public final class Util {
      */
     public static boolean bothNullOrEqual(Object a, Object b) {
         return a == null ? b == null : a.equals(b);
+    }
+
+    public static boolean bothModelsNullEquivalentOrEquals(Object a, Object b) {
+        if (a == null) {
+            return b == null;
+        }
+        if (a instanceof Model) {
+            return ((Model) a).isEquivalentTo(b);
+        }
+        return a.equals(b);
     }
 
     public static int hashCode(int value) {
