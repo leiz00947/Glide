@@ -19,7 +19,7 @@ import java.io.IOException;
  * <p>
  * {@link DiskCache}的实现类，对于指定的目录每次不能超过一个可用的实例
  *
- * @see #get(File, int)
+ * @see #get(java.io.File, int)
  */
 public class DiskLruCacheWrapper implements DiskCache {
     private static final String TAG = "DiskLruCacheWrapper";
@@ -92,9 +92,9 @@ public class DiskLruCacheWrapper implements DiskCache {
     public void put(Key key, Writer writer) {
         // We want to make sure that puts block so that data is available when put completes. We may
         // actually not write any data if we find that data is written by the time we acquire the lock.
-        writeLocker.acquire(key);
+        String safeKey = safeKeyGenerator.getSafeKey(key);
+        writeLocker.acquire(safeKey);
         try {
-            String safeKey = safeKeyGenerator.getSafeKey(key);
             if (Log.isLoggable(TAG, Log.VERBOSE)) {
                 Log.v(TAG, "Put: Obtained: " + safeKey + " for for Key: " + key);
             }
@@ -125,7 +125,7 @@ public class DiskLruCacheWrapper implements DiskCache {
                 }
             }
         } finally {
-            writeLocker.release(key);
+            writeLocker.release(safeKey);
         }
     }
 
