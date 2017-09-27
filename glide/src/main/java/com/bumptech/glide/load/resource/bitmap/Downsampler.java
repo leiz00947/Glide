@@ -19,6 +19,7 @@ import com.bumptech.glide.load.engine.bitmap_recycle.ArrayPool;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy.SampleSizeRounding;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.util.LogTime;
 import com.bumptech.glide.util.Preconditions;
 import com.bumptech.glide.util.Util;
 
@@ -222,7 +223,7 @@ public final class Downsampler {
                                             DecodeFormat decodeFormat, boolean isHardwareConfigAllowed, int requestedWidth,
                                             int requestedHeight, boolean fixBitmapToRequestedDimensions,
                                             DecodeCallbacks callbacks) throws IOException {
-
+        long startTime = LogTime.getLogTime();
         int[] sourceDimensions = getDimensions(is, options, callbacks, bitmapPool);
         int sourceWidth = sourceDimensions[0];
         int sourceHeight = sourceDimensions[1];
@@ -290,7 +291,7 @@ public final class Downsampler {
 
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
             logDecode(sourceWidth, sourceHeight, sourceMimeType, options, downsampled,
-                    requestedWidth, requestedHeight);
+                    requestedWidth, requestedHeight, startTime);
         }
 
         Bitmap rotated = null;
@@ -555,7 +556,8 @@ public final class Downsampler {
     }
 
     private static void logDecode(int sourceWidth, int sourceHeight, String outMimeType,
-                                  BitmapFactory.Options options, Bitmap result, int requestedWidth, int requestedHeight) {
+                                  BitmapFactory.Options options, Bitmap result, int requestedWidth, int requestedHeight,
+                                  long startTime) {
         Log.v(TAG, "Decoded " + getBitmapString(result)
                 + " from [" + sourceWidth + "x" + sourceHeight + "] " + outMimeType
                 + " with inBitmap " + getInBitmapString(options)
@@ -563,7 +565,8 @@ public final class Downsampler {
                 + ", sample size: " + options.inSampleSize
                 + ", density: " + options.inDensity
                 + ", target density: " + options.inTargetDensity
-                + ", thread: " + Thread.currentThread().getName());
+                + ", thread: " + Thread.currentThread().getName()
+                + ", duration: " + LogTime.getElapsedMillis(startTime));
     }
 
     private static String getInBitmapString(BitmapFactory.Options options) {

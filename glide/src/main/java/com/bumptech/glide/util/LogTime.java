@@ -26,7 +26,7 @@ public final class LogTime {
         if (Build.VERSION_CODES.JELLY_BEAN_MR1 <= Build.VERSION.SDK_INT) {
             return SystemClock.elapsedRealtimeNanos();
         } else {
-            return System.currentTimeMillis();
+            return SystemClock.uptimeMillis();
         }
     }
 
