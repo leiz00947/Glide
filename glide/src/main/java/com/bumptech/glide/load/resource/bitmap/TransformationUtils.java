@@ -379,7 +379,7 @@ public final class TransformationUtils {
 
         Bitmap argbBitmap = pool.get(maybeAlphaSafe.getWidth(), maybeAlphaSafe.getHeight(),
                 Bitmap.Config.ARGB_8888);
-        new Canvas(argbBitmap).drawBitmap(maybeAlphaSafe, 0 /*left*/, 0 /*top*/, null /*pain*/);
+        new Canvas(argbBitmap).drawBitmap(maybeAlphaSafe, 0 /*left*/, 0 /*top*/, null /*paint*/);
 
         // We now own this Bitmap. It's our responsibility to replace it in the pool outside this method
         // when we're finished with it.
