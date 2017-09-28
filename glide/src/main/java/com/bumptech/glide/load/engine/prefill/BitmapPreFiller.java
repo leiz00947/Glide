@@ -39,6 +39,7 @@ public final class BitmapPreFiller {
      * 则{@link Bitmap#setConfig(Bitmap.Config)}设置为{@link android.graphics.Bitmap.Config#ARGB_8888}，
      * 否则为{@link android.graphics.Bitmap.Config#RGB_565}
      */
+    @SuppressWarnings("deprecation")
     public void preFill(PreFillType.Builder... bitmapAttributeBuilders) {
         if (current != null) {
             current.cancel();

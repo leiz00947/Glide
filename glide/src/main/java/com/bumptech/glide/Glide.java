@@ -313,19 +313,20 @@ public class Glide implements ComponentCallbacks2 {
                 resources.getDisplayMetrics(), bitmapPool, arrayPool);
         ByteBufferGifDecoder byteBufferGifDecoder =
                 new ByteBufferGifDecoder(context, registry.getImageHeaderParsers(), bitmapPool, arrayPool);
-        registry.register(ByteBuffer.class, new ByteBufferEncoder())
-                .register(InputStream.class, new StreamEncoder(arrayPool))
+        registry
+                .append(ByteBuffer.class, new ByteBufferEncoder())
+                .append(InputStream.class, new StreamEncoder(arrayPool))
                 .append(ByteBuffer.class, Bitmap.class, new ByteBufferBitmapDecoder(downsampler))
                 .append(InputStream.class, Bitmap.class, new StreamBitmapDecoder(downsampler, arrayPool))
                 .append(ParcelFileDescriptor.class, Bitmap.class, new VideoBitmapDecoder(bitmapPool))
-                .register(Bitmap.class, new BitmapEncoder())
+                .append(Bitmap.class, new BitmapEncoder())
                 .append(ByteBuffer.class, BitmapDrawable.class, new BitmapDrawableDecoder<>(resources, bitmapPool, new ByteBufferBitmapDecoder(downsampler)))
                 .append(InputStream.class, BitmapDrawable.class, new BitmapDrawableDecoder<>(resources, bitmapPool, new StreamBitmapDecoder(downsampler, arrayPool)))
                 .append(ParcelFileDescriptor.class, BitmapDrawable.class, new BitmapDrawableDecoder<>(resources, bitmapPool, new VideoBitmapDecoder(bitmapPool)))
-                .register(BitmapDrawable.class, new BitmapDrawableEncoder(bitmapPool, new BitmapEncoder()))
+                .append(BitmapDrawable.class, new BitmapDrawableEncoder(bitmapPool, new BitmapEncoder()))
                 .prepend(InputStream.class, GifDrawable.class, new StreamGifDecoder(registry.getImageHeaderParsers(), byteBufferGifDecoder, arrayPool))
                 .prepend(ByteBuffer.class, GifDrawable.class, byteBufferGifDecoder)
-                .register(GifDrawable.class, new GifDrawableEncoder())
+                .append(GifDrawable.class, new GifDrawableEncoder())
                 .append(GifDecoder.class, GifDecoder.class, new UnitModelLoader.Factory<GifDecoder>())
                 .append(GifDecoder.class, Bitmap.class, new GifFrameResourceDecoder(bitmapPool))
                 .register(new ByteBufferRewinder.Factory())

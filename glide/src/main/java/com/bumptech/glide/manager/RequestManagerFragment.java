@@ -181,6 +181,7 @@ public class RequestManagerFragment extends Fragment {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

@@ -74,6 +74,7 @@ final class HardwareConfigState {
     }
 
     @TargetApi(Build.VERSION_CODES.O)
+    @SuppressWarnings("deprecation")
     boolean setHardwareConfigIfAllowed(
             int targetWidth,
             int targetHeight,

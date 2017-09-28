@@ -23,11 +23,6 @@ package com.bumptech.glide.gifdecoder;
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import static com.bumptech.glide.gifdecoder.GifFrame.DISPOSAL_BACKGROUND;
-import static com.bumptech.glide.gifdecoder.GifFrame.DISPOSAL_NONE;
-import static com.bumptech.glide.gifdecoder.GifFrame.DISPOSAL_PREVIOUS;
-import static com.bumptech.glide.gifdecoder.GifFrame.DISPOSAL_UNSPECIFIED;
-
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.os.Build;
@@ -41,6 +36,11 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+
+import static com.bumptech.glide.gifdecoder.GifFrame.DISPOSAL_BACKGROUND;
+import static com.bumptech.glide.gifdecoder.GifFrame.DISPOSAL_NONE;
+import static com.bumptech.glide.gifdecoder.GifFrame.DISPOSAL_PREVIOUS;
+import static com.bumptech.glide.gifdecoder.GifFrame.DISPOSAL_UNSPECIFIED;
 
 /**
  * Reads frame data from a GIF image source and decodes it into individual frames for animation
@@ -212,6 +212,7 @@ public class StandardGifDecoder implements GifDecoder {
         framePointer = INITIAL_FRAME_POINTER;
     }
 
+    @Deprecated
     @Override
     public int getLoopCount() {
         if (header.loopCount == GifHeader.NETSCAPE_LOOP_COUNT_DOES_NOT_EXIST) {
