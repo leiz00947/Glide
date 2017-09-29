@@ -1,8 +1,5 @@
 package com.bumptech.glide.annotation.compiler;
 
-import static com.bumptech.glide.annotation.GlideOption.OVERRIDE_EXTEND;
-import static com.bumptech.glide.annotation.GlideOption.OVERRIDE_NONE;
-
 import com.bumptech.glide.annotation.GlideExtension;
 import com.bumptech.glide.annotation.GlideOption;
 import com.google.common.base.Function;
@@ -23,9 +20,11 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import javax.annotation.Nullable;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -36,12 +35,15 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 
+import static com.bumptech.glide.annotation.GlideOption.OVERRIDE_EXTEND;
+import static com.bumptech.glide.annotation.GlideOption.OVERRIDE_NONE;
+
 /**
  * Generates a new implementation of {@link com.bumptech.glide.request.RequestOptions}
  * containing static versions of methods included in the base class and static and instance versions
  * of all methods annotated with {@link GlideOption} in classes annotated with
  * {@link GlideExtension}.
- *
+ * <p>
  * <p>The generated class looks something like this:
  * <pre>
  * <code>
@@ -138,6 +140,7 @@ final class RequestOptionsGenerator {
                 .addJavadoc(generateClassJavadoc(glideExtensionClassNames))
                 .addModifiers(Modifier.FINAL)
                 .addModifiers(Modifier.PUBLIC)
+                .addSuperinterface(Cloneable.class)
                 .superclass(requestOptionsName);
 
         for (MethodAndStaticVar methodAndStaticVar : allMethodsAndStaticVars) {
@@ -315,7 +318,7 @@ final class RequestOptionsGenerator {
      * instead of just delegating to the RequestOptions static methods. Using the instance methods
      * on the generated subclass allows our static methods to properly call code that overrides
      * an existing method in RequestOptions.
-     *
+     * <p>
      * <p>The string names here just map between the static methods in
      * {@link com.bumptech.glide.request.RequestOptions} and the instance methods they call.
      */
