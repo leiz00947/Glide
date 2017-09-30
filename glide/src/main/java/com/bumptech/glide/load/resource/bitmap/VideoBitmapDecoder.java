@@ -4,25 +4,24 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.os.ParcelFileDescriptor;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.Option;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.ResourceDecoder;
 import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 
 /**
  * An {@link com.bumptech.glide.load.ResourceDecoder} that can decode a thumbnail frame
- * {@link Bitmap} from a {@link ParcelFileDescriptor} containing a video.
+ * {@link android.graphics.Bitmap} from a {@link android.os.ParcelFileDescriptor} containing a
+ * video.
  * <p>
  * {@link ResourceDecoder}的实现类，根据一个视频的{@link ParcelFileDescriptor}来解码视频缩略图
  *
- * @see MediaMetadataRetriever
+ * @see android.media.MediaMetadataRetriever
  */
 public class VideoBitmapDecoder implements ResourceDecoder<ParcelFileDescriptor, Bitmap> {
     /**
@@ -33,9 +32,9 @@ public class VideoBitmapDecoder implements ResourceDecoder<ParcelFileDescriptor,
 
     /**
      * A long indicating the time position (in microseconds) of the target frame which will be
-     * retrieved. {@link MediaMetadataRetriever#getFrameAtTime(long)} is used to
+     * retrieved. {@link android.media.MediaMetadataRetriever#getFrameAtTime(long)} is used to
      * extract the video frame.
-     * <p>
+     *
      * <p>When retrieving the frame at the given time position, there is no guarantee that the data
      * source has a frame located at the position. When this happens, a frame nearby will be returned.
      * If the long is negative, time position and option will ignored, and any frame that the
@@ -45,7 +44,6 @@ public class VideoBitmapDecoder implements ResourceDecoder<ParcelFileDescriptor,
             "com.bumptech.glide.load.resource.bitmap.VideoBitmapDecode.TargetFrame", DEFAULT_FRAME,
             new Option.CacheKeyUpdater<Long>() {
                 private final ByteBuffer buffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE);
-
                 @Override
                 public void update(byte[] keyBytes, Long value, MessageDigest messageDigest) {
                     messageDigest.update(keyBytes);
@@ -58,7 +56,7 @@ public class VideoBitmapDecoder implements ResourceDecoder<ParcelFileDescriptor,
 
     /**
      * An integer indicating the frame option used to retrieve a target frame.
-     * <p>
+     *
      * <p>This option will be ignored if {@link #TARGET_FRAME} is not set or is set to
      * {@link #DEFAULT_FRAME}.
      *
@@ -69,7 +67,6 @@ public class VideoBitmapDecoder implements ResourceDecoder<ParcelFileDescriptor,
             null /*defaultValue*/,
             new Option.CacheKeyUpdater<Integer>() {
                 private final ByteBuffer buffer = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE);
-
                 @Override
                 public void update(byte[] keyBytes, Integer value, MessageDigest messageDigest) {
                     if (value == null) {
@@ -106,16 +103,10 @@ public class VideoBitmapDecoder implements ResourceDecoder<ParcelFileDescriptor,
 
     @Override
     public boolean handles(ParcelFileDescriptor data, Options options) {
-        MediaMetadataRetriever retriever = factory.build();
-        try {
-            retriever.setDataSource(data.getFileDescriptor());
-            return true;
-        } catch (RuntimeException e) {
-            // Throws a generic runtime exception when given invalid data.
-            return false;
-        } finally {
-            retriever.release();
-        }
+        // Calling setDataSource is expensive so avoid doing so unless we're actually called.
+        // For non-videos this isn't any cheaper, but for videos it safes the redundant call and
+        // 50-100ms.
+        return true;
     }
 
     @Override
@@ -145,6 +136,9 @@ public class VideoBitmapDecoder implements ResourceDecoder<ParcelFileDescriptor,
             } else {
                 result = mediaMetadataRetriever.getFrameAtTime(frameTimeMicros, frameOption);
             }
+        } catch (RuntimeException e) {
+            // MediaMetadataRetriever APIs throw generic runtime exceptions when given invalid data.
+            throw new IOException(e);
         } finally {
             mediaMetadataRetriever.release();
         }
