@@ -313,50 +313,82 @@ public class Glide implements ComponentCallbacks2 {
                 resources.getDisplayMetrics(), bitmapPool, arrayPool);
         ByteBufferGifDecoder byteBufferGifDecoder =
                 new ByteBufferGifDecoder(context, registry.getImageHeaderParsers(), bitmapPool, arrayPool);
+
         registry
                 .append(ByteBuffer.class, new ByteBufferEncoder())
                 .append(InputStream.class, new StreamEncoder(arrayPool))
-                .append(ByteBuffer.class, Bitmap.class, new ByteBufferBitmapDecoder(downsampler))
-                .append(InputStream.class, Bitmap.class, new StreamBitmapDecoder(downsampler, arrayPool))
-                .append(ParcelFileDescriptor.class, Bitmap.class, new VideoBitmapDecoder(bitmapPool))
+                /* Bitmaps */
+                .append(Registry.BUCKET_BITMAP, ByteBuffer.class, Bitmap.class,
+                        new ByteBufferBitmapDecoder(downsampler))
+                .append(Registry.BUCKET_BITMAP, InputStream.class, Bitmap.class,
+                        new StreamBitmapDecoder(downsampler, arrayPool))
+                .append(Registry.BUCKET_BITMAP, ParcelFileDescriptor.class, Bitmap.class,
+                        new VideoBitmapDecoder(bitmapPool))
                 .append(Bitmap.class, new BitmapEncoder())
-                .append(ByteBuffer.class, BitmapDrawable.class, new BitmapDrawableDecoder<>(resources, bitmapPool, new ByteBufferBitmapDecoder(downsampler)))
-                .append(InputStream.class, BitmapDrawable.class, new BitmapDrawableDecoder<>(resources, bitmapPool, new StreamBitmapDecoder(downsampler, arrayPool)))
-                .append(ParcelFileDescriptor.class, BitmapDrawable.class, new BitmapDrawableDecoder<>(resources, bitmapPool, new VideoBitmapDecoder(bitmapPool)))
+                /* GlideBitmapDrawables */
+                .append(Registry.BUCKET_BITMAP_DRAWABLE, ByteBuffer.class, BitmapDrawable.class,
+                        new BitmapDrawableDecoder<>(resources, bitmapPool,
+                                new ByteBufferBitmapDecoder(downsampler)))
+                .append(Registry.BUCKET_BITMAP_DRAWABLE, InputStream.class, BitmapDrawable.class,
+                        new BitmapDrawableDecoder<>(resources, bitmapPool,
+                                new StreamBitmapDecoder(downsampler, arrayPool)))
+                .append(Registry.BUCKET_BITMAP_DRAWABLE, ParcelFileDescriptor.class, BitmapDrawable.class,
+                        new BitmapDrawableDecoder<>(resources, bitmapPool, new VideoBitmapDecoder(bitmapPool)))
                 .append(BitmapDrawable.class, new BitmapDrawableEncoder(bitmapPool, new BitmapEncoder()))
-                .prepend(InputStream.class, GifDrawable.class, new StreamGifDecoder(registry.getImageHeaderParsers(), byteBufferGifDecoder, arrayPool))
-                .prepend(ByteBuffer.class, GifDrawable.class, byteBufferGifDecoder)
+                /* GIFs */
+                .append(Registry.BUCKET_GIF, InputStream.class, GifDrawable.class,
+                        new StreamGifDecoder(registry.getImageHeaderParsers(), byteBufferGifDecoder, arrayPool))
+                .append(Registry.BUCKET_GIF, ByteBuffer.class, GifDrawable.class, byteBufferGifDecoder)
                 .append(GifDrawable.class, new GifDrawableEncoder())
-                .append(GifDecoder.class, GifDecoder.class, new UnitModelLoader.Factory<GifDecoder>())
-                .append(GifDecoder.class, Bitmap.class, new GifFrameResourceDecoder(bitmapPool))
+                /* GIF Frames */
+                .append(GifDecoder.class, GifDecoder.class, new UnitModelLoader.Factory<>())
+                .append(Registry.BUCKET_BITMAP, GifDecoder.class, Bitmap.class,
+                        new GifFrameResourceDecoder(bitmapPool))
+                /* Files */
                 .register(new ByteBufferRewinder.Factory())
                 .append(File.class, ByteBuffer.class, new ByteBufferFileLoader.Factory())
                 .append(File.class, InputStream.class, new FileLoader.StreamFactory())
                 .append(File.class, File.class, new FileDecoder())
                 .append(File.class, ParcelFileDescriptor.class, new FileLoader.FileDescriptorFactory())
-                .append(File.class, File.class, new UnitModelLoader.Factory<File>())
+                .append(File.class, File.class, new UnitModelLoader.Factory<>())
+                /* Models */
                 .register(new InputStreamRewinder.Factory(arrayPool))
                 .append(int.class, InputStream.class, new ResourceLoader.StreamFactory(resources))
-                .append(int.class, ParcelFileDescriptor.class, new ResourceLoader.FileDescriptorFactory(resources))
+                .append(
+                        int.class,
+                        ParcelFileDescriptor.class,
+                        new ResourceLoader.FileDescriptorFactory(resources))
                 .append(Integer.class, InputStream.class, new ResourceLoader.StreamFactory(resources))
-                .append(Integer.class, ParcelFileDescriptor.class, new ResourceLoader.FileDescriptorFactory(resources))
+                .append(
+                        Integer.class,
+                        ParcelFileDescriptor.class,
+                        new ResourceLoader.FileDescriptorFactory(resources))
                 .append(String.class, InputStream.class, new DataUrlLoader.StreamFactory())
                 .append(String.class, InputStream.class, new StringLoader.StreamFactory())
                 .append(String.class, ParcelFileDescriptor.class, new StringLoader.FileDescriptorFactory())
                 .append(Uri.class, InputStream.class, new HttpUriLoader.Factory())
                 .append(Uri.class, InputStream.class, new AssetUriLoader.StreamFactory(context.getAssets()))
-                .append(Uri.class, ParcelFileDescriptor.class, new AssetUriLoader.FileDescriptorFactory(context.getAssets()))
+                .append(
+                        Uri.class,
+                        ParcelFileDescriptor.class,
+                        new AssetUriLoader.FileDescriptorFactory(context.getAssets()))
                 .append(Uri.class, InputStream.class, new MediaStoreImageThumbLoader.Factory(context))
                 .append(Uri.class, InputStream.class, new MediaStoreVideoThumbLoader.Factory(context))
-                .append(Uri.class, InputStream.class, new UriLoader.StreamFactory(context.getContentResolver()))
-                .append(Uri.class, ParcelFileDescriptor.class, new UriLoader.FileDescriptorFactory(context.getContentResolver()))
+                .append(
+                        Uri.class,
+                        InputStream.class,
+                        new UriLoader.StreamFactory(context.getContentResolver()))
+                .append(Uri.class, ParcelFileDescriptor.class,
+                        new UriLoader.FileDescriptorFactory(context.getContentResolver()))
                 .append(Uri.class, InputStream.class, new UrlUriLoader.StreamFactory())
                 .append(URL.class, InputStream.class, new UrlLoader.StreamFactory())
                 .append(Uri.class, File.class, new MediaStoreFileLoader.Factory(context))
                 .append(GlideUrl.class, InputStream.class, new HttpGlideUrlLoader.Factory())
                 .append(byte[].class, ByteBuffer.class, new ByteArrayLoader.ByteBufferFactory())
                 .append(byte[].class, InputStream.class, new ByteArrayLoader.StreamFactory())
-                .register(Bitmap.class, BitmapDrawable.class, new BitmapDrawableTranscoder(resources, bitmapPool))
+                /* Transcoders */
+                .register(Bitmap.class, BitmapDrawable.class,
+                        new BitmapDrawableTranscoder(resources, bitmapPool))
                 .register(Bitmap.class, byte[].class, new BitmapBytesTranscoder())
                 .register(GifDrawable.class, byte[].class, new GifDrawableBytesTranscoder());
 
