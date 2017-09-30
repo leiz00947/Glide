@@ -251,7 +251,8 @@ public class Registry {
      * @see #append(String, Class, Class, ResourceDecoder)
      * @see #prepend(String, Class, Class, ResourceDecoder)
      */
-    public Registry setResourceDecoderBucketPriorityList(List<String> buckets) {
+    // Final to avoid a PMD error.
+    public final Registry setResourceDecoderBucketPriorityList(List<String> buckets) {
         List<String> modifiedBuckets = new ArrayList<>(buckets);
         modifiedBuckets.add(0, BUCKET_PREPEND_ALL);
         modifiedBuckets.add(BUCKET_APPEND_ALL);
