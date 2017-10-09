@@ -2,6 +2,7 @@ package com.bumptech.glide.load.resource.transcode;
 
 import android.graphics.Bitmap;
 
+import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.resource.bytes.BytesResource;
 
@@ -29,7 +30,7 @@ public class BitmapBytesTranscoder implements ResourceTranscoder<Bitmap, byte[]>
     }
 
     @Override
-    public Resource<byte[]> transcode(Resource<Bitmap> toTranscode) {
+    public Resource<byte[]> transcode(Resource<Bitmap> toTranscode, Options options) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         toTranscode.get().compress(compressFormat, quality, os);
         toTranscode.recycle();
