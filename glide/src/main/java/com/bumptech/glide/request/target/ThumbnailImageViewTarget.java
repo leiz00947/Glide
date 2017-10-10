@@ -29,9 +29,12 @@ import com.bumptech.glide.RequestBuilder;
  * @param <T> The type of resource that will be displayed in the ImageView.
  */
 public abstract class ThumbnailImageViewTarget<T> extends ImageViewTarget<T> {
-
     public ThumbnailImageViewTarget(ImageView view) {
         super(view);
+    }
+
+    public ThumbnailImageViewTarget(ImageView view, boolean waitForLayout) {
+        super(view, waitForLayout);
     }
 
     /**

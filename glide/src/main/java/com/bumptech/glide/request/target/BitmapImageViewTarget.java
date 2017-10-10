@@ -14,6 +14,10 @@ public class BitmapImageViewTarget extends ImageViewTarget<Bitmap> {
         super(view);
     }
 
+    public BitmapImageViewTarget(ImageView view, boolean waitForLayout) {
+        super(view, waitForLayout);
+    }
+
     /**
      * Sets the {@link Bitmap} on the view using {@link
      * ImageView#setImageBitmap(Bitmap)}.

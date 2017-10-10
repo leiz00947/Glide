@@ -10,9 +10,12 @@ import android.widget.ImageView;
  * 展示一个{@link Drawable}对象到{@link ImageView}
  */
 public class DrawableImageViewTarget extends ImageViewTarget<Drawable> {
-
     public DrawableImageViewTarget(ImageView view) {
         super(view);
+    }
+
+    public DrawableImageViewTarget(ImageView view, boolean waitForLayout) {
+        super(view, waitForLayout);
     }
 
     @Override
