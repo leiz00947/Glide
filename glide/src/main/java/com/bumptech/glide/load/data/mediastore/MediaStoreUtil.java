@@ -4,6 +4,8 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import com.bumptech.glide.request.target.Target;
+
 /**
  * Utility classes for interacting with the media store.
  * <p>
@@ -45,6 +47,9 @@ public final class MediaStoreUtil {
     }
 
     public static boolean isThumbnailSize(int width, int height) {
-        return width <= MINI_THUMB_WIDTH && height <= MINI_THUMB_HEIGHT;
+        return width != Target.SIZE_ORIGINAL
+                && height != Target.SIZE_ORIGINAL
+                && width <= MINI_THUMB_WIDTH
+                && height <= MINI_THUMB_HEIGHT;
     }
 }
