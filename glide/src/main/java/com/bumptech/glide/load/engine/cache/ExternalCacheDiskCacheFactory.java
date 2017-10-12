@@ -11,7 +11,10 @@ import java.io.File;
  * 基于外部磁盘缓存目录创建一个{@link com.bumptech.glide.disklrucache.DiskLruCache}
  * <p>
  * <b>Images can be read by everyone when using external disk cache.</b>
+ *
+ * @deprecated use {@link ExternalPreferredCacheDiskCacheFactory} instead.
  */
+@Deprecated
 public final class ExternalCacheDiskCacheFactory extends DiskLruCacheFactory {
 
     public ExternalCacheDiskCacheFactory(Context context) {
