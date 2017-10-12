@@ -40,7 +40,7 @@ import static com.bumptech.glide.annotation.GlideOption.OVERRIDE_EXTEND;
 import static com.bumptech.glide.annotation.GlideOption.OVERRIDE_NONE;
 
 /**
- * Generates a new implementation of {@link com.bumptech.glide.request.RequestOptions}
+ * Generates a new implementation of {@code com.bumptech.glide.request.RequestOptions}
  * containing static versions of methods included in the base class and static and instance versions
  * of all methods annotated with {@link GlideOption} in classes annotated with
  * {@link GlideExtension}.
@@ -329,7 +329,7 @@ final class RequestOptionsGenerator {
      * an existing method in RequestOptions.
      * <p>
      * <p>The string names here just map between the static methods in
-     * {@link com.bumptech.glide.request.RequestOptions} and the instance methods they call.
+     * {@code com.bumptech.glide.request.RequestOptions} and the instance methods they call.
      */
     private static String getInstanceMethodNameFromStaticMethodName(String staticMethodName) {
         String equivalentInstanceMethodName;
