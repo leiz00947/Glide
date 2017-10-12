@@ -30,8 +30,6 @@ import static com.bumptech.glide.request.RequestOptions.signatureOf;
 
 /**
  * A generic class that can handle setting options and staring loads for generic resource types.
- * <p>
- * 一个可以设置选项和加载通用资源类型的类
  *
  * @param <TranscodeType> The type of resource that will be delivered to the
  *                        {@link com.bumptech.glide.request.target.Target}.
@@ -104,6 +102,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      * @return This request builder.
      * @see RequestOptions#apply(RequestOptions)
      */
+    @CheckResult
     public RequestBuilder<TranscodeType> apply(@NonNull RequestOptions requestOptions) {
         Preconditions.checkNotNull(requestOptions);
         this.requestOptions = getMutableOptions().apply(requestOptions);
@@ -121,12 +120,12 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      * <p>
      * 设置当加载图片成功时控制从{@link RequestOptions#placeholderDrawable}或缩略图过渡到请求规格
      * 图片的{@link TransitionOptions}实例
-     * <p>
      * <p>The given {@link TransitionOptions} will replace any {@link TransitionOptions} set
      * previously.
      *
      * @return This request builder.
      */
+    @CheckResult
     public RequestBuilder<TranscodeType> transition(
             @NonNull TransitionOptions<?, ? super TranscodeType> transitionOptions) {
         this.transitionOptions = Preconditions.checkNotNull(transitionOptions);
@@ -145,6 +144,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      * @param requestListener The request listener to use.
      * @return This request builder.
      */
+    @CheckResult
     @SuppressWarnings("unchecked")
     public RequestBuilder<TranscodeType> listener(
             @Nullable RequestListener<TranscodeType> requestListener) {
@@ -166,6 +166,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      * <p>
      * <p> Recursive calls to thumbnail are supported. </p>
      */
+    @CheckResult
     @SuppressWarnings("unchecked")
     public RequestBuilder<TranscodeType> thumbnail(
             @Nullable RequestBuilder<TranscodeType> thumbnailRequest) {
@@ -198,6 +199,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      *                       the thumbnail.
      * @return This request builder.
      */
+    @CheckResult
     @SuppressWarnings("unchecked")
     public RequestBuilder<TranscodeType> thumbnail(float sizeMultiplier) {
         if (sizeMultiplier < 0f || sizeMultiplier > 1f) {
@@ -217,6 +219,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      * @param model The model to load data for, or null.
      * @return This request builder.
      */
+    @CheckResult
     @SuppressWarnings("unchecked")
     public RequestBuilder<TranscodeType> load(@Nullable Object model) {
         return loadGeneric(model);
@@ -246,6 +249,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      *               {@link com.bumptech.glide.load.model.UriLoader}.
      * @see #load(Object)
      */
+    @CheckResult
     public RequestBuilder<TranscodeType> load(@Nullable String string) {
         return loadGeneric(string);
     }
@@ -267,6 +271,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      *            {@link com.bumptech.glide.load.model.UriLoader}.
      * @see #load(Object)
      */
+    @CheckResult
     public RequestBuilder<TranscodeType> load(@Nullable Uri uri) {
         return loadGeneric(uri);
     }
@@ -288,6 +293,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      * @param file The File containing the image
      * @see #load(Object)
      */
+    @CheckResult
     public RequestBuilder<TranscodeType> load(@Nullable File file) {
         return loadGeneric(file);
     }
@@ -311,6 +317,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      * @see #load(Integer)
      * @see com.bumptech.glide.signature.ApplicationVersionSignature
      */
+    @CheckResult
     public RequestBuilder<TranscodeType> load(@Nullable Integer resourceId) {
         return loadGeneric(resourceId).apply(signatureOf(ApplicationVersionSignature.obtain(context)));
     }
@@ -325,6 +332,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      * {@link #load(android.net.Uri)} or {@link #load(String)}.
      */
     @Deprecated
+    @CheckResult
     public RequestBuilder<TranscodeType> load(@Nullable URL url) {
         return loadGeneric(url);
     }
@@ -338,6 +346,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
      * @param model the data to load.
      * @see #load(Object)
      */
+    @CheckResult
     public RequestBuilder<TranscodeType> load(@Nullable byte[] model) {
         return loadGeneric(model).apply(signatureOf(new ObjectKey(UUID.randomUUID().toString()))
                 .diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true /*skipMemoryCache*/));
