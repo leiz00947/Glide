@@ -318,8 +318,9 @@ public final class SingleRequest<R> implements Request,
     private void assertNotCallingCallbacks() {
         if (isCallingCallbacks) {
             throw new IllegalStateException("You can't start or clear loads in RequestListener or"
-                    + " Target callbacks. If you must do so, consider posting your into() or clear() calls"
-                    + " to the main thread using a Handler instead.");
+                    + " Target callbacks. If you're trying to start a fallback request when a load fails, use"
+                    + " RequestBuilder#error(RequestBuilder). Otherwise consider posting your into() or"
+                    + " clear() calls to the main thread using a Handler instead.");
         }
     }
 
@@ -544,6 +545,12 @@ public final class SingleRequest<R> implements Request,
         }
     }
 
+    private void notifyLoadFailed() {
+        if (requestCoordinator != null) {
+            requestCoordinator.onRequestFailed(this);
+        }
+    }
+
     /**
      * A callback method that should never be invoked directly.
      */
@@ -647,6 +654,8 @@ public final class SingleRequest<R> implements Request,
         } finally {
             isCallingCallbacks = false;
         }
+
+        notifyLoadFailed();
     }
 
     @Override
