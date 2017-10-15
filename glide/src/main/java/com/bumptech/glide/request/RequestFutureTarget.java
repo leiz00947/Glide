@@ -139,9 +139,6 @@ public class RequestFutureTarget<R> implements FutureTarget<R>,
         // Do nothing because we do not retain references to SizeReadyCallbacks.
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setRequest(@Nullable Request request) {
         this.request = request;
