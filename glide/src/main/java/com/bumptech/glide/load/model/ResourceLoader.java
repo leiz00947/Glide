@@ -102,4 +102,26 @@ public class ResourceLoader<Data> implements ModelLoader<Integer, Data> {
             // Do nothing.
         }
     }
+
+    /**
+     * Factory for loading resource {@link Uri}s from Android resource ids.
+     */
+    public static class UriFactory implements ModelLoaderFactory<Integer, Uri> {
+
+        private final Resources resources;
+
+        public UriFactory(Resources resources) {
+            this.resources = resources;
+        }
+
+        @Override
+        public ModelLoader<Integer, Uri> build(MultiModelLoaderFactory multiFactory) {
+            return new ResourceLoader<>(resources, new UnitModelLoader<Uri>());
+        }
+
+        @Override
+        public void teardown() {
+            // Do nothing.
+        }
+    }
 }
