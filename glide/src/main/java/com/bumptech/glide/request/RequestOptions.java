@@ -65,6 +65,7 @@ public class RequestOptions implements Cloneable {
     private static final int TRANSFORMATION_REQUIRED = 1 << 17;
     private static final int USE_UNLIMITED_SOURCE_GENERATORS_POOL = 1 << 18;
     private static final int ONLY_RETRIEVE_FROM_CACHE = 1 << 19;
+    private static final int USE_ANIMATION_POOL = 1 << 20;
 
     @Nullable
     private static RequestOptions skipMemoryCacheTrueOptions;
@@ -118,6 +119,7 @@ public class RequestOptions implements Cloneable {
     private boolean useUnlimitedSourceGeneratorsPool;
     private boolean onlyRetrieveFromCache;
     private boolean isScaleOnlyOrNoTransform = true;
+    private boolean useAnimationPool;
 
     /**
      * Returns a {@link RequestOptions} object with {@link #sizeMultiplier(float)} set.
@@ -419,6 +421,15 @@ public class RequestOptions implements Cloneable {
         return selfOrThrowIfLocked();
     }
 
+    /**
+     * If set to {@code true}, uses a cached unlimited {@link java.util.concurrent.Executor} to run
+     * the request.
+     * <p>
+     * <p>This method should <em>ONLY</em> be used when a Glide load is started recursively on one
+     * of Glide's threads as part of another request. Using this method in other scenarios can lead
+     * to excessive memory usage and OOMs and/or a significant decrease in performance across an
+     * application.
+     */
     @CheckResult
     public RequestOptions useUnlimitedSourceGeneratorsPool(boolean flag) {
         if (isAutoCloneEnabled) {
@@ -427,6 +438,27 @@ public class RequestOptions implements Cloneable {
 
         this.useUnlimitedSourceGeneratorsPool = flag;
         fields |= USE_UNLIMITED_SOURCE_GENERATORS_POOL;
+
+        return selfOrThrowIfLocked();
+    }
+
+    /**
+     * If set to {@code true}, uses a special {@link java.util.concurrent.Executor} that is used
+     * exclusively for decoding frames of animated resources, like GIFs.
+     * <p>
+     * <p>The animation executor disallows network operations and must not be used for loads that
+     * may load remote data. The animation executor has fewer threads available to it than Glide's
+     * normal executors and is only useful as a way of avoiding blocking on longer and more expensive
+     * reads for critical requests like those in an animating GIF.
+     */
+    @CheckResult
+    public RequestOptions useAnimationPool(boolean flag) {
+        if (isAutoCloneEnabled) {
+            return clone().useAnimationPool(flag);
+        }
+
+        useAnimationPool = flag;
+        fields |= USE_ANIMATION_POOL;
 
         return selfOrThrowIfLocked();
     }
@@ -1232,6 +1264,9 @@ public class RequestOptions implements Cloneable {
         if (isSet(other.fields, USE_UNLIMITED_SOURCE_GENERATORS_POOL)) {
             useUnlimitedSourceGeneratorsPool = other.useUnlimitedSourceGeneratorsPool;
         }
+        if (isSet(other.fields, USE_ANIMATION_POOL)) {
+            useAnimationPool = other.useAnimationPool;
+        }
         if (isSet(other.fields, DISK_CACHE_STRATEGY)) {
             diskCacheStrategy = other.diskCacheStrategy;
         }
@@ -1506,6 +1541,10 @@ public class RequestOptions implements Cloneable {
 
     public final boolean getUseUnlimitedSourceGeneratorsPool() {
         return useUnlimitedSourceGeneratorsPool;
+    }
+
+    public final boolean getUseAnimationPool() {
+        return useAnimationPool;
     }
 
     public final boolean getOnlyRetrieveFromCache() {

@@ -35,15 +35,18 @@ import java.util.regex.Pattern;
 public final class GlideExecutor extends ThreadPoolExecutor {
 
     /**
-     * The default thread name prefix for executors used to load/decode/transform data not found in cache.
+     * The default thread name prefix for executors used to load/decode/transform data not found in
+     * cache.
      */
     public static final String DEFAULT_SOURCE_EXECUTOR_NAME = "source";
     /**
-     * The default thread name prefix for executors used to load/decode/transform data found in Glide's cache.
+     * The default thread name prefix for executors used to load/decode/transform data found in
+     * Glide's cache.
      */
     public static final String DEFAULT_DISK_CACHE_EXECUTOR_NAME = "disk-cache";
     /**
-     * The default thread count for executors used to load/decode/transform data found in Glide's cache.
+     * The default thread count for executors used to load/decode/transform data found in Glide's
+     * cache.
      */
     public static final int DEFAULT_DISK_CACHE_EXECUTOR_THREADS = 1;
 
@@ -55,6 +58,9 @@ public final class GlideExecutor extends ThreadPoolExecutor {
     private static final String CPU_LOCATION = "/sys/devices/system/cpu/";
     // Don't use more than four threads when automatically determining thread count..
     private static final int MAXIMUM_AUTOMATIC_THREAD_COUNT = 4;
+    // May be accessed on other threads, but this is an optimization only so it's ok if we set its
+    // value more than once.
+    private static volatile int bestThreadCount;
     private final boolean executeSynchronously;
 
     /**
@@ -63,19 +69,20 @@ public final class GlideExecutor extends ThreadPoolExecutor {
      */
     private static final String SOURCE_UNLIMITED_EXECUTOR_NAME = "source-unlimited";
     /**
-     * The default keep alive time for threads in source unlimited executor pool in milliseconds.
+     * The default keep alive time for threads in our cached thread pools in milliseconds.
      */
-    private static final long SOURCE_UNLIMITED_EXECUTOR_KEEP_ALIVE_TIME_MS =
-            TimeUnit.SECONDS.toMillis(10);
+    private static final long KEEP_ALIVE_TIME_MS = TimeUnit.SECONDS.toMillis(10);
+
+    private static final String ANIMATION_EXECUTOR_NAME = "animation";
 
     /**
      * Returns a new fixed thread pool with the default thread count returned from
      * {@link #calculateBestThreadCount()}, the {@link #DEFAULT_DISK_CACHE_EXECUTOR_NAME} thread name
      * prefix, and the
-     * {@link UncaughtThrowableStrategy#DEFAULT}
+     * {@link com.bumptech.glide.load.engine.executor.GlideExecutor.UncaughtThrowableStrategy#DEFAULT}
      * uncaught throwable strategy.
      * <p>
-     * Disk cache executors do not allow network operations on their threads.
+     * <p>Disk cache executors do not allow network operations on their threads.
      * <p>
      * 创建一个固定线程数为1，任务队列无限制的线程池；捕获到异常时，记录异常日志
      * <p>
@@ -84,43 +91,6 @@ public final class GlideExecutor extends ThreadPoolExecutor {
     public static GlideExecutor newDiskCacheExecutor() {
         return newDiskCacheExecutor(DEFAULT_DISK_CACHE_EXECUTOR_THREADS,
                 DEFAULT_DISK_CACHE_EXECUTOR_NAME, UncaughtThrowableStrategy.DEFAULT);
-    }
-
-    /**
-     * Returns a new fixed thread pool with the given thread count, thread name prefix,
-     * and {@link UncaughtThrowableStrategy}.
-     * <p>
-     * Disk cache executors do not allow network operations on their threads.
-     * <p>
-     * 创建一个固定数量核心线程，没有临时线程，但任务队列无大小限制的线程池；支持预防网络操作
-     *
-     * @param threadCount               The number of threads.
-     * @param name                      The prefix for each thread name.
-     * @param uncaughtThrowableStrategy The {@link
-     *                                  UncaughtThrowableStrategy} to use to
-     *                                  handle uncaught exceptions.
-     */
-    public static GlideExecutor newDiskCacheExecutor(int threadCount, String name,
-                                                     UncaughtThrowableStrategy uncaughtThrowableStrategy) {
-        return new GlideExecutor(threadCount, name, uncaughtThrowableStrategy,
-                true /*preventNetworkOperations*/, false /*executeSynchronously*/);
-    }
-
-    /**
-     * Returns a new fixed thread pool with the default thread count returned from
-     * {@link #calculateBestThreadCount()}, the {@link #DEFAULT_SOURCE_EXECUTOR_NAME} thread name
-     * prefix, and the
-     * {@link UncaughtThrowableStrategy#DEFAULT}
-     * uncaught throwable strategy.
-     * <p>
-     * Source executors allow network operations on their threads.
-     * <p>
-     * 根据计算CPU核数，设置一个核心线程数不大于{@link #MAXIMUM_AUTOMATIC_THREAD_COUNT}，
-     * 不创建临时线程，任务队列无大小限制的线程池；对网络操作不进行干涉
-     */
-    public static GlideExecutor newSourceExecutor() {
-        return newSourceExecutor(calculateBestThreadCount(), DEFAULT_SOURCE_EXECUTOR_NAME,
-                UncaughtThrowableStrategy.DEFAULT);
     }
 
     /**
@@ -140,6 +110,43 @@ public final class GlideExecutor extends ThreadPoolExecutor {
             UncaughtThrowableStrategy uncaughtThrowableStrategy) {
         return newDiskCacheExecutor(DEFAULT_DISK_CACHE_EXECUTOR_THREADS,
                 DEFAULT_DISK_CACHE_EXECUTOR_NAME, uncaughtThrowableStrategy);
+    }
+
+    /**
+     * Returns a new fixed thread pool with the given thread count, thread name prefix,
+     * and {@link com.bumptech.glide.load.engine.executor.GlideExecutor.UncaughtThrowableStrategy}.
+     * <p>
+     * <p>Disk cache executors do not allow network operations on their threads.
+     * <p>
+     * 创建一个固定数量核心线程，没有临时线程，但任务队列无大小限制的线程池；支持预防网络操作
+     *
+     * @param threadCount               The number of threads.
+     * @param name                      The prefix for each thread name.
+     * @param uncaughtThrowableStrategy The {@link
+     *                                  com.bumptech.glide.load.engine.executor.GlideExecutor.UncaughtThrowableStrategy} to use to
+     *                                  handle uncaught exceptions.
+     */
+    public static GlideExecutor newDiskCacheExecutor(int threadCount, String name,
+                                                     UncaughtThrowableStrategy uncaughtThrowableStrategy) {
+        return new GlideExecutor(threadCount, name, uncaughtThrowableStrategy,
+                true /*preventNetworkOperations*/, false /*executeSynchronously*/);
+    }
+
+    /**
+     * Returns a new fixed thread pool with the default thread count returned from
+     * {@link #calculateBestThreadCount()}, the {@link #DEFAULT_SOURCE_EXECUTOR_NAME} thread name
+     * prefix, and the
+     * {@link com.bumptech.glide.load.engine.executor.GlideExecutor.UncaughtThrowableStrategy#DEFAULT}
+     * uncaught throwable strategy.
+     * <p>
+     * <p>Source executors allow network operations on their threads.
+     * <p>
+     * 根据计算CPU核数，设置一个核心线程数不大于{@link #MAXIMUM_AUTOMATIC_THREAD_COUNT}，
+     * 不创建临时线程，任务队列无大小限制的线程池；对网络操作不进行干涉
+     */
+    public static GlideExecutor newSourceExecutor() {
+        return newSourceExecutor(calculateBestThreadCount(), DEFAULT_SOURCE_EXECUTOR_NAME,
+                UncaughtThrowableStrategy.DEFAULT);
     }
 
     /**
@@ -163,16 +170,16 @@ public final class GlideExecutor extends ThreadPoolExecutor {
 
     /**
      * Returns a new fixed thread pool with the given thread count, thread name prefix,
-     * and {@link UncaughtThrowableStrategy}.
+     * and {@link com.bumptech.glide.load.engine.executor.GlideExecutor.UncaughtThrowableStrategy}.
      * <p>
-     * Source executors allow network operations on their threads.
+     * <p>Source executors allow network operations on their threads.
      * <p>
      * 创建一个固定数量核心线程，没有临时线程，但任务队列无大小限制的线程池；不支持预防网络操作
      *
      * @param threadCount               The number of threads.
      * @param name                      The prefix for each thread name.
      * @param uncaughtThrowableStrategy The {@link
-     *                                  UncaughtThrowableStrategy} to use to
+     *                                  com.bumptech.glide.load.engine.executor.GlideExecutor.UncaughtThrowableStrategy} to use to
      *                                  handle uncaught exceptions.
      */
     public static GlideExecutor newSourceExecutor(int threadCount, String name,
@@ -183,9 +190,9 @@ public final class GlideExecutor extends ThreadPoolExecutor {
 
     /**
      * Returns a new unlimited thread pool with zero core thread count to make sure no threads are
-     * created by default, {@link #SOURCE_UNLIMITED_EXECUTOR_KEEP_ALIVE_TIME_MS} keep alive
+     * created by default, {@link #KEEP_ALIVE_TIME_MS} keep alive
      * time, the {@link #SOURCE_UNLIMITED_EXECUTOR_NAME} thread name prefix, the
-     * {@link UncaughtThrowableStrategy#DEFAULT}
+     * {@link com.bumptech.glide.load.engine.executor.GlideExecutor.UncaughtThrowableStrategy#DEFAULT}
      * uncaught throwable strategy, and the {@link SynchronousQueue} since using default unbounded
      * blocking queue, for example, {@link PriorityBlockingQueue} effectively won't create more than
      * {@code corePoolSize} threads.
@@ -193,19 +200,38 @@ public final class GlideExecutor extends ThreadPoolExecutor {
      * "http://developer.android.com/reference/java/util/concurrent/ThreadPoolExecutor.html">
      * ThreadPoolExecutor documentation</a>.
      * <p>
-     * Source executors allow network operations on their threads.
+     * <p>Source executors allow network operations on their threads.
      * <p>
      * 创建一个无核心线程，但可以无限制创建临时线程的线程池，任务队列无大小限制
      */
     public static GlideExecutor newUnlimitedSourceExecutor() {
         return new GlideExecutor(0 /* corePoolSize */,
                 Integer.MAX_VALUE /* maximumPoolSize */,
-                SOURCE_UNLIMITED_EXECUTOR_KEEP_ALIVE_TIME_MS,
+                KEEP_ALIVE_TIME_MS,
                 SOURCE_UNLIMITED_EXECUTOR_NAME,
                 UncaughtThrowableStrategy.DEFAULT,
                 false /*preventNetworkOperations*/,
                 false /*executeSynchronously*/,
                 new SynchronousQueue<Runnable>());
+    }
+
+    public static GlideExecutor newAnimationExecutor() {
+        int bestThreadCount = calculateBestThreadCount();
+        // We don't want to add a ton of threads running animations in parallel with our source and
+        // disk cache executors. Doing so adds unnecessary CPU load and can also dramatically increase
+        // our maximum memory usage. Typically one thread is sufficient here, but for higher end devices
+        // with more cores, two threads can provide better performance if lots of GIFs are showing at
+        // once.
+        int maximumPoolSize = bestThreadCount >= 4 ? 2 : 1;
+        return new GlideExecutor(
+        /*corePoolSize=*/ 0,
+                maximumPoolSize,
+                KEEP_ALIVE_TIME_MS,
+                ANIMATION_EXECUTOR_NAME,
+                UncaughtThrowableStrategy.DEFAULT,
+        /*preventNetworkOperations=*/ true,
+        /*executeSynchronously=*/ false,
+                new PriorityBlockingQueue<Runnable>());
     }
 
     // Visible for testing.
@@ -300,43 +326,45 @@ public final class GlideExecutor extends ThreadPoolExecutor {
     /**
      * Determines the number of cores available on the device.
      * <p>
-     * {@link Runtime#availableProcessors()} returns the number of awake cores, which may not
+     * <p>{@link Runtime#availableProcessors()} returns the number of awake cores, which may not
      * be the number of available cores depending on the device's current state. See
      * http://goo.gl/8H670N.
      * <p>
      * 根据CPU个数配置一个不大于{@link #MAXIMUM_AUTOMATIC_THREAD_COUNT}的线程数
      */
     public static int calculateBestThreadCount() {
-        /**
-         * We override the current ThreadPolicy to allow disk reads.
-         * This shouldn't actually do disk-IO and accesses a device file.
-         * See: https://github.com/bumptech/glide/issues/1170
-         */
-        ThreadPolicy originalPolicy = StrictMode.allowThreadDiskReads();
-        File[] cpus = null;
-        try {
-            File cpuInfo = new File(CPU_LOCATION);
-            final Pattern cpuNamePattern = Pattern.compile(CPU_NAME_REGEX);
-            cpus = cpuInfo.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File file, String s) {
-                    return cpuNamePattern.matcher(s).matches();
+        if (bestThreadCount == 0) {
+            // We override the current ThreadPolicy to allow disk reads.
+            // This shouldn't actually do disk-IO and accesses a device file.
+            // See: https://github.com/bumptech/glide/issues/1170
+            ThreadPolicy originalPolicy = StrictMode.allowThreadDiskReads();
+            File[] cpus = null;
+            try {
+                File cpuInfo = new File(CPU_LOCATION);
+                final Pattern cpuNamePattern = Pattern.compile(CPU_NAME_REGEX);
+                cpus = cpuInfo.listFiles(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File file, String s) {
+                        return cpuNamePattern.matcher(s).matches();
+                    }
+                });
+            } catch (Throwable t) {
+                if (Log.isLoggable(TAG, Log.ERROR)) {
+                    Log.e(TAG, "Failed to calculate accurate cpu count", t);
                 }
-            });
-        } catch (Throwable t) {
-            if (Log.isLoggable(TAG, Log.ERROR)) {
-                Log.e(TAG, "Failed to calculate accurate cpu count", t);
+            } finally {
+                StrictMode.setThreadPolicy(originalPolicy);
             }
-        } finally {
-            StrictMode.setThreadPolicy(originalPolicy);
-        }
 
-        int cpuCount = cpus != null ? cpus.length : 0;
-        int availableProcessors = Math.max(1, Runtime.getRuntime().availableProcessors());
-        /**
-         * {@link cpuCount}和{@link availableProcessors}有什么区别呢？
-         */
-        return Math.min(MAXIMUM_AUTOMATIC_THREAD_COUNT, Math.max(availableProcessors, cpuCount));
+            int cpuCount = cpus != null ? cpus.length : 0;
+            int availableProcessors = Math.max(1, Runtime.getRuntime().availableProcessors());
+            /**
+             * {@link cpuCount}和{@link availableProcessors}有什么区别呢？
+             */
+            bestThreadCount =
+                    Math.min(MAXIMUM_AUTOMATIC_THREAD_COUNT, Math.max(availableProcessors, cpuCount));
+        }
+        return bestThreadCount;
     }
 
     /**
@@ -387,7 +415,7 @@ public final class GlideExecutor extends ThreadPoolExecutor {
     }
 
     /**
-     * A {@link ThreadFactory} that builds threads slightly above priority {@link
+     * A {@link java.util.concurrent.ThreadFactory} that builds threads slightly above priority {@link
      * android.os.Process#THREAD_PRIORITY_BACKGROUND}.
      */
     private static final class DefaultThreadFactory implements ThreadFactory {

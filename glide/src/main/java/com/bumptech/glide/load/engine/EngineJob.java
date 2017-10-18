@@ -25,7 +25,8 @@ import java.util.List;
  * <p>
  * 当加载完成时对于这个加载和其需要通知的回调通过添加和移除回调来进行管理
  */
-class EngineJob<R> implements DecodeJob.Callback<R>, Poolable {
+class EngineJob<R> implements DecodeJob.Callback<R>,
+        Poolable {
     private static final EngineResourceFactory DEFAULT_FACTORY = new EngineResourceFactory();
     private static final Handler MAIN_THREAD_HANDLER =
             new Handler(Looper.getMainLooper(), new MainThreadCallback());
@@ -56,6 +57,7 @@ class EngineJob<R> implements DecodeJob.Callback<R>, Poolable {
     private final GlideExecutor diskCacheExecutor;
     private final GlideExecutor sourceExecutor;
     private final GlideExecutor sourceUnlimitedExecutor;
+    private final GlideExecutor animationExecutor;
 
     private Key key;
     /**
@@ -63,6 +65,7 @@ class EngineJob<R> implements DecodeJob.Callback<R>, Poolable {
      */
     private boolean isCacheable;
     private boolean useUnlimitedSourceGeneratorPool;
+    private boolean isAnimation;
     private Resource<?> resource;
     private DataSource dataSource;
     /**
@@ -86,30 +89,51 @@ class EngineJob<R> implements DecodeJob.Callback<R>, Poolable {
      */
     private volatile boolean isCancelled;
 
-    EngineJob(GlideExecutor diskCacheExecutor, GlideExecutor sourceExecutor,
-              GlideExecutor sourceUnlimitedExecutor,
-              EngineJobListener listener, Pools.Pool<EngineJob<?>> pool) {
-        this(diskCacheExecutor, sourceExecutor, sourceUnlimitedExecutor, listener, pool, DEFAULT_FACTORY);
+    EngineJob(
+            GlideExecutor diskCacheExecutor,
+            GlideExecutor sourceExecutor,
+            GlideExecutor sourceUnlimitedExecutor,
+            GlideExecutor animationExecutor,
+            EngineJobListener listener,
+            Pools.Pool<EngineJob<?>> pool) {
+        this(
+                diskCacheExecutor,
+                sourceExecutor,
+                sourceUnlimitedExecutor,
+                animationExecutor,
+                listener,
+                pool,
+                DEFAULT_FACTORY);
     }
 
     // Visible for testing.
-    EngineJob(GlideExecutor diskCacheExecutor, GlideExecutor sourceExecutor,
-              GlideExecutor sourceUnlimitedExecutor,
-              EngineJobListener listener, Pools.Pool<EngineJob<?>> pool,
-              EngineResourceFactory engineResourceFactory) {
+    EngineJob(
+            GlideExecutor diskCacheExecutor,
+            GlideExecutor sourceExecutor,
+            GlideExecutor sourceUnlimitedExecutor,
+            GlideExecutor animationExecutor,
+            EngineJobListener listener,
+            Pools.Pool<EngineJob<?>> pool,
+            EngineResourceFactory engineResourceFactory) {
         this.diskCacheExecutor = diskCacheExecutor;
         this.sourceExecutor = sourceExecutor;
         this.sourceUnlimitedExecutor = sourceUnlimitedExecutor;
+        this.animationExecutor = animationExecutor;
         this.listener = listener;
         this.pool = pool;
         this.engineResourceFactory = engineResourceFactory;
     }
 
     // Visible for testing.
-    EngineJob<R> init(Key key, boolean isCacheable, boolean useUnlimitedSourceGeneratorPool) {
+    EngineJob<R> init(
+            Key key,
+            boolean isCacheable,
+            boolean useUnlimitedSourceGeneratorPool,
+            boolean isAnimation) {
         this.key = key;
         this.isCacheable = isCacheable;
         this.useUnlimitedSourceGeneratorPool = useUnlimitedSourceGeneratorPool;
+        this.isAnimation = isAnimation;
         return this;
     }
 
@@ -150,6 +174,9 @@ class EngineJob<R> implements DecodeJob.Callback<R>, Poolable {
     }
 
     private GlideExecutor getActiveSourceExecutor() {
+        if (isAnimation) {
+            return animationExecutor;
+        }
         return useUnlimitedSourceGeneratorPool ? sourceUnlimitedExecutor : sourceExecutor;
     }
 
@@ -171,11 +198,10 @@ class EngineJob<R> implements DecodeJob.Callback<R>, Poolable {
         return ignoredCallbacks != null && ignoredCallbacks.contains(cb);
     }
 
-    // Exposed for testing.
-
     /**
      * 取消启动任务
      */
+    // Exposed for testing.
     void cancel() {
         if (hasLoadFailed || hasResource || isCancelled) {
             return;
@@ -322,6 +348,7 @@ class EngineJob<R> implements DecodeJob.Callback<R>, Poolable {
     /**
      * 生产{@link EngineResource}实例的工厂
      */
+    // Visible for testing.
     static class EngineResourceFactory {
         public <R> EngineResource<R> build(Resource<R> resource, boolean isMemoryCacheable) {
             return new EngineResource<>(resource, isMemoryCacheable);
