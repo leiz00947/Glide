@@ -65,7 +65,7 @@ class EngineJob<R> implements DecodeJob.Callback<R>,
      */
     private boolean isCacheable;
     private boolean useUnlimitedSourceGeneratorPool;
-    private boolean isAnimation;
+    private boolean useAnimationPool;
     private Resource<?> resource;
     private DataSource dataSource;
     /**
@@ -129,11 +129,11 @@ class EngineJob<R> implements DecodeJob.Callback<R>,
             Key key,
             boolean isCacheable,
             boolean useUnlimitedSourceGeneratorPool,
-            boolean isAnimation) {
+            boolean useAnimationPool) {
         this.key = key;
         this.isCacheable = isCacheable;
         this.useUnlimitedSourceGeneratorPool = useUnlimitedSourceGeneratorPool;
-        this.isAnimation = isAnimation;
+        this.useAnimationPool = useAnimationPool;
         return this;
     }
 
@@ -174,7 +174,7 @@ class EngineJob<R> implements DecodeJob.Callback<R>,
     }
 
     private GlideExecutor getActiveSourceExecutor() {
-        if (isAnimation) {
+        if (useAnimationPool) {
             return animationExecutor;
         }
         return useUnlimitedSourceGeneratorPool ? sourceUnlimitedExecutor : sourceExecutor;
