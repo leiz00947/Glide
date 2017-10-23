@@ -61,6 +61,8 @@ final class RequestManagerGenerator {
             "com.bumptech.glide.manager.RequestManagerTreeNode";
     private static final ClassName CHECK_RESULT_CLASS_NAME =
             ClassName.get("android.support.annotation", "CheckResult");
+    private static final ClassName CONTEXT_CLASS_NAME =
+            ClassName.get("android.content", "Context");
 
     private static final String GENERATED_REQUEST_MANAGER_SIMPLE_NAME =
             "GlideRequests";
@@ -130,7 +132,8 @@ final class RequestManagerGenerator {
                 .addParameter(ClassName.get(glideType), "glide")
                 .addParameter(ClassName.get(lifecycleType), "lifecycle")
                 .addParameter(ClassName.get(requestManagerTreeNodeType), "treeNode")
-                .addStatement("super(glide, lifecycle, treeNode)")
+                .addParameter(CONTEXT_CLASS_NAME, "context")
+                .addStatement("super(glide, lifecycle, treeNode, context)")
                 .build();
     }
 
@@ -152,7 +155,7 @@ final class RequestManagerGenerator {
                 .addParameter(classOfResouceType, "resourceClass")
                 .addAnnotation(AnnotationSpec.builder(CHECK_RESULT_CLASS_NAME).build())
                 .returns(requestBuilderOfResourceType)
-                .addStatement("return new $T<>(glide, this, resourceClass)",
+                .addStatement("return new $T<>(glide, this, resourceClass, context)",
                         this.generatedRequestBuilderClassName)
                 .build();
     }

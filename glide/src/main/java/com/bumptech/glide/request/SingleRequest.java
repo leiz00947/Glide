@@ -1,5 +1,7 @@
 package com.bumptech.glide.request;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
@@ -94,6 +96,7 @@ public final class SingleRequest<R> implements Request,
     private final StateVerifier stateVerifier = StateVerifier.newInstance();
 
     private RequestCoordinator requestCoordinator;
+    private Context context;
     private GlideContext glideContext;
     @Nullable
     private Object model;
@@ -140,6 +143,7 @@ public final class SingleRequest<R> implements Request,
      * @param requestListener 供开发者自定义的图片加载过程做自定义处理的监听器
      */
     public static <R> SingleRequest<R> obtain(
+            Context context,
             GlideContext glideContext,
             Object model,
             Class<R> transcodeClass,
@@ -158,6 +162,7 @@ public final class SingleRequest<R> implements Request,
             request = new SingleRequest<>();
         }
         request.init(
+                context,
                 glideContext,
                 model,
                 transcodeClass,
@@ -179,6 +184,7 @@ public final class SingleRequest<R> implements Request,
     }
 
     private void init(
+            Context context,
             GlideContext glideContext,
             Object model,
             Class<R> transcodeClass,
@@ -191,6 +197,7 @@ public final class SingleRequest<R> implements Request,
             RequestCoordinator requestCoordinator,
             Engine engine,
             TransitionFactory<? super R> animationFactory) {
+        this.context = context;
         this.glideContext = glideContext;
         this.model = model;
         this.transcodeClass = transcodeClass;
@@ -214,6 +221,7 @@ public final class SingleRequest<R> implements Request,
     @Override
     public void recycle() {
         assertNotCallingCallbacks();
+        context = null;
         glideContext = null;
         model = null;
         transcodeClass = null;
@@ -423,7 +431,9 @@ public final class SingleRequest<R> implements Request,
     }
 
     private Drawable loadDrawable(@DrawableRes int resourceId) {
-        return DrawableDecoderCompat.getDrawable(glideContext, resourceId, requestOptions.getTheme());
+        Resources.Theme theme = requestOptions.getTheme() != null
+                ? requestOptions.getTheme() : context.getTheme();
+        return DrawableDecoderCompat.getDrawable(glideContext, resourceId, theme);
     }
 
     private void setErrorPlaceholder() {

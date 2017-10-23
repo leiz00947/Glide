@@ -96,8 +96,12 @@ public class RequestManagerRetriever implements Handler.Callback {
                     // ApplicationLifecycle.
 
                     // TODO(b/27524013): Factor out this Glide.get() call.
-                    Glide glide = Glide.get(context);
-                    applicationManager = factory.build(glide, new ApplicationLifecycle(), new EmptyRequestManagerTreeNode());
+                    Glide glide = Glide.get(context.getApplicationContext());
+                    applicationManager = factory.build(
+                            glide,
+                            new ApplicationLifecycle(),
+                            new EmptyRequestManagerTreeNode(),
+                            context.getApplicationContext());
                 }
             }
         }
@@ -351,7 +355,8 @@ public class RequestManagerRetriever implements Handler.Callback {
         if (requestManager == null) {
             // TODO(b/27524013): Factor out this Glide.get() call.
             Glide glide = Glide.get(context);
-            requestManager = factory.build(glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode());
+            requestManager = factory.build(
+                    glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
             current.setRequestManager(requestManager);
         }
         return requestManager;
@@ -390,7 +395,8 @@ public class RequestManagerRetriever implements Handler.Callback {
         if (requestManager == null) {
             // TODO(b/27524013): Factor out this Glide.get() call.
             Glide glide = Glide.get(context);
-            requestManager = factory.build(glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode());
+            requestManager = factory.build(
+                    glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
             current.setRequestManager(requestManager);
         }
         return requestManager;
@@ -427,14 +433,17 @@ public class RequestManagerRetriever implements Handler.Callback {
      */
     public interface RequestManagerFactory {
         RequestManager build(
-                Glide glide, Lifecycle lifecycle, RequestManagerTreeNode requestManagerTreeNode);
+                Glide glide,
+                Lifecycle lifecycle,
+                RequestManagerTreeNode requestManagerTreeNode,
+                Context context);
     }
 
     private static final RequestManagerFactory DEFAULT_FACTORY = new RequestManagerFactory() {
         @Override
         public RequestManager build(Glide glide, Lifecycle lifecycle,
-                                    RequestManagerTreeNode requestManagerTreeNode) {
-            return new RequestManager(glide, lifecycle, requestManagerTreeNode);
+                                    RequestManagerTreeNode requestManagerTreeNode, Context context) {
+            return new RequestManager(glide, lifecycle, requestManagerTreeNode, context);
         }
     };
 }
