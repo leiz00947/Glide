@@ -95,6 +95,8 @@ public final class SingleRequest<R> implements Request,
     private final String tag = String.valueOf(super.hashCode());
     private final StateVerifier stateVerifier = StateVerifier.newInstance();
 
+    @Nullable
+    private RequestListener<R> targetListener;
     private RequestCoordinator requestCoordinator;
     private Context context;
     private GlideContext glideContext;
@@ -152,6 +154,7 @@ public final class SingleRequest<R> implements Request,
             int overrideHeight,
             Priority priority,
             Target<R> target,
+            RequestListener<R> targetListener,
             RequestListener<R> requestListener,
             RequestCoordinator requestCoordinator,
             Engine engine,
@@ -171,6 +174,7 @@ public final class SingleRequest<R> implements Request,
                 overrideHeight,
                 priority,
                 target,
+                targetListener,
                 requestListener,
                 requestCoordinator,
                 engine,
@@ -193,6 +197,7 @@ public final class SingleRequest<R> implements Request,
             int overrideHeight,
             Priority priority,
             Target<R> target,
+            RequestListener<R> targetListener,
             RequestListener<R> requestListener,
             RequestCoordinator requestCoordinator,
             Engine engine,
@@ -206,6 +211,7 @@ public final class SingleRequest<R> implements Request,
         this.overrideHeight = overrideHeight;
         this.priority = priority;
         this.target = target;
+        this.targetListener = targetListener;
         this.requestListener = requestListener;
         this.requestCoordinator = requestCoordinator;
         this.engine = engine;
@@ -230,6 +236,7 @@ public final class SingleRequest<R> implements Request,
         overrideHeight = -1;
         target = null;
         requestListener = null;
+        targetListener = null;
         requestCoordinator = null;
         animationFactory = null;
         loadStatus = null;
@@ -596,8 +603,10 @@ public final class SingleRequest<R> implements Request,
 
         isCallingCallbacks = true;
         try {
-            if (requestListener == null
-                    || !requestListener.onResourceReady(result, model, target, dataSource, isFirstResource)) {
+            if ((requestListener == null
+                    || !requestListener.onResourceReady(result, model, target, dataSource, isFirstResource))
+                    && (targetListener == null
+                    || !targetListener.onResourceReady(result, model, target, dataSource, isFirstResource))) {
                 Transition<? super R> animation =
                         animationFactory.build(dataSource, isFirstResource);
                 target.onResourceReady(result, animation);
@@ -633,8 +642,10 @@ public final class SingleRequest<R> implements Request,
         isCallingCallbacks = true;
         try {
             //TODO: what if this is a thumbnail request?
-            if (requestListener == null
-                    || !requestListener.onLoadFailed(e, model, target, isFirstReadyResource())) {
+            if ((requestListener == null
+                    || !requestListener.onLoadFailed(e, model, target, isFirstReadyResource()))
+                    && (targetListener == null
+                    || !targetListener.onLoadFailed(e, model, target, isFirstReadyResource()))) {
                 setErrorPlaceholder();
             }
         } finally {
