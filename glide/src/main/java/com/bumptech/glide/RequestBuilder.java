@@ -804,7 +804,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
         return buildRequestRecursive(
                 target,
                 targetListener,
-        /*requestCoordinator=*/ null,
+        /*parentCoordinator=*/ null,
                 transitionOptions,
                 requestOptions.getPriority(),
                 requestOptions.getOverrideWidth(),
