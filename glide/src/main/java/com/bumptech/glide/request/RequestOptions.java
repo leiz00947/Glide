@@ -1058,7 +1058,7 @@ public class RequestOptions implements Cloneable {
         }
 
         downsample(downsampleStrategy);
-        return optionalTransform(transformation);
+        return transform(transformation, /*isRequired=*/ false);
     }
 
     // calling transform() on the result of clone() requires greater access.
@@ -1112,14 +1112,7 @@ public class RequestOptions implements Cloneable {
     @SuppressWarnings("CheckResult")
     @CheckResult
     public RequestOptions transform(@NonNull Transformation<Bitmap> transformation) {
-        if (isAutoCloneEnabled) {
-            return clone().transform(transformation);
-        }
-
-        optionalTransform(transformation);
-        isTransformationRequired = true;
-        fields |= TRANSFORMATION_REQUIRED;
-        return selfOrThrowIfLocked();
+        return transform(transformation, /*isRequired=*/ true);
     }
 
     /**
@@ -1139,14 +1132,7 @@ public class RequestOptions implements Cloneable {
     @SuppressWarnings({"unchecked", "varargs", "CheckResult"})
     @CheckResult
     public RequestOptions transforms(@NonNull Transformation<Bitmap>... transformations) {
-        if (isAutoCloneEnabled) {
-            return clone().transforms(transformations);
-        }
-
-        optionalTransform(new MultiTransformation<>(transformations));
-        isTransformationRequired = true;
-        fields |= TRANSFORMATION_REQUIRED;
-        return selfOrThrowIfLocked();
+        return transform(new MultiTransformation<>(transformations), /*isRequired=*/ true);
     }
 
     /**
@@ -1165,19 +1151,25 @@ public class RequestOptions implements Cloneable {
     @SuppressWarnings("CheckResult")
     @CheckResult
     public RequestOptions optionalTransform(@NonNull Transformation<Bitmap> transformation) {
+        return transform(transformation, /*isRequired=*/ false);
+    }
+
+    private RequestOptions transform(
+            @NonNull Transformation<Bitmap> transformation, boolean isRequired) {
         if (isAutoCloneEnabled) {
-            return clone().optionalTransform(transformation);
+            return clone().transform(transformation, isRequired);
         }
 
-        DrawableTransformation drawableTransformation = new DrawableTransformation(transformation);
-        optionalTransform(Bitmap.class, transformation);
-        optionalTransform(Drawable.class, drawableTransformation);
+        DrawableTransformation drawableTransformation =
+                new DrawableTransformation(transformation, isRequired);
+        transform(Bitmap.class, transformation, isRequired);
+        transform(Drawable.class, drawableTransformation, isRequired);
         // TODO: remove BitmapDrawable decoder and this transformation.
         // Registering as BitmapDrawable is simply an optimization to avoid some iteration and
         // isAssignableFrom checks when obtaining the transformation later on. It can be removed without
         // affecting the functionality.
-        optionalTransform(BitmapDrawable.class, drawableTransformation.asBitmapDrawable());
-        optionalTransform(GifDrawable.class, new GifDrawableTransformation(transformation));
+        transform(BitmapDrawable.class, drawableTransformation.asBitmapDrawable(), isRequired);
+        transform(GifDrawable.class, new GifDrawableTransformation(transformation), isRequired);
         return selfOrThrowIfLocked();
     }
 
@@ -1201,8 +1193,15 @@ public class RequestOptions implements Cloneable {
     @CheckResult
     public <T> RequestOptions optionalTransform(
             @NonNull Class<T> resourceClass, @NonNull Transformation<T> transformation) {
+        return transform(resourceClass, transformation, /*isRequired=*/ false);
+    }
+
+    private <T> RequestOptions transform(
+            @NonNull Class<T> resourceClass,
+            @NonNull Transformation<T> transformation,
+            boolean isRequired) {
         if (isAutoCloneEnabled) {
-            return clone().optionalTransform(resourceClass, transformation);
+            return clone().transform(resourceClass, transformation, isRequired);
         }
 
         Preconditions.checkNotNull(resourceClass);
@@ -1214,6 +1213,10 @@ public class RequestOptions implements Cloneable {
         // Always set to false here. Known scale only transformations will call this method and then
         // set isScaleOnlyOrNoTransform to true immediately after.
         isScaleOnlyOrNoTransform = false;
+        if (isRequired) {
+            fields |= TRANSFORMATION_REQUIRED;
+            isTransformationRequired = true;
+        }
         return selfOrThrowIfLocked();
     }
 
@@ -1232,14 +1235,7 @@ public class RequestOptions implements Cloneable {
     @CheckResult
     public <T> RequestOptions transform(
             @NonNull Class<T> resourceClass, @NonNull Transformation<T> transformation) {
-        if (isAutoCloneEnabled) {
-            return clone().transform(resourceClass, transformation);
-        }
-
-        optionalTransform(resourceClass, transformation);
-        isTransformationRequired = true;
-        fields |= TRANSFORMATION_REQUIRED;
-        return selfOrThrowIfLocked();
+        return transform(resourceClass, transformation, /*isRequired=*/ true);
     }
 
     /**

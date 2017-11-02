@@ -9,7 +9,9 @@ import com.bumptech.glide.gifdecoder.GifDecoder;
 import com.bumptech.glide.gifdecoder.GifHeader;
 import com.bumptech.glide.gifdecoder.GifHeaderParser;
 import com.bumptech.glide.gifdecoder.StandardGifDecoder;
+import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.ImageHeaderParser;
+import com.bumptech.glide.load.ImageHeaderParser.ImageType;
 import com.bumptech.glide.load.ImageHeaderParserUtils;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.ResourceDecoder;
@@ -27,14 +29,13 @@ import java.util.Queue;
 
 /**
  * An {@link com.bumptech.glide.load.ResourceDecoder} that decodes {@link
- * GifDrawable} from {@link java.io.InputStream} data.
+ * com.bumptech.glide.load.resource.gif.GifDrawable} from {@link java.io.InputStream} data.
  * <p>
  * {@link ResourceDecoder}的实现类，用{@link java.io.InputStream}解码{@link GifDrawable}
  */
 public class ByteBufferGifDecoder implements ResourceDecoder<ByteBuffer, GifDrawable> {
     private static final String TAG = "BufferGifDecoder";
     private static final GifDecoderFactory GIF_DECODER_FACTORY = new GifDecoderFactory();
-
     private static final GifHeaderParserPool PARSER_POOL = new GifHeaderParserPool();
 
     private final Context context;
@@ -74,21 +75,21 @@ public class ByteBufferGifDecoder implements ResourceDecoder<ByteBuffer, GifDraw
     @Override
     public boolean handles(ByteBuffer source, Options options) throws IOException {
         return !options.get(GifOptions.DISABLE_ANIMATION)
-                && ImageHeaderParserUtils.getType(parsers, source) == ImageHeaderParser.ImageType.GIF;
+                && ImageHeaderParserUtils.getType(parsers, source) == ImageType.GIF;
     }
 
     @Override
     public GifDrawableResource decode(ByteBuffer source, int width, int height, Options options) {
         final GifHeaderParser parser = parserPool.obtain(source);
         try {
-            return decode(source, width, height, parser);
+            return decode(source, width, height, parser, options);
         } finally {
             parserPool.release(parser);
         }
     }
 
-    private GifDrawableResource decode(ByteBuffer byteBuffer, int width, int height,
-                                       GifHeaderParser parser) {
+    private GifDrawableResource decode(
+            ByteBuffer byteBuffer, int width, int height, GifHeaderParser parser, Options options) {
         long startTime = LogTime.getLogTime();
         final GifHeader header = parser.parseHeader();
         if (header.getNumFrames() <= 0 || header.getStatus() != GifDecoder.STATUS_OK) {
@@ -96,8 +97,12 @@ public class ByteBufferGifDecoder implements ResourceDecoder<ByteBuffer, GifDraw
             return null;
         }
 
+        Bitmap.Config config = options.get(GifOptions.DECODE_FORMAT) == DecodeFormat.PREFER_RGB_565
+                ? Bitmap.Config.RGB_565 : Bitmap.Config.ARGB_8888;
+
         int sampleSize = getSampleSize(header, width, height);
         GifDecoder gifDecoder = gifDecoderFactory.build(provider, header, byteBuffer, sampleSize);
+        gifDecoder.setDefaultBitmapConfig(config);
         gifDecoder.advance();
         Bitmap firstFrame = gifDecoder.getNextFrame();
         if (firstFrame == null) {
