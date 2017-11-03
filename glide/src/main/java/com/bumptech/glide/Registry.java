@@ -54,10 +54,10 @@ public class Registry {
     private final ModelToResourceClassCache modelToResourceClassCache =
             new ModelToResourceClassCache();
     private final LoadPathCache loadPathCache = new LoadPathCache();
-    private final Pool<List<Exception>> exceptionListPool = FactoryPools.threadSafeList();
+    private final Pool<List<Throwable>> throwableListPool = FactoryPools.threadSafeList();
 
     public Registry() {
-        this.modelLoaderRegistry = new ModelLoaderRegistry(exceptionListPool);
+        this.modelLoaderRegistry = new ModelLoaderRegistry(throwableListPool);
         this.encoderRegistry = new EncoderRegistry();
         this.decoderRegistry = new ResourceDecoderRegistry();
         this.resourceEncoderRegistry = new ResourceEncoderRegistry();
@@ -451,8 +451,9 @@ public class Registry {
             if (decodePaths.isEmpty()) {
                 result = null;
             } else {
-                result = new LoadPath<>(dataClass, resourceClass, transcodeClass, decodePaths,
-                        exceptionListPool);
+                result =
+                        new LoadPath<>(
+                                dataClass, resourceClass, transcodeClass, decodePaths, throwableListPool);
             }
             loadPathCache.put(dataClass, resourceClass, transcodeClass, result);
         }
@@ -477,7 +478,7 @@ public class Registry {
                 ResourceTranscoder<TResource, Transcode> transcoder =
                         transcoderRegistry.get(registeredResourceClass, registeredTranscodeClass);
                 decodePaths.add(new DecodePath<>(dataClass, registeredResourceClass,
-                        registeredTranscodeClass, decoders, transcoder, exceptionListPool));
+                        registeredTranscodeClass, decoders, transcoder, throwableListPool));
             }
         }
         return decodePaths;
