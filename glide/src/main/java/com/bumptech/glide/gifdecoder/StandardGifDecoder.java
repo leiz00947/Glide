@@ -23,10 +23,8 @@ package com.bumptech.glide.gifdecoder;
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -55,11 +53,11 @@ import static com.bumptech.glide.gifdecoder.GifFrame.DISPOSAL_UNSPECIFIED;
  * lowers its memory footprint by only housing the minimum data necessary to decode the next frame
  * in the animation sequence.
  * <p>
- * The animation must be manually moved forward using {@link #advance()} before requesting the
+ * <p>The animation must be manually moved forward using {@link #advance()} before requesting the
  * next frame.  This method must also be called before you request the first frame or an error
  * will occur.
  * <p>
- * Implementation adapted from sample code published in Lyons. (2004). <em>Java for
+ * <p>Implementation adapted from sample code published in Lyons. (2004). <em>Java for
  * Programmers</em>, republished under the MIT Open Source License
  *
  * @see <a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt">GIF 89a Specification</a>
@@ -128,7 +126,7 @@ public class StandardGifDecoder implements GifDecoder {
 
     private int framePointer;
     private GifHeader header;
-    private BitmapProvider bitmapProvider;
+    private GifDecoder.BitmapProvider bitmapProvider;
     private Bitmap previousImage;
     private boolean savePrevious;
     @GifDecodeStatus
@@ -138,22 +136,22 @@ public class StandardGifDecoder implements GifDecoder {
     private int downsampledWidth;
     private boolean isFirstFrameTransparent;
     @NonNull
-    private Config bitmapConfig = Config.ARGB_8888;
+    private Bitmap.Config bitmapConfig = Config.ARGB_8888;
 
     public StandardGifDecoder(
-            BitmapProvider provider, GifHeader gifHeader, ByteBuffer rawData) {
+            GifDecoder.BitmapProvider provider, GifHeader gifHeader, ByteBuffer rawData) {
         this(provider, gifHeader, rawData, 1 /*sampleSize*/);
     }
 
     public StandardGifDecoder(
-            BitmapProvider provider, GifHeader gifHeader, ByteBuffer rawData,
+            GifDecoder.BitmapProvider provider, GifHeader gifHeader, ByteBuffer rawData,
             int sampleSize) {
         this(provider);
         setData(gifHeader, rawData, sampleSize);
     }
 
     public StandardGifDecoder(
-            BitmapProvider provider) {
+            GifDecoder.BitmapProvider provider) {
         this.bitmapProvider = provider;
         header = new GifHeader();
     }
@@ -432,8 +430,20 @@ public class StandardGifDecoder implements GifDecoder {
         // Final location of blended pixels.
         final int[] dest = mainScratch;
 
-        // clear all pixels when meet first frame
+        // clear all pixels when meet first frame and drop prev image from last loop
         if (previousFrame == null) {
+            if (previousImage != null) {
+                bitmapProvider.release(previousImage);
+            }
+            previousImage = null;
+            Arrays.fill(dest, COLOR_TRANSPARENT_BLACK);
+        }
+
+        // clear all pixels when dispose is 3 but previousImage is null.
+        // When DISPOSAL_PREVIOUS and previousImage didn't be set, new frame should draw on
+        // a empty image
+        if (previousFrame != null && previousFrame.dispose == DISPOSAL_PREVIOUS
+                && previousImage == null) {
             Arrays.fill(dest, COLOR_TRANSPARENT_BLACK);
         }
 
@@ -806,17 +816,10 @@ public class StandardGifDecoder implements GifDecoder {
     }
 
     private Bitmap getNextBitmap() {
-        Config config = isFirstFrameTransparent
-                ? Config.ARGB_8888 : bitmapConfig;
+        Bitmap.Config config = isFirstFrameTransparent
+                ? Bitmap.Config.ARGB_8888 : bitmapConfig;
         Bitmap result = bitmapProvider.obtain(downsampledWidth, downsampledHeight, config);
-        setAlpha(result);
+        result.setHasAlpha(true);
         return result;
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
-    private static void setAlpha(Bitmap bitmap) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-            bitmap.setHasAlpha(true);
-        }
     }
 }
