@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
@@ -47,6 +49,8 @@ class GifFrameLoader {
     private Bitmap firstFrame;
     private Transformation<Bitmap> transformation;
     private DelayTarget pendingTarget;
+    @Nullable
+    private GifFrameLoader.OnEveryFrameListener onEveryFrameListener;
 
     public interface FrameCallback {
         void onFrameReady();
@@ -240,8 +244,16 @@ class GifFrameLoader {
         }
     }
 
-    // Visible for testing.
+    @VisibleForTesting
+    void setOnEveryFrameReadyListener(@Nullable OnEveryFrameListener onEveryFrameListener) {
+        this.onEveryFrameListener = onEveryFrameListener;
+    }
+
+    @VisibleForTesting
     void onFrameReady(DelayTarget delayTarget) {
+        if (onEveryFrameListener != null) {
+            onEveryFrameListener.onFrameReady();
+        }
         isLoadPending = false;
         if (isCleared) {
             handler.obtainMessage(FrameLoaderCallback.MSG_CLEAR, delayTarget).sendToTarget();
@@ -337,5 +349,10 @@ class GifFrameLoader {
         // Some devices seem to have crypto bugs that throw exceptions when you create a new UUID.
         // See #1510.
         return new ObjectKey(Math.random());
+    }
+
+    @VisibleForTesting
+    interface OnEveryFrameListener {
+        void onFrameReady();
     }
 }
