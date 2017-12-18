@@ -7,8 +7,6 @@ import java.io.File;
 /**
  * Creates an {@link com.bumptech.glide.disklrucache.DiskLruCache} based disk cache in the internal
  * disk cache directory.
- * <p>
- * 基于内部磁盘缓存目录创建一个{@link com.bumptech.glide.disklrucache.DiskLruCache}
  */
 public final class InternalCacheDiskCacheFactory extends DiskLruCacheFactory {
 
@@ -17,18 +15,15 @@ public final class InternalCacheDiskCacheFactory extends DiskLruCacheFactory {
                 DiskCache.Factory.DEFAULT_DISK_CACHE_SIZE);
     }
 
-    public InternalCacheDiskCacheFactory(Context context, int diskCacheSize) {
+    public InternalCacheDiskCacheFactory(Context context, long diskCacheSize) {
         this(context, DiskCache.Factory.DEFAULT_DISK_CACHE_DIR, diskCacheSize);
     }
 
     public InternalCacheDiskCacheFactory(final Context context, final String diskCacheName,
-                                         int diskCacheSize) {
+                                         long diskCacheSize) {
         super(new CacheDirectoryGetter() {
             @Override
             public File getCacheDirectory() {
-                /**
-                 * 用于获取{@code /data/data/<application package>/cache/}目录
-                 */
                 File cacheDirectory = context.getCacheDir();
                 if (cacheDirectory == null) {
                     return null;

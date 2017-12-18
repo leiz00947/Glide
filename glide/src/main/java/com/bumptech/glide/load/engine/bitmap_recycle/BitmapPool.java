@@ -4,60 +4,52 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 /**
- * An interface for a pool that allows users to reuse {@link Bitmap} objects.
- * <p>
- * 一个允许用户重用Bitmap的Bitmap对象池
+ * An interface for a pool that allows users to reuse {@link android.graphics.Bitmap} objects.
  */
 public interface BitmapPool {
 
     /**
      * Returns the current maximum size of the pool in bytes.
-     * <p>
-     * 返回对象池所占用的内存大小字节数
      */
-    int getMaxSize();
+    long getMaxSize();
 
     /**
      * Multiplies the initial size of the pool by the given multiplier to dynamically and
      * synchronously allow users to adjust the size of the pool.
      * <p>
-     * 允许用户通过给定的乘数因子乘以给定的初始对象池的容量大小来动态同步调整对象池的字节数大小
-     * <p>
-     * If the current total size of the pool is larger than the max size after the given
+     * <p> If the current total size of the pool is larger than the max size after the given
      * multiplier is applied, {@link Bitmap}s should be evicted until the pool is smaller than the new
-     * max size.
-     * <p>
-     * 若申请设置的容量大小小于当前容量，一些位图对象会被移除直到小于申请的容量大小
+     * max size. </p>
      *
-     * @param sizeMultiplier The size multiplier to apply between 0 and 1.乘数因子，介于0~1之间
+     * @param sizeMultiplier The size multiplier to apply between 0 and 1.
      */
     void setSizeMultiplier(float sizeMultiplier);
 
     /**
-     * Adds the given {@link Bitmap} if it is eligible to be re-used and the pool
+     * Adds the given {@link android.graphics.Bitmap} if it is eligible to be re-used and the pool
      * can fit it, or calls {@link Bitmap#recycle()} on the Bitmap and discards it.
      * <p>
-     * Callers must <em>not</em> continue to use the Bitmap after calling this method.
+     * <p> Callers must <em>not</em> continue to use the Bitmap after calling this method. </p>
      *
-     * @param bitmap The {@link Bitmap} to attempt to add.
-     * @see Bitmap#isMutable()
-     * @see Bitmap#recycle()
+     * @param bitmap The {@link android.graphics.Bitmap} to attempt to add.
+     * @see android.graphics.Bitmap#isMutable()
+     * @see android.graphics.Bitmap#recycle()
      */
     void put(Bitmap bitmap);
 
     /**
-     * Returns a {@link Bitmap} of exactly the given width, height, and
+     * Returns a {@link android.graphics.Bitmap} of exactly the given width, height, and
      * configuration, and containing only transparent pixels.
      * <p>
-     * If no Bitmap with the requested attributes is present in the pool, a new one will be
-     * allocated.
+     * <p> If no Bitmap with the requested attributes is present in the pool, a new one will be
+     * allocated. </p>
      * <p>
-     * Because this method erases all pixels in the {@link Bitmap}, this method is slightly slower
-     * than {@link #getDirty(int, int, Bitmap.Config)}. If the {@link
-     * Bitmap} is being obtained to be used in {@link android.graphics.BitmapFactory}
-     * or in any other case where every pixel in the {@link Bitmap} will always be
-     * overwritten or cleared, {@link #getDirty(int, int, Bitmap.Config)} will be
-     * faster. When in doubt, use this method to ensure correctness.
+     * <p> Because this method erases all pixels in the {@link Bitmap}, this method is slightly slower
+     * than {@link #getDirty(int, int, android.graphics.Bitmap.Config)}. If the {@link
+     * android.graphics.Bitmap} is being obtained to be used in {@link android.graphics.BitmapFactory}
+     * or in any other case where every pixel in the {@link android.graphics.Bitmap} will always be
+     * overwritten or cleared, {@link #getDirty(int, int, android.graphics.Bitmap.Config)} will be
+     * faster. When in doubt, use this method to ensure correctness. </p>
      * <p>
      * <pre>
      *     Implementations can should clear out every returned Bitmap using the following:
@@ -67,41 +59,41 @@ public interface BitmapPool {
      * }
      * </pre>
      *
-     * @param width  The width in pixels of the desired {@link Bitmap}.
-     * @param height The height in pixels of the desired {@link Bitmap}.
-     * @param config The {@link Bitmap.Config} of the desired {@link Bitmap}.
-     * @see #getDirty(int, int, Bitmap.Config)
+     * @param width  The width in pixels of the desired {@link android.graphics.Bitmap}.
+     * @param height The height in pixels of the desired {@link android.graphics.Bitmap}.
+     * @param config The {@link android.graphics.Bitmap.Config} of the desired {@link
+     *               android.graphics.Bitmap}.
+     * @see #getDirty(int, int, android.graphics.Bitmap.Config)
      */
     @NonNull
     Bitmap get(int width, int height, Bitmap.Config config);
 
     /**
-     * Identical to {@link #get(int, int, Bitmap.Config)} except that any returned
-     * {@link Bitmap} may <em>not</em> have been erased and may contain random data.
+     * Identical to {@link #get(int, int, android.graphics.Bitmap.Config)} except that any returned
+     * {@link android.graphics.Bitmap} may <em>not</em> have been erased and may contain random data.
      * <p>
-     * If no Bitmap with the requested attributes is present in the pool, a new one will be
-     * allocated.
+     * <p>If no Bitmap with the requested attributes is present in the pool, a new one will be
+     * allocated. </p>
      * <p>
-     * Although this method is slightly more efficient than {@link #get(int, int,
-     * Bitmap.Config)} it should be used with caution and only when the caller is
-     * sure that they are going to erase the {@link Bitmap} entirely before writing
-     * new data to it.
+     * <p> Although this method is slightly more efficient than {@link #get(int, int,
+     * android.graphics.Bitmap.Config)} it should be used with caution and only when the caller is
+     * sure that they are going to erase the {@link android.graphics.Bitmap} entirely before writing
+     * new data to it. </p>
      *
-     * @param width  The width in pixels of the desired {@link Bitmap}.
-     * @param height The height in pixels of the desired {@link Bitmap}.
-     * @param config The {@link Bitmap.Config} of the desired {@link Bitmap}.
-     * @return A {@link Bitmap} with exactly the given width, height, and config
-     * potentially containing random image data or null if no such {@link Bitmap}
+     * @param width  The width in pixels of the desired {@link android.graphics.Bitmap}.
+     * @param height The height in pixels of the desired {@link android.graphics.Bitmap}.
+     * @param config The {@link android.graphics.Bitmap.Config} of the desired {@link
+     *               android.graphics.Bitmap}.
+     * @return A {@link android.graphics.Bitmap} with exactly the given width, height, and config
+     * potentially containing random image data or null if no such {@link android.graphics.Bitmap}
      * could be obtained from the pool.
-     * @see #get(int, int, Bitmap.Config)
+     * @see #get(int, int, android.graphics.Bitmap.Config)
      */
     @NonNull
     Bitmap getDirty(int width, int height, Bitmap.Config config);
 
     /**
-     * Removes all {@link Bitmap}s from the pool.
-     * <p>
-     * 清理对象池
+     * Removes all {@link android.graphics.Bitmap}s from the pool.
      */
     void clearMemory();
 
@@ -109,7 +101,7 @@ public interface BitmapPool {
      * Reduces the size of the cache by evicting items based on the given level.
      *
      * @param level The level from {@link android.content.ComponentCallbacks2} to use to determine how
-     *              many {@link Bitmap}s to evict.
+     *              many {@link android.graphics.Bitmap}s to evict.
      * @see android.content.ComponentCallbacks2
      */
     void trimMemory(int level);

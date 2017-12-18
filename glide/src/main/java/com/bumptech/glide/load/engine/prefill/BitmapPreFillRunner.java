@@ -19,12 +19,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A class that allocates {@link Bitmap Bitmaps} to make sure that the {@link
+ * A class that allocates {@link android.graphics.Bitmap Bitmaps} to make sure that the {@link
  * com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool} is pre-populated.
  * <p>
- * 确保{@link BitmapPool}处于预填充从而分配{@link Bitmap}
- * <p>
- * By posting to the main thread with backoffs, we try to avoid ANRs when the garbage collector
+ * <p>By posting to the main thread with backoffs, we try to avoid ANRs when the garbage collector
  * gets into a state where a high percentage of {@link Bitmap} allocations trigger a stop the world
  * GC. We try to detect whether or not a GC has occurred by only allowing our allocator to run for a
  * limited number of milliseconds. Since the allocations themselves very fast, a GC is the most
@@ -87,19 +85,14 @@ final class BitmapPreFillRunner implements Runnable {
     }
 
     /**
-     * Attempts to allocate {@link Bitmap}s and returns {@code true} if there are
-     * more {@link Bitmap}s to allocate and {@code false} otherwise.
-     * <p>
-     * 申请预先要加载的图片内存，优先加载到{@link MemoryCache}，其次再是{@link BitmapPool}
+     * Attempts to allocate {@link android.graphics.Bitmap}s and returns {@code true} if there are
+     * more {@link android.graphics.Bitmap}s to allocate and {@code false} otherwise.
      */
     private boolean allocate() {
         long start = clock.now();
         while (!toPrefill.isEmpty() && !isGcDetected(start)) {
             PreFillType toAllocate = toPrefill.remove();
             final Bitmap bitmap;
-            /**
-             * 若{@link #seenTypes}中包含该{@link toAllocate}，说明该图片需要预先加载的不止一张
-             */
             if (!seenTypes.contains(toAllocate)) {
                 seenTypes.add(toAllocate);
                 bitmap = bitmapPool.getDirty(toAllocate.getWidth(), toAllocate.getHeight(),
@@ -112,9 +105,6 @@ final class BitmapPreFillRunner implements Runnable {
             // Don't over fill the memory cache to avoid evicting useful resources, but make sure it's
             // not empty so
             // we use all available space.
-            /**
-             * 若内存缓存空间足够，那么就将该图片放入内存缓存中去，否则放入图片池中去
-             */
             if (getFreeMemoryCacheBytes() >= Util.getBitmapByteSize(bitmap)) {
                 memoryCache.put(new UniqueKey(), BitmapResource.obtain(bitmap, bitmapPool));
             } else {
@@ -122,25 +112,20 @@ final class BitmapPreFillRunner implements Runnable {
             }
 
             if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "allocated [" + toAllocate.getWidth() + "x" + toAllocate.getHeight()
-                        + "] " + toAllocate.getConfig() + " size: " + Util.getBitmapByteSize(bitmap));
+                Log.d(TAG,
+                        "allocated [" + toAllocate.getWidth() + "x" + toAllocate.getHeight() + "] " + toAllocate
+                                .getConfig() + " size: " + Util.getBitmapByteSize(bitmap));
             }
         }
 
         return !isCancelled && !toPrefill.isEmpty();
     }
 
-    /**
-     * 判断当前线程间隔运行时间是否大于{@link #MAX_DURATION_MS}
-     */
     private boolean isGcDetected(long startTimeMs) {
         return clock.now() - startTimeMs >= MAX_DURATION_MS;
     }
 
-    /**
-     * 返回分配的缓存内存目前还闲置的内存字节数
-     */
-    private int getFreeMemoryCacheBytes() {
+    private long getFreeMemoryCacheBytes() {
         return memoryCache.getMaxSize() - memoryCache.getCurrentSize();
     }
 
@@ -169,9 +154,6 @@ final class BitmapPreFillRunner implements Runnable {
         }
     }
 
-    /**
-     * 返回在当前线程运行的毫秒数
-     */
     // Visible for testing.
     static class Clock {
         public long now() {
