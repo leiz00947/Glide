@@ -1,6 +1,7 @@
 package com.bumptech.glide.annotation.compiler;
 
 import com.bumptech.glide.annotation.GlideExtension;
+import com.bumptech.glide.annotation.GlideOption;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
@@ -93,6 +94,12 @@ final class ProcessorUtil {
 
     boolean isExtension(TypeElement element) {
         return element.getAnnotation(GlideExtension.class) != null;
+    }
+
+    int getOverrideType(ExecutableElement element) {
+        GlideOption glideOption =
+                element.getAnnotation(GlideOption.class);
+        return glideOption.override();
     }
 
     void writeIndexer(TypeSpec indexer) {
@@ -214,7 +221,6 @@ final class ProcessorUtil {
         return CodeBlock.of(javadocString, javadocArgs.toArray(new Object[0]));
     }
 
-
     /**
      * Returns a safe String to use in a Javadoc that will function in a link.
      * <p>
@@ -242,8 +248,8 @@ final class ProcessorUtil {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "[" + round + "] " + toLog);
     }
 
-    void error(String toLog) {
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, toLog);
+    void warnLog(String toLog) {
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, toLog);
     }
 
     static CodeBlock generateCastingSuperCall(TypeName toReturn, ExecutableElement method) {

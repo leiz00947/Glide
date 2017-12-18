@@ -83,7 +83,8 @@ public final class GlideAnnotationProcessor extends AbstractProcessor {
         IndexerGenerator indexerGenerator = new IndexerGenerator(processorUtil);
         libraryModuleProcessor = new LibraryModuleProcessor(processorUtil, indexerGenerator);
         appModuleProcessor = new AppModuleProcessor(processingEnvironment, processorUtil);
-        extensionProcessor = new ExtensionProcessor(processorUtil, indexerGenerator);
+        extensionProcessor =
+                new ExtensionProcessor(processingEnvironment, processorUtil, indexerGenerator);
     }
 
     @Override
