@@ -242,6 +242,10 @@ final class ProcessorUtil {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "[" + round + "] " + toLog);
     }
 
+    void error(String toLog) {
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, toLog);
+    }
+
     static CodeBlock generateCastingSuperCall(TypeName toReturn, ExecutableElement method) {
         return CodeBlock.builder()
                 .add("return ($T) super.$N(", toReturn, method.getSimpleName())
@@ -371,8 +375,11 @@ final class ProcessorUtil {
                 throw new IllegalArgumentException("Expected single value, but found: " + values);
             }
             excludedModuleAnnotationValue = values.iterator().next().getValue();
-            if (excludedModuleAnnotationValue == null) {
-                throw new NullPointerException("Failed to find Excludes#value");
+            if (excludedModuleAnnotationValue == null
+                    || excludedModuleAnnotationValue instanceof Attribute.UnresolvedClass) {
+                throw new IllegalArgumentException(
+                        "Failed to find value for: " + annotationClass + " from mirrors: "
+                                + clazz.getAnnotationMirrors());
             }
         }
         if (excludedModuleAnnotationValue == null) {
@@ -451,4 +458,5 @@ final class ProcessorUtil {
             return (ExecutableElement) input;
         }
     }
+
 }
