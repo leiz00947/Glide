@@ -17,6 +17,7 @@ android {
         }
     }
 }
+android.defaultConfig.javaCompileOptions.annotationProcessorOptions.includeCompileClasspath = true
 repositories {
     flatDir {
         dirs 'libs'
@@ -31,9 +32,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation project(':glide')
     implementation "com.android.support:recyclerview-v7:${ANDROID_SUPPORT_VERSION}"
-    implementation 'com.google.code.gson:gson:2.2.4'
-    testImplementation 'org.mockito:mockito-core:1.10.19'
-    testImplementation 'org.robolectric:robolectric:3.1.4'
-    testImplementation 'org.robolectric:robolectric-annotations:3.1.4'
-    implementation(name: 'volley-1.1.1', ext: 'aar')
+    implementation 'com.google.code.gson:gson:2.8.2'
+    annotationProcessor project(':annotation')
+    implementation "com.android.volley:volley:${VOLLEY_VERSION}"
 }
