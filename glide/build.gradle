@@ -23,8 +23,9 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile "com.android.support:appcompat-v7:${ANDROID_SUPPORT_VERSION}"
-    compile "com.squareup.okhttp3:okhttp:${OK_HTTP_VERSION}"
-    testCompile 'junit:junit:4.12'
-    compile project(':annotation')
+    testImplementation 'junit:junit:4.12'
+    implementation "com.android.support:appcompat-v7:${ANDROID_SUPPORT_VERSION}"
+    compileOnly "com.android.support:recyclerview-v7:${ANDROID_SUPPORT_VERSION}"
+    implementation "com.squareup.okhttp3:okhttp:${OK_HTTP_VERSION}"
+    implementation project(':annotation')
 }
