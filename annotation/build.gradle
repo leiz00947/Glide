@@ -3,10 +3,10 @@ import org.gradle.internal.jvm.Jvm
 apply plugin: 'java'
 
 dependencies {
-    compileOnly "com.squareup:javapoet:${JAVAPOET_VERSION}"
-    compileOnly "com.google.auto.service:auto-service:${AUTO_SERVICE_VERSION}"
-    compileOnly "com.google.code.findbugs:jsr305:${JSR_305_VERSION}"
-    implementation files(Jvm.current().getToolsJar())
+    compile "com.squareup:javapoet:${JAVAPOET_VERSION}"
+    compile "com.google.auto.service:auto-service:${AUTO_SERVICE_VERSION}"
+    compile "com.google.code.findbugs:jsr305:${JSR_305_VERSION}"
+    compile files(Jvm.current().getToolsJar())
 
     compileOnly('com.github.bumptech.glide:glide:4.8.0')
 }
