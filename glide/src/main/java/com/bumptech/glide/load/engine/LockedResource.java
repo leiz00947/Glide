@@ -1,94 +1,99 @@
 package com.bumptech.glide.load.engine;
 
+import android.support.annotation.NonNull;
 import android.support.v4.util.Pools;
-
+import com.bumptech.glide.util.Preconditions;
 import com.bumptech.glide.util.Synthetic;
 import com.bumptech.glide.util.pool.FactoryPools;
 import com.bumptech.glide.util.pool.StateVerifier;
 
 /**
- * A resource that defers any calls to {@link Resource#recycle()} until after {@link #unlock()} is called.
- * <p>
- * 延迟一个资源在调用了{@link #unlock()}之后才会调用{@link Resource#recycle()}
- * <p>
- * If the resource was recycled prior to {@link #unlock()}, then {@link #unlock()} will also
+ * A resource that defers any calls to {@link Resource#recycle()} until after {@link #unlock()} is
+ * called.
+ *
+ * <p>If the resource was recycled prior to {@link #unlock()}, then {@link #unlock()} will also
  * recycle the resource.
  */
-final class LockedResource<Z> implements Resource<Z>, FactoryPools.Poolable {
-    private static final Pools.Pool<LockedResource<?>> POOL = FactoryPools.threadSafe(20,
-            new FactoryPools.Factory<LockedResource<?>>() {
-                @Override
-                public LockedResource<?> create() {
-                    return new LockedResource<Object>();
-                }
-            });
-    private final StateVerifier stateVerifier = StateVerifier.newInstance();
-    private Resource<Z> toWrap;
-    private boolean isLocked;
-    private boolean isRecycled;
-
-    @SuppressWarnings("unchecked")
-    static <Z> LockedResource<Z> obtain(Resource<Z> resource) {
-        LockedResource<Z> result = (LockedResource<Z>) POOL.acquire();
-        result.init(resource);
-        return result;
-    }
-
-    @Synthetic
-    LockedResource() {
-    }
-
-    private void init(Resource<Z> toWrap) {
-        isRecycled = false;
-        isLocked = true;
-        this.toWrap = toWrap;
-    }
-
-    private void release() {
-        toWrap = null;
-        POOL.release(this);
-    }
-
-    public synchronized void unlock() {
-        stateVerifier.throwIfRecycled();
-
-        if (!isLocked) {
-            throw new IllegalStateException("Already unlocked");
+final class LockedResource<Z> implements Resource<Z>,
+    FactoryPools.Poolable {
+  private static final Pools.Pool<LockedResource<?>> POOL = FactoryPools.threadSafe(20,
+      new FactoryPools.Factory<LockedResource<?>>() {
+        @Override
+        public LockedResource<?> create() {
+          return new LockedResource<Object>();
         }
-        this.isLocked = false;
-        if (isRecycled) {
-            recycle();
-        }
-    }
+      });
+  private final StateVerifier stateVerifier = StateVerifier.newInstance();
+  private Resource<Z> toWrap;
+  private boolean isLocked;
+  private boolean isRecycled;
 
-    @Override
-    public Class<Z> getResourceClass() {
-        return toWrap.getResourceClass();
-    }
+  @SuppressWarnings("unchecked")
+  @NonNull
+  static <Z> LockedResource<Z> obtain(Resource<Z> resource) {
+    LockedResource<Z> result = Preconditions.checkNotNull((LockedResource<Z>) POOL.acquire());
+    result.init(resource);
+    return result;
+  }
 
-    @Override
-    public Z get() {
-        return toWrap.get();
-    }
+  @SuppressWarnings("WeakerAccess")
+  @Synthetic
+  LockedResource() { }
 
-    @Override
-    public int getSize() {
-        return toWrap.getSize();
-    }
+  private void init(Resource<Z> toWrap) {
+    isRecycled = false;
+    isLocked = true;
+    this.toWrap = toWrap;
+  }
 
-    @Override
-    public synchronized void recycle() {
-        stateVerifier.throwIfRecycled();
+  private void release() {
+    toWrap = null;
+    POOL.release(this);
+  }
 
-        this.isRecycled = true;
-        if (!isLocked) {
-            toWrap.recycle();
-            release();
-        }
-    }
+  synchronized void unlock() {
+    stateVerifier.throwIfRecycled();
 
-    @Override
-    public StateVerifier getVerifier() {
-        return stateVerifier;
+    if (!isLocked) {
+      throw new IllegalStateException("Already unlocked");
     }
+    this.isLocked = false;
+    if (isRecycled) {
+      recycle();
+    }
+  }
+
+  @NonNull
+  @Override
+  public Class<Z> getResourceClass() {
+    return toWrap.getResourceClass();
+  }
+
+  @NonNull
+  @Override
+  public Z get() {
+    return toWrap.get();
+  }
+
+  @Override
+  public int getSize() {
+    return toWrap.getSize();
+  }
+
+  @Override
+  public synchronized void recycle() {
+    stateVerifier.throwIfRecycled();
+
+    this.isRecycled = true;
+    if (!isLocked) {
+      toWrap.recycle();
+      release();
+    }
+  }
+
+  @NonNull
+  @Override
+  public StateVerifier getVerifier() {
+    return stateVerifier;
+  }
 }

@@ -1,5 +1,7 @@
 package com.bumptech.glide.util;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Queue;
@@ -9,128 +11,127 @@ import java.util.Queue;
  * calls and stores them so they can later be handled or thrown. This class is a workaround for a
  * framework issue where exceptions during reads while decoding bitmaps in {@link
  * android.graphics.BitmapFactory} can return partially decoded bitmaps.
- * <p>
- * {@link InputStream}的子类，在读取流期间捕捉{@link IOException}然后跳过这些异常并存储起来，
- * 达到延迟抛出异常处理
- * <p>
+ *
  * See https://github.com/bumptech/glide/issues/126.
  */
 public class ExceptionCatchingInputStream extends InputStream {
 
-    private static final Queue<ExceptionCatchingInputStream> QUEUE = Util.createQueue(0);
+  private static final Queue<ExceptionCatchingInputStream> QUEUE = Util.createQueue(0);
 
-    private InputStream wrapped;
-    private IOException exception;
+  private InputStream wrapped;
+  private IOException exception;
 
-    public static ExceptionCatchingInputStream obtain(InputStream toWrap) {
-        ExceptionCatchingInputStream result;
-        synchronized (QUEUE) {
-            result = QUEUE.poll();
-        }
-        if (result == null) {
-            result = new ExceptionCatchingInputStream();
-        }
-        result.setInputStream(toWrap);
-        return result;
+  @NonNull
+  public static ExceptionCatchingInputStream obtain(@NonNull InputStream toWrap) {
+    ExceptionCatchingInputStream result;
+    synchronized (QUEUE) {
+      result = QUEUE.poll();
     }
-
-    // Exposed for testing.
-    static void clearQueue() {
-        while (!QUEUE.isEmpty()) {
-            QUEUE.remove();
-        }
+    if (result == null) {
+      result = new ExceptionCatchingInputStream();
     }
+    result.setInputStream(toWrap);
+    return result;
+  }
 
-    ExceptionCatchingInputStream() {
-        // Do nothing.
+  // Exposed for testing.
+  static void clearQueue() {
+    while (!QUEUE.isEmpty()) {
+      QUEUE.remove();
     }
+  }
 
-    void setInputStream(InputStream toWrap) {
-        wrapped = toWrap;
-    }
+  ExceptionCatchingInputStream() {
+    // Do nothing.
+  }
 
-    @Override
-    public int available() throws IOException {
-        return wrapped.available();
-    }
+  void setInputStream(@NonNull InputStream toWrap) {
+    wrapped = toWrap;
+  }
 
-    @Override
-    public void close() throws IOException {
-        wrapped.close();
-    }
+  @Override
+  public int available() throws IOException {
+    return wrapped.available();
+  }
 
-    @Override
-    public void mark(int readlimit) {
-        wrapped.mark(readlimit);
-    }
+  @Override
+  public void close() throws IOException {
+    wrapped.close();
+  }
 
-    @Override
-    public boolean markSupported() {
-        return wrapped.markSupported();
-    }
+  @Override
+  public void mark(int readLimit) {
+    wrapped.mark(readLimit);
+  }
 
-    @Override
-    public int read(byte[] buffer) throws IOException {
-        int read;
-        try {
-            read = wrapped.read(buffer);
-        } catch (IOException e) {
-            exception = e;
-            read = -1;
-        }
-        return read;
-    }
+  @Override
+  public boolean markSupported() {
+    return wrapped.markSupported();
+  }
 
-    @Override
-    public int read(byte[] buffer, int byteOffset, int byteCount) throws IOException {
-        int read;
-        try {
-            read = wrapped.read(buffer, byteOffset, byteCount);
-        } catch (IOException e) {
-            exception = e;
-            read = -1;
-        }
-        return read;
+  @Override
+  public int read(byte[] buffer) {
+    int read;
+    try {
+      read = wrapped.read(buffer);
+    } catch (IOException e) {
+      exception = e;
+      read = -1;
     }
+    return read;
+  }
 
-    @Override
-    public synchronized void reset() throws IOException {
-        wrapped.reset();
+  @Override
+  public int read(byte[] buffer, int byteOffset, int byteCount) {
+    int read;
+    try {
+      read = wrapped.read(buffer, byteOffset, byteCount);
+    } catch (IOException e) {
+      exception = e;
+      read = -1;
     }
+    return read;
+  }
 
-    @Override
-    public long skip(long byteCount) throws IOException {
-        long skipped;
-        try {
-            skipped = wrapped.skip(byteCount);
-        } catch (IOException e) {
-            exception = e;
-            skipped = 0;
-        }
-        return skipped;
-    }
+  @Override
+  public synchronized void reset() throws IOException {
+    wrapped.reset();
+  }
 
-    @Override
-    public int read() throws IOException {
-        int result;
-        try {
-            result = wrapped.read();
-        } catch (IOException e) {
-            exception = e;
-            result = -1;
-        }
-        return result;
+  @Override
+  public long skip(long byteCount) {
+    long skipped;
+    try {
+      skipped = wrapped.skip(byteCount);
+    } catch (IOException e) {
+      exception = e;
+      skipped = 0;
     }
+    return skipped;
+  }
 
-    public IOException getException() {
-        return exception;
+  @Override
+  public int read() {
+    int result;
+    try {
+      result = wrapped.read();
+    } catch (IOException e) {
+      exception = e;
+      result = -1;
     }
+    return result;
+  }
 
-    public void release() {
-        exception = null;
-        wrapped = null;
-        synchronized (QUEUE) {
-            QUEUE.offer(this);
-        }
+  @Nullable
+  public IOException getException() {
+    return exception;
+  }
+
+  public void release() {
+    exception = null;
+    wrapped = null;
+    synchronized (QUEUE) {
+      QUEUE.offer(this);
     }
+  }
 }

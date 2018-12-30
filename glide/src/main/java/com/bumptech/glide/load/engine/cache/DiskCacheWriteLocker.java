@@ -41,8 +41,8 @@ final class DiskCacheWriteLocker {
       writeLock = Preconditions.checkNotNull(locks.get(safeKey));
       if (writeLock.interestedThreads < 1) {
         throw new IllegalStateException("Cannot release a lock that is not held"
-                + ", safeKey: " + safeKey
-                + ", interestedThreads: " + writeLock.interestedThreads);
+            + ", safeKey: " + safeKey
+            + ", interestedThreads: " + writeLock.interestedThreads);
       }
 
       writeLock.interestedThreads--;
@@ -50,9 +50,9 @@ final class DiskCacheWriteLocker {
         WriteLock removed = locks.remove(safeKey);
         if (!removed.equals(writeLock)) {
           throw new IllegalStateException("Removed the wrong lock"
-                  + ", expected to remove: " + writeLock
-                  + ", but actually removed: " + removed
-                  + ", safeKey: " + safeKey);
+              + ", expected to remove: " + writeLock
+              + ", but actually removed: " + removed
+              + ", safeKey: " + safeKey);
         }
         writeLockPool.offer(removed);
       }

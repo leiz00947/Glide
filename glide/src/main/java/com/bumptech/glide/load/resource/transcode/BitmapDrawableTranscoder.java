@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-
-import com.bumptech.glide.Glide;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
@@ -13,25 +13,35 @@ import com.bumptech.glide.load.resource.bitmap.LazyBitmapDrawableResource;
 import com.bumptech.glide.util.Preconditions;
 
 /**
- * An {@link ResourceTranscoder} that converts {@link Bitmap}s into {@link BitmapDrawable}s.
- * <p>
- * {@link ResourceTranscoder}的实现类，将{@link Bitmap}转换成{@link BitmapDrawable}
+ * An {@link ResourceTranscoder} that converts {@link
+ * Bitmap}s into {@link BitmapDrawable}s.
  */
 public class BitmapDrawableTranscoder implements ResourceTranscoder<Bitmap, BitmapDrawable> {
-    private final Resources resources;
-    private final BitmapPool bitmapPool;
+  private final Resources resources;
 
-    public BitmapDrawableTranscoder(Context context) {
-        this(context.getResources(), Glide.get(context).getBitmapPool());
-    }
+  // Public API.
+  @SuppressWarnings("unused")
+  public BitmapDrawableTranscoder(@NonNull Context context) {
+    this(context.getResources());
+  }
 
-    public BitmapDrawableTranscoder(Resources resources, BitmapPool bitmapPool) {
-        this.resources = Preconditions.checkNotNull(resources);
-        this.bitmapPool = Preconditions.checkNotNull(bitmapPool);
-    }
+  /**
+   * @deprecated Use {@link #BitmapDrawableTranscoder(Resources)}, {@code bitmapPool} is unused.
+   */
+  @Deprecated
+  public BitmapDrawableTranscoder(
+      @NonNull Resources resources, @SuppressWarnings("unused") BitmapPool bitmapPool) {
+    this(resources);
+  }
 
-    @Override
-    public Resource<BitmapDrawable> transcode(Resource<Bitmap> toTranscode, Options options) {
-        return LazyBitmapDrawableResource.obtain(resources, bitmapPool, toTranscode.get());
-    }
+  public BitmapDrawableTranscoder(@NonNull Resources resources) {
+    this.resources = Preconditions.checkNotNull(resources);
+  }
+
+  @Nullable
+  @Override
+  public Resource<BitmapDrawable> transcode(@NonNull Resource<Bitmap> toTranscode,
+      @NonNull Options options) {
+    return LazyBitmapDrawableResource.obtain(resources, toTranscode);
+  }
 }

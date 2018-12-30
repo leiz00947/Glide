@@ -1,32 +1,34 @@
 package com.bumptech.glide.util;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.bumptech.glide.ListPreloader;
 
-import java.util.Arrays;
-
 /**
- * A {@link com.bumptech.glide.ListPreloader.PreloadSizeProvider} with a fixed width and height.
- * <p>
- * {@link com.bumptech.glide.ListPreloader.PreloadSizeProvider}的实现类，需要传递固定宽高值参数
+ * A {@link ListPreloader.PreloadSizeProvider} with a fixed width and height.
  *
  * @param <T> The type of the model the size should be provided for.
  */
 public class FixedPreloadSizeProvider<T> implements ListPreloader.PreloadSizeProvider<T> {
 
-    private final int[] size;
+  private final int[] size;
 
-    /**
-     * Constructor for a PreloadSizeProvider with a fixed size.
-     *
-     * @param width  The width of the preload size in pixels.
-     * @param height The height of the preload size in pixels.
-     */
-    public FixedPreloadSizeProvider(int width, int height) {
-        this.size = new int[]{width, height};
-    }
+  /**
+   * Constructor for a PreloadSizeProvider with a fixed size.
+   *
+   * @param width  The width of the preload size in pixels.
+   * @param height The height of the preload size in pixels.
+   */
+  public FixedPreloadSizeProvider(int width, int height) {
+    this.size = new int[] { width, height };
+  }
 
-    @Override
-    public int[] getPreloadSize(T item, int adapterPosition, int itemPosition) {
-        return Arrays.copyOf(this.size, this.size.length);
-    }
+  @Nullable
+  @Override
+  // It's better to take on the risk that callers may mutate the array when there isn't any reason
+  // for them to do so than it the performance overhead of copying the array with every call.
+  @SuppressWarnings("PMD.MethodReturnsInternalArray")
+  public int[] getPreloadSize(@NonNull T item, int adapterPosition, int itemPosition) {
+    return size;
+  }
 }

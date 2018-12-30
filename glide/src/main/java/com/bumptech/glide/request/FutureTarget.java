@@ -1,7 +1,6 @@
 package com.bumptech.glide.request;
 
 import com.bumptech.glide.request.target.Target;
-
 import java.util.concurrent.Future;
 
 /**
@@ -18,11 +17,9 @@ import java.util.concurrent.Future;
  * futureTarget.cancel(false);
  * }
  * </pre>
- * <p>
- * 合并{@link Target}和{@link Future}接口的接口类
- * <p>
- * Note - {@link #get()} and {@link #get(long, java.util.concurrent.TimeUnit)} must be called
- * off of the main thread or they will block forever.
+ *
+ * <p> Note - {@link #get()} and {@link #get(long, java.util.concurrent.TimeUnit)} must be called
+ * off of the main thread or they will block forever. </p>
  *
  * @param <R> The type of resource this FutureTarget will retrieve.
  */

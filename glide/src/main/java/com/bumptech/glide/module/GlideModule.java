@@ -6,7 +6,7 @@ import com.bumptech.glide.Registry;
  * An interface allowing lazy configuration of Glide including setting options using
  * {@link com.bumptech.glide.GlideBuilder} and registering
  * {@link com.bumptech.glide.load.model.ModelLoader ModelLoaders}.
- * <p>
+ *
  * <p> To use this interface: <ol> <li> Implement the GlideModule interface in a class with public
  * visibility, calling
  * {@link Registry#prepend(Class, Class, com.bumptech.glide.load.ResourceDecoder)} for each
@@ -42,10 +42,10 @@ import com.bumptech.glide.Registry;
  *                 }
  *             </pre>
  * </li> </ol> </p>
- * <p>
+ *
  * <p> All implementations must be publicly visible and contain only an empty constructor so they
  * can be instantiated via reflection when Glide is lazily initialized. </p>
- * <p>
+ *
  * <p> There is no defined order in which modules are called, so projects should be careful to avoid
  * applying conflicting settings in different modules. If an application depends on libraries that
  * have conflicting modules, the application should consider avoiding the library modules and
@@ -55,5 +55,4 @@ import com.bumptech.glide.Registry;
  * {@link AppGlideModule}.
  */
 @Deprecated
-public interface GlideModule extends RegistersComponents, AppliesOptions {
-}
+public interface GlideModule extends RegistersComponents, AppliesOptions { }
