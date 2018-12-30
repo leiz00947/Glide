@@ -1,1 +1,8 @@
-include ':app', ':glide', ':annotation'
+include ':glide', ':annotation'
+
+include ':samples:contacturi'
+include ':samples:flickr'
+include ':samples:gallery'
+include ':samples:giphy'
+include ':samples:imgur'
+include ':samples:svg'
