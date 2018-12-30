@@ -1,13 +1,10 @@
 package com.bumptech.glide.samples.gallery;
 
-import static com.bumptech.glide.request.RequestOptions.fitCenterTransform;
-import static com.bumptech.glide.request.RequestOptions.signatureOf;
-
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -16,12 +13,16 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageView;
+
+import com.bumptech.glide.GlideRequest;
+import com.bumptech.glide.GlideRequests;
 import com.bumptech.glide.ListPreloader;
 import com.bumptech.glide.RequestBuilder;
-import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.samples.R;
 import com.bumptech.glide.signature.MediaStoreSignature;
+import com.bumptech.glide.util.Preconditions;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -29,126 +30,123 @@ import java.util.List;
  * Displays {@link MediaStoreData} in a recycler view.
  */
 class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListViewHolder>
-    implements ListPreloader.PreloadSizeProvider<MediaStoreData>,
-    ListPreloader.PreloadModelProvider<MediaStoreData> {
+        implements ListPreloader.PreloadSizeProvider<MediaStoreData>,
+        ListPreloader.PreloadModelProvider<MediaStoreData> {
 
-  private final List<MediaStoreData> data;
-  private final int screenWidth;
-  private final RequestBuilder<Drawable> requestBuilder;
+    private final List<MediaStoreData> data;
+    private final int screenWidth;
+    private final GlideRequest<Drawable> requestBuilder;
 
-  private int[] actualDimensions;
+    private int[] actualDimensions;
 
-  RecyclerAdapter(Context context, List<MediaStoreData> data, RequestManager requestManager) {
-    this.data = data;
-    requestBuilder = requestManager
-        .asDrawable()
-        .apply(fitCenterTransform());
+    RecyclerAdapter(Context context, List<MediaStoreData> data, GlideRequests glideRequests) {
+        this.data = data;
+        requestBuilder = glideRequests.asDrawable().fitCenter();
 
-    setHasStableIds(true);
+        setHasStableIds(true);
 
-    screenWidth = getScreenWidth(context);
-  }
+        screenWidth = getScreenWidth(context);
+    }
 
-  @Override
-  public ListViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-    LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-    final View view = inflater.inflate(R.layout.recycler_item, viewGroup, false);
-    view.getLayoutParams().width = screenWidth;
+    @NonNull
+    @Override
+    public ListViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
+        final View view = inflater.inflate(R.layout.recycler_item, viewGroup, false);
+        view.getLayoutParams().width = screenWidth;
 
-    if (actualDimensions == null) {
-      view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-        @Override
-        public boolean onPreDraw() {
-          if (actualDimensions == null) {
-            actualDimensions = new int[] { view.getWidth(), view.getHeight() };
-          }
-          view.getViewTreeObserver().removeOnPreDrawListener(this);
-          return true;
+        if (actualDimensions == null) {
+            view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    if (actualDimensions == null) {
+                        actualDimensions = new int[]{view.getWidth(), view.getHeight()};
+                    }
+                    view.getViewTreeObserver().removeOnPreDrawListener(this);
+                    return true;
+                }
+            });
         }
-      });
+
+        return new ListViewHolder(view);
     }
 
-    return new ListViewHolder(view);
-  }
+    @Override
+    public void onBindViewHolder(@NonNull ListViewHolder viewHolder, int position) {
+        MediaStoreData current = data.get(position);
 
-  @Override
-  public void onBindViewHolder(ListViewHolder viewHolder, int position) {
-    MediaStoreData current = data.get(position);
+        Key signature =
+                new MediaStoreSignature(current.mimeType, current.dateModified, current.orientation);
 
-    Key signature =
-        new MediaStoreSignature(current.mimeType, current.dateModified, current.orientation);
-
-    requestBuilder
-        .clone()
-        .apply(signatureOf(signature))
-        .load(current.uri)
-        .into(viewHolder.image);
-  }
-
-  @Override
-  public long getItemId(int position) {
-    return data.get(position).rowId;
-  }
-
-  @Override
-  public int getItemCount() {
-    return data.size();
-  }
-
-  @Override
-  public int getItemViewType(int position) {
-    return 0;
-  }
-
-  @Override
-  public List<MediaStoreData> getPreloadItems(int position) {
-    return Collections.singletonList(data.get(position));
-  }
-
-  @Override
-  public RequestBuilder<Drawable> getPreloadRequestBuilder(MediaStoreData item) {
-    MediaStoreSignature signature =
-        new MediaStoreSignature(item.mimeType, item.dateModified, item.orientation);
-    return requestBuilder
-        .clone()
-        .apply(signatureOf(signature))
-        .load(item.uri);
-  }
-
-  @Override
-  public int[] getPreloadSize(MediaStoreData item, int adapterPosition, int perItemPosition) {
-    return actualDimensions;
-  }
-
-  // Display#getSize(Point)
-  @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-  @SuppressWarnings("deprecation")
-  private static int getScreenWidth(Context context) {
-    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    Display display = wm.getDefaultDisplay();
-
-    final int result;
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-      Point size = new Point();
-      display.getSize(size);
-      result = size.x;
-    } else {
-      result = display.getWidth();
+        requestBuilder
+                .clone()
+                .signature(signature)
+                .load(current.uri)
+                .into(viewHolder.image);
     }
-    return result;
-  }
 
-  /**
-   * ViewHolder containing views to display individual {@link
-   * MediaStoreData}.
-   */
-  public static final class ListViewHolder extends RecyclerView.ViewHolder {
-
-    private final ImageView image;
-
-    public ListViewHolder(View itemView) {
-      super(itemView);
-      image = (ImageView) itemView.findViewById(R.id.image);
+    @Override
+    public long getItemId(int position) {
+        return data.get(position).rowId;
     }
-  }
+
+    @Override
+    public int getItemCount() {
+        return data.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return 0;
+    }
+
+    @NonNull
+    @Override
+    public List<MediaStoreData> getPreloadItems(int position) {
+        return data.isEmpty()
+                ? Collections.<MediaStoreData>emptyList()
+                : Collections.singletonList(data.get(position));
+    }
+
+    @Nullable
+    @Override
+    public RequestBuilder<Drawable> getPreloadRequestBuilder(@NonNull MediaStoreData item) {
+        MediaStoreSignature signature =
+                new MediaStoreSignature(item.mimeType, item.dateModified, item.orientation);
+        return requestBuilder
+                .clone()
+                .signature(signature)
+                .load(item.uri);
+    }
+
+    @Nullable
+    @Override
+    public int[] getPreloadSize(@NonNull MediaStoreData item, int adapterPosition,
+                                int perItemPosition) {
+        return actualDimensions;
+    }
+
+    // Display#getSize(Point)
+    @SuppressWarnings("deprecation")
+    private static int getScreenWidth(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = Preconditions.checkNotNull(wm).getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return size.x;
+    }
+
+    /**
+     * ViewHolder containing views to display individual {@link
+     * MediaStoreData}.
+     */
+    static final class ListViewHolder extends RecyclerView.ViewHolder {
+
+        private final ImageView image;
+
+        ListViewHolder(View itemView) {
+            super(itemView);
+            image = itemView.findViewById(R.id.image);
+        }
+    }
 }

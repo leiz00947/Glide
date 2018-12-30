@@ -4,14 +4,14 @@ import com.bumptech.glide.samples.flickr.api.Photo;
 import java.util.List;
 
 /**
- * An interface for an object that displays {@link com.bumptech.glide.samples.flickr.api.Photo}
+ * An interface for an object that displays {@link Photo}
  * objects.
  */
-public interface PhotoViewer {
+interface PhotoViewer {
   /**
-   * Called whenever new {@link com.bumptech.glide.samples.flickr.api.Photo}s are loaded.
+   * Called whenever new {@link Photo}s are loaded.
    *
    * @param photos The loaded photos.
    */
-  public void onPhotosUpdated(List<Photo> photos);
+  void onPhotosUpdated(List<Photo> photos);
 }

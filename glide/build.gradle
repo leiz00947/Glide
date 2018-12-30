@@ -27,5 +27,5 @@ dependencies {
     implementation "com.android.support:appcompat-v7:${ANDROID_SUPPORT_VERSION}"
     compileOnly "com.android.support:recyclerview-v7:${ANDROID_SUPPORT_VERSION}"
     implementation "com.squareup.okhttp3:okhttp:${OK_HTTP_VERSION}"
-    implementation project(':annotation')
+    annotationProcessor project(':annotation')
 }
