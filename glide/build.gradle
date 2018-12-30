@@ -2,8 +2,6 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION as int
-    buildToolsVersion BUILD_TOOLS_VERSION as String
-
     defaultConfig {
         minSdkVersion MIN_SDK_VERSION as int
         targetSdkVersion TARGET_SDK_VERSION as int
@@ -11,7 +9,6 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
     buildTypes {
         release {
@@ -26,7 +23,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile "com.android.support:appcompat-v7:${SUPPORT_V7_VERSION}"
+    compile "com.android.support:appcompat-v7:${ANDROID_SUPPORT_VERSION}"
     compile "com.squareup.okhttp3:okhttp:${OK_HTTP_VERSION}"
     testCompile 'junit:junit:4.12'
     compile project(':annotation')
