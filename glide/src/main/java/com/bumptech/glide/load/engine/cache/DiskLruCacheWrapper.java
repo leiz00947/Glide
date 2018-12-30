@@ -16,10 +16,8 @@ import java.io.IOException;
 /**
  * The default DiskCache implementation. There must be no more than one active instance for a given
  * directory at a time.
- * <p>
- * {@link DiskCache}的实现类，对于指定的目录每次不能超过一个可用的实例
  *
- * @see #get(java.io.File, int)
+ * @see #get(java.io.File, long)
  */
 public class DiskLruCacheWrapper implements DiskCache {
     private static final String TAG = "DiskLruCacheWrapper";
@@ -30,7 +28,7 @@ public class DiskLruCacheWrapper implements DiskCache {
 
     private final SafeKeyGenerator safeKeyGenerator;
     private final File directory;
-    private final int maxSize;
+    private final long maxSize;
     private final DiskCacheWriteLocker writeLocker = new DiskCacheWriteLocker();
     private DiskLruCache diskLruCache;
 
@@ -43,7 +41,7 @@ public class DiskLruCacheWrapper implements DiskCache {
      * @param maxSize   The max size for the disk cache
      * @return The new disk cache with the given arguments, or the current cache if one already exists
      */
-    public static synchronized DiskCache get(File directory, int maxSize) {
+    public static synchronized DiskCache get(File directory, long maxSize) {
         // TODO calling twice with different arguments makes it return the cache for the same
         // directory, it's public!
         if (wrapper == null) {
@@ -52,7 +50,7 @@ public class DiskLruCacheWrapper implements DiskCache {
         return wrapper;
     }
 
-    protected DiskLruCacheWrapper(File directory, int maxSize) {
+    protected DiskLruCacheWrapper(File directory, long maxSize) {
         this.directory = directory;
         this.maxSize = maxSize;
         this.safeKeyGenerator = new SafeKeyGenerator();

@@ -5,20 +5,18 @@ import com.bumptech.glide.load.engine.Resource;
 
 /**
  * A simple class that ignores all puts and returns null for all gets.
- * <p>
- * {@link MemoryCache}的实现类，一个所有返回为空并忽略所有添加的简单类
  */
 public class MemoryCacheAdapter implements MemoryCache {
 
     private ResourceRemovedListener listener;
 
     @Override
-    public int getCurrentSize() {
+    public long getCurrentSize() {
         return 0;
     }
 
     @Override
-    public int getMaxSize() {
+    public long getMaxSize() {
         return 0;
     }
 

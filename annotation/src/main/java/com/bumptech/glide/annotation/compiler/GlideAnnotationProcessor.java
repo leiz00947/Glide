@@ -74,6 +74,7 @@ public final class GlideAnnotationProcessor extends AbstractProcessor {
     private AppModuleProcessor appModuleProcessor;
     private boolean isGeneratedAppGlideModuleWritten;
     private ExtensionProcessor extensionProcessor;
+    private boolean isGeneratedAppGlideModulePending;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
@@ -82,7 +83,8 @@ public final class GlideAnnotationProcessor extends AbstractProcessor {
         IndexerGenerator indexerGenerator = new IndexerGenerator(processorUtil);
         libraryModuleProcessor = new LibraryModuleProcessor(processorUtil, indexerGenerator);
         appModuleProcessor = new AppModuleProcessor(processingEnvironment, processorUtil);
-        extensionProcessor = new ExtensionProcessor(processorUtil, indexerGenerator);
+        extensionProcessor =
+                new ExtensionProcessor(processingEnvironment, processorUtil, indexerGenerator);
     }
 
     @Override
@@ -114,6 +116,9 @@ public final class GlideAnnotationProcessor extends AbstractProcessor {
      */
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment env) {
+//    if (set.isEmpty() && !isGeneratedAppGlideModulePending) {
+//      return false;
+//    }
         processorUtil.process();
         boolean newModulesWritten = libraryModuleProcessor.processModules(set, env);
         boolean newExtensionWritten = extensionProcessor.processExtensions(set, env);
@@ -123,6 +128,7 @@ public final class GlideAnnotationProcessor extends AbstractProcessor {
             if (isGeneratedAppGlideModuleWritten) {
                 throw new IllegalStateException("Cannot process annotations after writing AppGlideModule");
             }
+            isGeneratedAppGlideModulePending = true;
             return true;
         }
 

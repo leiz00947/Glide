@@ -8,8 +8,6 @@ import com.bumptech.glide.util.LruCache;
 
 /**
  * An LRU in memory cache for {@link com.bumptech.glide.load.engine.Resource}s.
- * <p>
- * 基于LRU策略的{@link Resource}内存缓存
  */
 public class LruResourceCache extends LruCache<Key, Resource<?>> implements MemoryCache {
     private ResourceRemovedListener listener;
@@ -19,7 +17,7 @@ public class LruResourceCache extends LruCache<Key, Resource<?>> implements Memo
      *
      * @param size The maximum size in bytes the in memory cache can use.
      */
-    public LruResourceCache(int size) {
+    public LruResourceCache(long size) {
         super(size);
     }
 
@@ -35,9 +33,6 @@ public class LruResourceCache extends LruCache<Key, Resource<?>> implements Memo
         }
     }
 
-    /**
-     * @return 获取传参的字节大小数
-     */
     @Override
     protected int getSize(Resource<?> item) {
         return item.getSize();

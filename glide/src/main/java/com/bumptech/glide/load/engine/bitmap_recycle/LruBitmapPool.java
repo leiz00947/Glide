@@ -21,8 +21,6 @@ import java.util.Set;
  * {@link com.bumptech.glide.load.engine.bitmap_recycle.LruPoolStrategy} to bucket {@link Bitmap}s
  * and then uses an LRU eviction policy to evict {@link android.graphics.Bitmap}s from the least
  * recently used bucket in order to keep the pool below a given maximum size limit.
- * <p>
- * {@link BitmapPool}的实现类，使用{@link LruPoolStrategy}来存放{@link Bitmap}并用LRU策略来维持Pool大小
  */
 public class LruBitmapPool implements BitmapPool {
     private static final String TAG = "LruBitmapPool";
@@ -30,18 +28,18 @@ public class LruBitmapPool implements BitmapPool {
 
     private final LruPoolStrategy strategy;
     private final Set<Bitmap.Config> allowedConfigs;
-    private final int initialMaxSize;
+    private final long initialMaxSize;
     private final BitmapTracker tracker;
 
-    private int maxSize;
-    private int currentSize;
+    private long maxSize;
+    private long currentSize;
     private int hits;
     private int misses;
     private int puts;
     private int evictions;
 
     // Exposed for testing only.
-    LruBitmapPool(int maxSize, LruPoolStrategy strategy, Set<Bitmap.Config> allowedConfigs) {
+    LruBitmapPool(long maxSize, LruPoolStrategy strategy, Set<Bitmap.Config> allowedConfigs) {
         this.initialMaxSize = maxSize;
         this.maxSize = maxSize;
         this.strategy = strategy;
@@ -54,7 +52,7 @@ public class LruBitmapPool implements BitmapPool {
      *
      * @param maxSize The initial maximum size of the pool in bytes.
      */
-    public LruBitmapPool(int maxSize) {
+    public LruBitmapPool(long maxSize) {
         this(maxSize, getDefaultStrategy(), getDefaultAllowedConfigs());
     }
 
@@ -66,12 +64,12 @@ public class LruBitmapPool implements BitmapPool {
      *                       allowed to be put into the pool. Configs not in the allowed put will be
      *                       rejected.
      */
-    public LruBitmapPool(int maxSize, Set<Bitmap.Config> allowedConfigs) {
+    public LruBitmapPool(long maxSize, Set<Bitmap.Config> allowedConfigs) {
         this(maxSize, getDefaultStrategy(), allowedConfigs);
     }
 
     @Override
-    public int getMaxSize() {
+    public long getMaxSize() {
         return maxSize;
     }
 
@@ -128,9 +126,6 @@ public class LruBitmapPool implements BitmapPool {
             // Bitmaps in the pool contain random data that in some cases must be cleared for an image
             // to be rendered correctly. we shouldn't force all consumers to independently erase the
             // contents individually, so we do so here. See issue #131.
-            /**
-             * 将图片设置成透明的
-             */
             result.eraseColor(Color.TRANSPARENT);
         } else {
             result = Bitmap.createBitmap(width, height, config);
@@ -223,7 +218,7 @@ public class LruBitmapPool implements BitmapPool {
         }
     }
 
-    private synchronized void trimToSize(int size) {
+    private synchronized void trimToSize(long size) {
         while (currentSize > size) {
             final Bitmap removed = strategy.removeLast();
             // TODO: This shouldn't ever happen, see #331.
@@ -283,9 +278,6 @@ public class LruBitmapPool implements BitmapPool {
         return Collections.unmodifiableSet(configs);
     }
 
-    /**
-     * 可进行添加/移除{@link Bitmap}对象的接口
-     */
     private interface BitmapTracker {
         void add(Bitmap bitmap);
 

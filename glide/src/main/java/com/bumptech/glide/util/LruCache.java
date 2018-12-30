@@ -9,17 +9,15 @@ import java.util.Map;
  * A general purpose size limited cache that evicts items using an LRU algorithm. By default every
  * item is assumed to have a size of one. Subclasses can override {@link #getSize(Object)}} to
  * change the size on a per item basis.
- * <p>
- * 一般的使用LRU运算法则进行缓存大小限制
  *
  * @param <T> The type of the keys.
  * @param <Y> The type of the values.
  */
 public class LruCache<T, Y> {
     private final LinkedHashMap<T, Y> cache = new LinkedHashMap<>(100, 0.75f, true);
-    private final int initialMaxSize;
-    private int maxSize;
-    private int currentSize = 0;
+    private final long initialMaxSize;
+    private long maxSize;
+    private long currentSize = 0;
 
     /**
      * Constructor for LruCache.
@@ -27,7 +25,7 @@ public class LruCache<T, Y> {
      * @param size The maximum size of the cache, the units must match the units used in {@link
      *             #getSize(Object)}.
      */
-    public LruCache(int size) {
+    public LruCache(long size) {
         this.initialMaxSize = size;
         this.maxSize = size;
     }
@@ -51,8 +49,6 @@ public class LruCache<T, Y> {
      * Returns the size of a given item, defaulting to one. The units must match those used in the
      * size passed in to the constructor. Subclasses can override this method to return sizes in
      * various units, usually bytes.
-     * <p>
-     * 默认返回1，表示容量个数，而不是以字节数计算
      *
      * @param item The item to get the size of.
      */
@@ -80,14 +76,14 @@ public class LruCache<T, Y> {
     /**
      * Returns the current maximum size of the cache in bytes.
      */
-    public synchronized int getMaxSize() {
+    public synchronized long getMaxSize() {
         return maxSize;
     }
 
     /**
      * Returns the sum of the sizes of all items in the cache.
      */
-    public synchronized int getCurrentSize() {
+    public synchronized long getCurrentSize() {
         return currentSize;
     }
 
@@ -129,9 +125,6 @@ public class LruCache<T, Y> {
             return null;
         }
 
-        /**
-         * 返回与{@code key}关联的旧值
-         */
         final Y result = cache.put(key, item);
         if (item != null) {
             currentSize += getSize(item);
@@ -172,7 +165,7 @@ public class LruCache<T, Y> {
      *
      * @param size The size the cache should be less than.
      */
-    protected synchronized void trimToSize(int size) {
+    protected synchronized void trimToSize(long size) {
         Map.Entry<T, Y> last;
         while (currentSize > size) {
             last = cache.entrySet().iterator().next();

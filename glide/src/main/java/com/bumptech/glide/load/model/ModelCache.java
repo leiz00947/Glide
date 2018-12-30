@@ -12,16 +12,11 @@ import java.util.Queue;
  * some data for a given model, width and height. For a loader that takes a model and returns a url,
  * the cache could be used to safely memoize url creation based on the width and height of the
  * view.
- * <p>
- * 一个可以被{@link ModelLoader}和{@link ModelLoaderFactory}通过指定模型和宽高来缓存数据的简单缓存类
  *
  * @param <A> Some Model type that implements {@link #equals} and {@link #hashCode}.
  * @param <B> Some useful type that may be expensive to create (URL, file path, etc).
  */
 public class ModelCache<A, B> {
-    /**
-     * 默认的容量个数，而非字节数
-     */
     private static final int DEFAULT_SIZE = 250;
 
     private final LruCache<ModelKey<A>, B> cache;
@@ -30,10 +25,7 @@ public class ModelCache<A, B> {
         this(DEFAULT_SIZE);
     }
 
-    /**
-     * 当存放超过指定大小时，会存放到{@link ModelKey#KEY_QUEUE}中去
-     */
-    public ModelCache(int size) {
+    public ModelCache(long size) {
         cache = new LruCache<ModelKey<A>, B>(size) {
             @Override
             protected void onItemEvicted(ModelKey<A> key, B item) {
